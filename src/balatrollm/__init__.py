@@ -71,7 +71,7 @@ Examples:
     config_path = Path(args.config)
     if not config_path.exists():
         logger.error(f"LiteLLM config file not found: {config_path}")
-        logger.error(f"Please create the config file or start the proxy manually:")
+        logger.error("Please create the config file or start the proxy manually:")
         logger.error(f"  litellm --config {config_path}")
         sys.exit(1)
 
