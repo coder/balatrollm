@@ -1,4 +1,4 @@
-"""Balatrollm project."""
+"""BalatroLLM project."""
 
 import argparse
 import asyncio

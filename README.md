@@ -1,9 +1,14 @@
 <div align="center">
-
-# Balatrollm
-
-*Add your description here*
-
+  <h1>BalatroLLM</h1>
+  <p align="center">
+    <a href="https://github.com/S1M0N38/balatrollm/releases">
+      <img alt="GitHub release" src="https://img.shields.io/github/v/release/S1M0N38/balatrollm?include_prereleases&sort=semver&style=for-the-badge&logo=github"/>
+    </a>
+    <a href="https://discord.gg/TPn6FYgGPv">
+      <img alt="Discord" src="https://img.shields.io/badge/discord-server?style=for-the-badge&logo=discord&logoColor=%23FFFFFF&color=%235865F2"/>
+    </a>
+  </p>
+  <p><em>A Balatro bot powered by LLMs</em></p>
 </div>
 
 ---
