@@ -1,0 +1,87 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ruff:
+    name: Ruff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ruff Check
+        uses: astral-sh/ruff-action@v3
+        with:
+          version: latest
+
+      - name: Ruff Format
+        uses: astral-sh/ruff-action@v3
+        with:
+          version: latest
+          args: format --check
+
+  pyright:
+    name: Type Check
+    runs-on: ubuntu-latest
+    needs: ruff # Run after ruff
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install dependencies
+        run: |
+          uv venv
+          uv sync --dev
+
+      - name: Run pyright
+        run: |
+          source .venv/bin/activate
+          basedpyright
+
+  pytest:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: pyright # Run after pyright
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install dependencies
+        run: |
+          uv venv
+          # Ensure dev dependencies including pytest are installed
+          uv sync --dev
+
+      - name: Run pytest
+        run: |
+          source .venv/bin/activate
+          pytest

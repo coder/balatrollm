@@ -1,0 +1,20 @@
+# Example .envrc file for direnv
+# Copy this file to .envrc and fill in your actual values.
+
+# Load the virtual environment
+# source .venv/bin/activate
+
+# Example environment variables:
+# export MY_VARIABLE="some_value"
+# export ANOTHER_VARIABLE="another_value"
+
+# Python-specific variables
+export PYTHONUNBUFFERED="1"
+export PYTHONPATH="${PWD}/src:${PYTHONPATH}"
+
+# Example: Django settings module
+# export DJANGO_SETTINGS_MODULE="myproject.settings.local"
+
+# Example: Flask app
+# export FLASK_APP="myapp:create_app()"
+# export FLASK_ENV="development"

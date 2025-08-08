@@ -1,0 +1,59 @@
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Code Quality"]
+    types:
+      - completed
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+name: Release tag
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.MY_RELEASE_PLEASE_TOKEN }}
+          release-type: python
+
+      - uses: actions/checkout@v4
+        if: ${{ steps.release.outputs.release_created }}
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Install uv
+        if: ${{ steps.release.outputs.release_created }}
+        uses: astral-sh/setup-uv@v5
+
+      - name: Configure Git
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Update lock file
+        if: ${{ steps.release.outputs.release_created }}
+        run: uv lock
+
+      - name: Commit and push updated lock file
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          if [[ -n $(git status --porcelain uv.lock) ]]; then
+            git add uv.lock
+            git commit -m "chore(deps): update uv.lock for version ${{ steps.release.outputs.version }}"
+            git push
+          else
+            echo "No changes to uv.lock"
+          fi

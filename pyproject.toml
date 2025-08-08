@@ -1,0 +1,46 @@
+[project]
+name = "template-python"
+version = "0.2.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [{ name = "S1M0N38", email = "bertolottosimone@gmail.com" }]
+requires-python = ">=3.13"
+dependencies = []
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.13",
+]
+
+[project.urls]
+Homepage = "https://github.com/S1M0N38/template-python"
+Issues = "https://github.com/S1M0N38/template-python/issues"
+Repository = "https://github.com/S1M0N38/template-python"
+Changelog = "https://github.com/S1M0N38/template-python/blob/main/CHANGELOG.md"
+
+[project.scripts]
+template-python = "template_python:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+publish-url = "https://upload.pypi.org/legacy/"
+
+[tool.ruff]
+lint.extend-select = ["I"]
+lint.task-tags = ["FIX", "TODO", "HACK", "WARN", "PERF", "NOTE", "TEST"]
+
+[tool.pyright]
+typeCheckingMode = "basic"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+  "basedpyright>=1.31.1",
+  "pytest>=8.4.1",
+  "pytest-asyncio>=1.1.0",
+  "ruff>=0.12.8",
+]
