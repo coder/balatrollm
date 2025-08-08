@@ -1,0 +1,30 @@
+model_list:
+  # Cerebras Profile - High performance cloud inference
+  - model_name: cerebras-gpt-oss-120b
+    litellm_params:
+      model: cerebras/gpt-oss-120b
+      api_key: os.environ/CEREBRAS_API_KEY
+      api_base: https://api.cerebras.ai/v1
+      reasoning_effort: "medium"
+  - model_name: cerebras-gpt-oss-20b
+    litellm_params:
+      model: cerebras/gpt-oss-20b
+      api_key: os.environ/CEREBRAS_API_KEY
+      api_base: https://api.cerebras.ai/v1
+      reasoning_effort: "medium"
+  # Groq Profile - Fast inference with Qwen model
+  - model_name: groq-qwen3-32b
+    litellm_params:
+      model: groq/qwen/qwen3-32b
+      api_key: os.environ/GROQ_API_KEY
+      api_base: https://api.groq.com/openai/v1
+  # LM Studio Local - Local development and testing
+  - model_name: local-deepseek
+    litellm_params:
+      model: openai/deepseek-r1-0528-qwen3-8b
+      api_key: dummy-key
+      api_base: http://localhost:1234/v1
+general_settings:
+  master_key: sk-balatrollm-proxy-key
+  set_verbose: true
+
