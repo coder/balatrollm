@@ -1,0 +1,96 @@
+{
+  "BLIND_SELECT": [
+    {
+      "type": "function",
+      "function": {
+        "name": "skip_or_select_blind",
+        "description": "Select or skip the current blind",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "select",
+                "skip"
+              ],
+              "description": "Whether to select or skip the blind"
+            }
+          },
+          "required": [
+            "action"
+          ]
+        }
+      }
+    }
+  ],
+  "SELECTING_HAND": [
+    {
+      "type": "function",
+      "function": {
+        "name": "play_hand_or_discard",
+        "description": "Play cards as a poker hand or discard them",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "play_hand",
+                "discard"
+              ],
+              "description": "Whether to play cards or discard them"
+            },
+            "cards": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "List of 0-indexed card positions to play or discard"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "A quick reasoning for play or discard the cards"
+            }
+          },
+          "required": [
+            "action",
+            "cards",
+            "reasoning"
+          ]
+        }
+      }
+    }
+  ],
+  "SHOP": [
+    {
+      "type": "function",
+      "function": {
+        "name": "shop",
+        "description": "Perform an action in the shop",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "next_round",
+                "reroll",
+                "buy_card",
+                "redeem_voucher"
+              ],
+              "description": "The shop action to perform"
+            },
+            "index": {
+              "type": "integer",
+              "description": "0-indexed position in the relevant shop area (required for buy_card and redeem_voucher)"
+            }
+          },
+          "required": [
+            "action"
+          ]
+        }
+      }
+    }
+  ]
+}
