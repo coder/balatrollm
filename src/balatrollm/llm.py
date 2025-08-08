@@ -12,7 +12,7 @@ from balatrobot import BalatroClient
 from balatrobot.enums import State
 from jinja2 import Environment, FileSystemLoader
 from openai import AsyncOpenAI
-from openai.types.chat import ChatCompletion, ChatCompletionMessageToolCall
+from openai.types.chat import ChatCompletion
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -145,26 +145,30 @@ class LLMBot:
             self.responses.append(response)
 
             # Extract tool call
-            tool_calls = response.choices[0].message.tool_calls
-            if not tool_calls:
+            message = response.choices[0].message
+            if not hasattr(message, "tool_calls") or not message.tool_calls:
                 raise ValueError("No tool calls in LLM response")
 
-            tool_call = tool_calls[0]
-            logger.info(
-                f"LLM tool call: {tool_call.function.name} with args: {tool_call.function.arguments}"
-            )
+            tool_call = message.tool_calls[0]
+            function_obj = getattr(tool_call, "function", tool_call)
+            function_name = getattr(function_obj, "name", None)
+            if function_name is None:
+                raise ValueError("Invalid tool call: missing name")
+            function_args = getattr(function_obj, "arguments", None)
+            if function_args is None:
+                raise ValueError("Invalid tool call: missing arguments")
+            logger.info(f"LLM tool call: {function_name} with args: {function_args}")
             return tool_call
 
         except Exception as e:
             logger.error(f"LLM decision failed: {e}")
             raise
 
-    def execute_tool_call(
-        self, tool_call: ChatCompletionMessageToolCall
-    ) -> dict[str, Any]:
+    def execute_tool_call(self, tool_call: Any) -> dict[str, Any]:
         """Execute the action decided by the LLM."""
-        name = tool_call.function.name
-        arguments = json.loads(tool_call.function.arguments)
+        function = getattr(tool_call, "function", tool_call)
+        name = function.name
+        arguments = json.loads(function.arguments)
         return self.balatro_client.send_message(name, arguments)
 
     async def play_game(self) -> None:
