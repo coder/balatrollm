@@ -43,6 +43,7 @@ balatrollm --verbose
 ```
 
 ### Development Quality Commands
+
 ```bash
 # Run all quality checks
 make all
@@ -108,7 +109,7 @@ pytest tests/test_example.py
 ### Game Integration Flow
 
 1. **Initialization**: Validate LiteLLM proxy connection and model availability
-2. **Game Loop**: 
+2. **Game Loop**:
    - Get current game state from BalatroClient
    - Render game state using Jinja2 templates
    - Send context to LLM with state-specific tools
@@ -136,6 +137,7 @@ Environment variables required:
 - Automated release process with Release Please
 
 ### Project Structure
+
 ```
 src/balatrollm/
 ├── __init__.py             # CLI entry point and argument parsing
@@ -147,12 +149,14 @@ src/balatrollm/
 ```
 
 ### Template System Usage
+
 - Templates handle complex game state rendering for LLM context
 - System template contains extensive Balatro strategy documentation
 - Game state template dynamically formats current game information
 - Custom Jinja2 filter `from_json` for JSON parsing in templates
 
 ### Error Handling Patterns
+
 - Proxy connection validation before game start
 - Model availability checking with fallback suggestions
 - Graceful keyboard interrupt handling
@@ -163,6 +167,7 @@ src/balatrollm/
 When working with code that uses these dependencies, search their documentation using Context7 MCP server (`--c7` flag) with these library IDs:
 
 **Core Dependencies:**
+
 - **balatrobot**: `/s1m0n38/balatrobot`
 - **jinja2**: `/pallets/jinja`
 - **openai**: `/openai/openai-python`
@@ -170,6 +175,7 @@ When working with code that uses these dependencies, search their documentation 
 - **httpx**: `/encode/httpx`
 
 **Dev Dependencies:**
+
 - **basedpyright**: `/detachhead/basedpyright`
 - **pytest**: `/pytest-dev/pytest`
 - **pytest-asyncio**: `/pytest-dev/pytest-asyncio`
