@@ -20,7 +20,7 @@
           {
             "type": "command",
             "command": "ruff check --select I --fix . && ruff format -s ."
-          },
+          }
         ]
       }
     ]
