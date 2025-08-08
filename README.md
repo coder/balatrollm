@@ -12,25 +12,12 @@
 
 Add your project overview here.
 
-## Features
-
-**Development Tools**
-- **uv** – Lightning-fast Python package management
-- **Ruff** – Blazing fast Python linter and formatter  
-- **Pyright** – Static type checker for Python
-- **pytest** – Comprehensive testing framework
-
-**Automation**
-- **GitHub Actions** – Automated CI/CD pipeline
-- **Release Please** – Automated semantic versioning and releases
-- **PyPI Publishing** – Trusted publishing to PyPI
-
 ## Quick Start
 
 ### Prerequisites
 
-- Python 3.11+
 - [uv](https://docs.astral.sh/uv/) package manager
+- Balatro instance with [BalatroBot](https://github.com/S1M0N38/balatrobot) running.
 
 ### Setup
 
@@ -42,36 +29,25 @@ cd balatrollm
 # Create and activate environment
 uv sync --all-extras
 
+# Configure environment
+cp .envrc.example .envrc
+
 # Activate environment
-source .venv/bin/activate
+source .envrc
 ```
 
-### Development Commands
+### Usage
+
+1. Start the LiteLLM proxy (in a separate terminal)
 
 ```bash
-# Run tests
-pytest
-
-# Lint and format code
-ruff check
-ruff format
-
-# Type check
-pyright
-
-# Run the application
-python -m balatrollm
+litellm --config config/litellm.yaml
 ```
 
-## Project Structure
+2. Run the application
 
-```
-balatrollm/
-├── src/balatrollm/        # Main package source
-├── tests/                 # Test suite
-├── .github/workflows/     # CI/CD automation
-├── pyproject.toml        # Project configuration
-└── README.md             # This file
+```bash
+balatrollm
 ```
 
 ## Contributing
@@ -90,8 +66,6 @@ This project is licensed under the MIT License – see the [LICENSE](LICENSE) fi
 ---
 
 <div align="center">
-
-**Ready to build something amazing?**
 
 [Get Started](#quick-start) • [Contribute](CONTRIBUTING.md) • [Report Issues](https://github.com/S1M0N38/balatrollm/issues)
 
