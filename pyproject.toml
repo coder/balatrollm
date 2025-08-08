@@ -1,5 +1,5 @@
 [project]
-name = "template-python"
+name = "balatrollm"
 version = "0.2.0"
 description = "Add your description here"
 readme = "README.md"
@@ -12,13 +12,13 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/S1M0N38/template-python"
-Issues = "https://github.com/S1M0N38/template-python/issues"
-Repository = "https://github.com/S1M0N38/template-python"
-Changelog = "https://github.com/S1M0N38/template-python/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/S1M0N38/balatrollm"
+Issues = "https://github.com/S1M0N38/balatrollm/issues"
+Repository = "https://github.com/S1M0N38/balatrollm"
+Changelog = "https://github.com/S1M0N38/balatrollm/blob/main/CHANGELOG.md"
 
 [project.scripts]
-template-python = "template_python:main"
+balatrollm = "balatrollm:main"
 
 [build-system]
 requires = ["hatchling"]

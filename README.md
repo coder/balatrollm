@@ -1,8 +1,8 @@
 <div align="center">
 
-# Python Project Template
+# Balatrollm
 
-*A modern, minimal Python project template with automated tooling*
+*Add your description here*
 
 </div>
 
@@ -10,7 +10,7 @@
 
 ## Overview
 
-A carefully crafted Python project template that provides a solid foundation for your next Python project. Built with modern development practices in mind, featuring automated testing, linting, type checking, and seamless CI/CD integration.
+Add your project overview here.
 
 ## Features
 
@@ -35,13 +35,12 @@ A carefully crafted Python project template that provides a solid foundation for
 ### Setup
 
 ```bash
-# Clone the template
-git clone https://github.com/S1M0N38/template-python.git
-cd template-python
+# Clone the repository
+git clone https://github.com/S1M0N38/balatrollm.git
+cd balatrollm
 
 # Create and activate environment
-uv venv
-uv pip install -e ".[dev]"
+uv sync --all-extras
 
 # Activate environment
 source .venv/bin/activate
@@ -61,18 +60,18 @@ ruff format
 pyright
 
 # Run the application
-python -m template_python
+python -m balatrollm
 ```
 
 ## Project Structure
 
 ```
-template-python/
-├── src/template_python/    # Main package source
-├── tests/                  # Test suite
-├── .github/workflows/      # CI/CD automation
-├── pyproject.toml         # Project configuration
-└── README.md              # This file
+balatrollm/
+├── src/balatrollm/        # Main package source
+├── tests/                 # Test suite
+├── .github/workflows/     # CI/CD automation
+├── pyproject.toml        # Project configuration
+└── README.md             # This file
 ```
 
 ## Contributing
@@ -94,6 +93,6 @@ This project is licensed under the MIT License – see the [LICENSE](LICENSE) fi
 
 **Ready to build something amazing?**
 
-[Get Started](#quick-start) • [Contribute](CONTRIBUTING.md) • [Report Issues](https://github.com/S1M0N38/template-python/issues)
+[Get Started](#quick-start) • [Contribute](CONTRIBUTING.md) • [Report Issues](https://github.com/S1M0N38/balatrollm/issues)
 
 </div>
