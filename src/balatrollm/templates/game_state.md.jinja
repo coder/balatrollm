@@ -1,92 +1,54 @@
 # Game State
 
 ## Current Situation
-- **Game Phase**: {{ state_name }}
+- **Phase**: {{ state_name }}
 {% if game -%}
-- **Round**: {{ game.round }}
-- **Ante**: Level {{ (game.round + 2) // 3 }}
-{% endif %}
-
-{% if consumables and consumables.cards and (consumables.cards | length) > 0 %}
-### Consumables ({{ consumables.cards | length }})
-{% for c in consumables.cards -%}
-  - {{ loop.index0 }}: {{ c.label }} ({{ c.config.center_key }}) | Cost: {{ c.cost | default('N/A') }}
-{% endfor %}
-{% endif %}
-
-{% if game %}
-## Resources
-- **Money**: ${{ game.dollars }}
-- **Chips**: {{ game.chips }}
+- **Round**: {{ game.round }} | **Ante**: {{ (game.round + 2) // 3 }}
+- **Money**: ${{ game.dollars }}{% if game.dollars >= 25 %} ✓ (earning max interest){% elif game.dollars >= 5 %} (earning ${{ (game.dollars // 5) }} interest){% endif %}
 {% if game.current_round -%}
-- **Hands Remaining**: {{ game.current_round.hands_left | default(0) }}
-- **Discards Remaining**: {{ game.current_round.discards_left | default(0) }}
+- **Hands**: {{ game.current_round.hands_left | default(0) }} | **Discards**: {{ game.current_round.discards_left | default(0) }}
 {% endif -%}
-{% if game.skips > 0 -%}
-- **Skips Available**: {{ game.skips }}
 {% endif %}
 
-{% if game.blind_on_deck %}
+{% if game and game.blind_on_deck %}
 ## Current Challenge
 - **Blind**: {{ game.blind_on_deck }}
-{# Blind target values may not be provided in game_state #}
 {% endif %}
 
-## Game Constraints
-- **Hands Played This Run**: {{ game.hands_played }}
-{% if jokers and jokers.config and jokers.config.card_limit -%}
-- **Joker Slots**: {{ jokers.cards | length }}/{{ jokers.config.card_limit }}
-{% endif -%}
-{% if game.discount_percent > 0 -%}
-- **Shop Discount**: {{ game.discount_percent }}%
-{% endif -%}
-{% if game.bankrupt_at > 0 -%}
-- **Bankruptcy Threshold**: ${{ game.bankrupt_at }}
-{% endif %}
-{% endif %}
-
-## Player Assets
-
-### Hand
 {% if hand and hand.cards -%}
-{%- set value_map = {
-  "Ace": "A", "King": "K", "Queen": "Q", "Jack": "J", "10": "T",
-  "9": "9", "8": "8", "7": "7", "6": "6", "5": "5", "4": "4", "3": "3", "2": "2"
-} -%}
-{%- set suit_map = {"Spades": "s", "Hearts": "h", "Diamonds": "d", "Clubs": "c"} -%}
-  Cards:
+## Hand ({{ hand.cards | length }} cards)
+{%- set value_map = {"Ace": "A", "King": "K", "Queen": "Q", "Jack": "J", "10": "T", "9": "9", "8": "8", "7": "7", "6": "6", "5": "5", "4": "4", "3": "3", "2": "2"} -%}
+{%- set suit_map = {"Spades": "♠", "Hearts": "♥", "Diamonds": "♦", "Clubs": "♣"} -%}
 {% for card in hand.cards -%}
 {%- set card_config = card.config.card -%}
 {%- set short_value = value_map.get(card_config.value, "?") -%}
 {%- set short_suit = suit_map.get(card_config.suit, "?") -%}
-    {{ loop.index0 }}: {{ short_value }}{{ short_suit }} ({{ card_config.value }} of {{ card_config.suit }})
-{% endfor %}
-  Available Indices: {{ range(hand.cards | length) | list }}
+{{ loop.index0 }}: {{ short_value }}{{ short_suit }}{% if not loop.last %} | {% endif %}
+{%- endfor %}
 {% else -%}
-  No cards in hand
+## Hand
+Empty
 {% endif %}
 
 {% if jokers and jokers.cards %}
-### Jokers ({{ jokers.cards | length }})
+## Jokers ({{ jokers.cards | length }}{% if jokers.config and jokers.config.card_limit %}/{{ jokers.config.card_limit }}{% endif %})
 {% for joker in jokers.cards -%}
-  - **{{ joker.label | default('Joker ' ~ loop.index) }}** (key: {{ joker.config.center_key | default('unknown') }})
-    - Cost: {{ joker.cost | default('N/A') }} | Debuff: {{ joker.debuff | default(false) }}
+{{ loop.index0 }}: **{{ joker.label | default('Unknown Joker') }}**{% if joker.sell_cost %} (${{ joker.sell_cost }} sell){% endif %}{% if joker.debuff %} [DEBUFFED]{% endif %}
 {% endfor %}
 {% else %}
-### Jokers
-  No jokers
+## Jokers
+None
 {% endif %}
-{% if reasoning_history %}
 
-## Previous Plays
-
-{% for reasoning in reasoning_history[-3:] -%}
-{{ loop.index }}. {{ reasoning }}
+{% if consumables and consumables.cards and (consumables.cards | length) > 0 %}
+## Consumables ({{ consumables.cards | length }})
+{% for c in consumables.cards -%}
+{{ loop.index0 }}: {{ c.label }}{% if c.sell_cost %} (${{ c.sell_cost }} sell){% endif %}
 {% endfor %}
-{% elif responses %}
+{% endif %}
 
-## Previous Plays
-
+{% if responses and responses[-3:] %}
+## Recent Actions
 {% for response in responses[-3:] -%}
 {%- if response.choices and response.choices[0].message.tool_calls -%}
 {%- set tool_call = response.choices[0].message.tool_calls[0] -%}
@@ -99,71 +61,62 @@
 {% endfor %}
 {% endif %}
 
-## Decision Required
+## Available Actions
 
 {% if state_name == "BLIND_SELECT" -%}
-You need to decide whether to **select** or **skip** the current blind.
+**PRIMARY**: Use `skip_or_select_blind` to choose:
+- **select** (recommended): Play the blind to earn money and progress
+- **skip**: Only if blind is impossible or you desperately need a tag
 
-### Available Actions:
+**SECONDARY**: If needed for preparation:
+- `sell_joker` / `sell_consumable`: Generate money for crucial purchases
+- `use_consumable`: Strengthen your deck before the blind
 
-- **select**: Play against this blind to earn chips and money
-- **skip**: Skip this blind to get a tag reward but no chips
-
-### Strategy:
-
-- Consider your current hand strength and jokers
-- Evaluate if you can beat the blind's chip requirement
-- Skipping gives you a tag but no progress toward winning
 {% elif state_name == "SELECTING_HAND" -%}
-You need to decide whether to **play cards** to form a poker hand or **discard cards** to try for better combinations.
+**PRIMARY**: Use `play_hand_or_discard`:
+- **play**: Submit your best poker hand (select card indices)
+- **discard**: Improve weak hands (select cards to replace)
 
-### Available Actions:
+**SECONDARY**: 
+- `sell_joker` / `sell_consumable`: Generate emergency funds
+- `use_consumable`: Enhance cards or hand types strategically
 
-- **play_hand**: Play selected cards as a poker hand to score chips
-- **discard**: Discard selected cards to draw new ones (uses a discard)
-
-### Strategy:
-
-- Look for the strongest poker hand you can make
-- Consider remaining hands and discards
-- Balance between playing weak hands vs. using discards to improve
-- Remember: higher poker hands score more points
-
-### Card Selection:
-
-- Use 0-based indices from the "Available indices" list above
-- You can select 1-5 cards for either action
-- Example: [0, 2, 4] selects the 1st, 3rd, and 5th cards
 {% elif state_name == "SHOP" -%}
-You are in the shop and need to decide what to do.
-
-### Available Actions:
-
-- **next_round**: End shopping and proceed to next blind
-- **reroll**: Spend money to refresh shop items
-- **buy_card (index)**: Purchase a card from the shop_jokers area by 0-based index
-- **redeem_voucher (index)**: Redeem a voucher from the shop_vouchers area by 0-based index
-
-### Strategy:
-
-- Consider your current money and what you need
-- Jokers can provide powerful ongoing effects
-- Vouchers give permanent upgrades
-- Don't overspend - you need money for future rounds
-
-### Shop Items
+**PRIMARY**: Use `shop` with these actions:
+- **next_round**: Leave shop and proceed (do this when done shopping)
+- **buy_card**: Purchase jokers/consumables that synergize with your build
+- **reroll**: Refresh shop items (costs ${{ game.current_round.reroll_cost | default('5') }}, increases each time)
+- **redeem_voucher**: Buy permanent upgrades
 
 {% if shop_jokers and shop_jokers.cards and (shop_jokers.cards | length) > 0 -%}
-Jokers / Cards:
+### Shop Items
 {% for card in shop_jokers.cards -%}
-  - {{ loop.index0 }}: {{ card.label }} ({{ card.ability.set }}) — ${{ card.cost }}
+{{ loop.index0 }}: **{{ card.label }}** - ${{ card.cost }}
 {% endfor %}
 {% endif -%}
 
 {% if shop_vouchers and shop_vouchers.cards and (shop_vouchers.cards | length) > 0 -%}
-Vouchers:
+### Vouchers
 {% for card in shop_vouchers.cards -%}
-  - {{ loop.index0 }}: {{ card.label }} — ${{ card.cost }}
+{{ loop.index0 }}: **{{ card.label }}** - ${{ card.cost }}
 {% endfor %}
 {% endif -%}
+
+{% if shop_booster and shop_booster.cards and (shop_booster.cards | length) > 0 -%}
+### Boosters
+{% for card in shop_booster.cards -%}
+{{ loop.index0 }}: **{{ card.label }}** - ${{ card.cost }}
+{% endfor %}
+{% endif -%}
+
+**REMEMBER**: Only buy what clearly improves your strategy. Keep money for interest ($25+ ideal) and future rounds.
+
+{% elif state_name == "ROUND_EVAL" -%}
+**PRIMARY**: Use `cash_out` to proceed to shop
+
+**OPTIONAL**: Before cashing out:
+- `use_consumable`: Use Planet cards to upgrade hand types you just played successfully
+- `sell_joker` / `sell_consumable`: Generate money for the upcoming shop
 {% endif %}
+
+**Strategic Reminder**: Selling items gives approximately **half** their original cost. Avoid unnecessary buy/sell cycles that drain your money.
