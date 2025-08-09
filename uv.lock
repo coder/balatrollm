@@ -157,7 +157,7 @@ wheels = [
 [[package]]
 name = "balatrobot"
 version = "0.5.0"
-source = { git = "https://github.com/S1M0N38/balatrobot.git?rev=main#e18c7b741a1f69086b6ec6d9a1d0e90303661780" }
+source = { git = "https://github.com/S1M0N38/balatrobot.git?rev=main#d51139cb59d9c3c30f3b5bc934f37a4fb75390c2" }
 dependencies = [
     { name = "pydantic" },
 ]
@@ -272,7 +272,7 @@ wheels = [
 
 [[package]]
 name = "charset-normalizer"
-version = "3.4.2"
+version = "3.4.3"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e4/33/89c2ced2b67d1c2a61c19c6751aa8902d46ce3dacb23600a283619f5a12d/charset_normalizer-3.4.2.tar.gz", hash = "sha256:5baececa9ecba31eff645232d59845c07aa030f0c81ee70184a90d35099a0e63", size = 126367, upload-time = "2025-05-02T08:34:42.01Z" }
 wheels = [
@@ -680,7 +680,7 @@ wheels = [
 
 [[package]]
 name = "litellm"
-version = "1.75.2"
+version = "1.75.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -883,7 +883,7 @@ wheels = [
 
 [[package]]
 name = "nodejs-wheel-binaries"
-version = "22.16.0"
+version = "22.18.0"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/0f/c6/66f36b7b0d528660dfb4a59cb9b8dd6a3f4c0a3939cd49c404a775ea4a63/nodejs_wheel_binaries-22.16.0.tar.gz", hash = "sha256:d695832f026df3a0cf9a089d222225939de9d1b67f8f0a353b79f015aabbe7e2", size = 8061, upload-time = "2025-05-22T07:27:52.149Z" }
 wheels = [
@@ -908,7 +908,7 @@ wheels = [
 
 [[package]]
 name = "openai"
-version = "1.99.3"
+version = "1.99.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -1480,7 +1480,7 @@ wheels = [
 
 [[package]]
 name = "tiktoken"
-version = "0.10.0"
+version = "0.11.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "regex" },
