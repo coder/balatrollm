@@ -8,11 +8,12 @@ from pathlib import Path
 from typing import Any
 
 import httpx
-from balatrobot import BalatroClient
-from balatrobot.enums import State
 from jinja2 import Environment, FileSystemLoader
 from openai import AsyncOpenAI
 from openai.types.chat import ChatCompletion
+
+from balatrobot import BalatroClient
+from balatrobot.enums import State
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -147,6 +148,7 @@ class LLMBot:
             # Extract tool call
             message = response.choices[0].message
             if not hasattr(message, "tool_calls") or not message.tool_calls:
+                print(response.choices[0].message)
                 raise ValueError("No tool calls in LLM response")
 
             tool_call = message.tool_calls[0]
@@ -188,26 +190,20 @@ class LLMBot:
 
                 match current_state:
                     case State.BLIND_SELECT:
-                        # TODO: Enable LLM decision for blind selection
-                        # tool_call = await self.make_decision(game_state)
-                        game_state = self.balatro_client.send_message(
-                            "skip_or_select_blind", {"action": "select"}
-                        )
+                        tool_call = await self.get_tool_call(game_state)
+                        game_state = self.execute_tool_call(tool_call)
 
                     case State.SELECTING_HAND:
                         tool_call = await self.get_tool_call(game_state)
                         game_state = self.execute_tool_call(tool_call)
 
                     case State.ROUND_EVAL:
-                        logger.info("Cashing out")
-                        game_state = self.balatro_client.send_message("cash_out")
+                        tool_call = await self.get_tool_call(game_state)
+                        game_state = self.execute_tool_call(tool_call)
 
                     case State.SHOP:
-                        # TODO: Enable LLM decision for shop actions
-                        # tool_call = await self.make_decision(game_state)
-                        game_state = self.balatro_client.send_message(
-                            "shop", {"action": "next_round"}
-                        )
+                        tool_call = await self.get_tool_call(game_state)
+                        game_state = self.execute_tool_call(tool_call)
 
                     case State.GAME_OVER:
                         logger.info("Game over!")
