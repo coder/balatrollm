@@ -57,13 +57,7 @@ class TemplateManager:
         template = self.jinja_env.get_template("game_state.md.jinja")
         return template.render(
             state_name=state_name,
-            game=game_state.get("game"),
-            hand=game_state.get("hand"),
-            jokers=game_state.get("jokers"),
-            shop_jokers=game_state.get("shop_jokers"),
-            shop_vouchers=game_state.get("shop_vouchers"),
-            shop_booster=game_state.get("shop_booster"),
-            consumables=game_state.get("consumables"),
+            game_state=game_state,
             responses=responses,
         )
 
