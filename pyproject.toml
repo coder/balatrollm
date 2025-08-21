@@ -1,7 +1,7 @@
 [project]
 name = "balatrollm"
 version = "0.1.0"
-description = "Add your description here"
+description = "LLM-powered bot that plays Balatro using strategic decision making"
 readme = "README.md"
 authors = [{ name = "S1M0N38", email = "bertolottosimone@gmail.com" }]
 requires-python = ">=3.13"
@@ -54,5 +54,6 @@ dev = [
   "basedpyright>=1.31.1",
   "pytest>=8.4.1",
   "pytest-asyncio>=1.1.0",
+  "pytest-cov>=6.0.0",
   "ruff>=0.12.8",
 ]

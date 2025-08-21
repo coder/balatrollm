@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install install-dev lint lint-fix format typecheck quality clean all dev
+.PHONY: help install install-dev lint lint-fix format typecheck test test-cov quality clean start all dev
 
 # Colors for output
 YELLOW := \033[33m
@@ -49,7 +49,15 @@ typecheck: ## Run type checker
 	@echo "$(YELLOW)Running type checker...$(RESET)"
 	$(TYPECHECK)
 
-quality: lint format typecheck ## Run all code quality checks
+test: ## Run tests
+	@echo "$(YELLOW)Running tests...$(RESET)"
+	pytest
+
+test-cov: ## Run tests with coverage report
+	@echo "$(YELLOW)Running tests with coverage...$(RESET)"
+	pytest --cov=src/balatrollm --cov-report=term-missing --cov-report=html
+
+quality: lint format typecheck test ## Run all code quality checks
 	@echo "$(GREEN)✓ All quality checks completed$(RESET)"
 
 # Build targets
@@ -62,8 +70,19 @@ clean: ## Clean build artifacts and caches
 	find . -type f -name "*.pyc" -delete
 	@echo "$(GREEN)✓ Cleanup completed$(RESET)"
 
+# Game targetmaks
+start: ## Kill previous instances and start LiteLLM server + Balatro
+	@echo "$(YELLOW)Stopping all previous instances...$(RESET)"
+	@pkill -f litellm 2>/dev/null || true
+	@./balatro.sh --kill 2>/dev/null || true
+	@echo "$(YELLOW)Starting LiteLLM proxy server...$(RESET)"
+	@litellm --config config/litellm.yaml &
+	@sleep 3
+	@echo "$(YELLOW)Starting Balatro...$(RESET)"
+	@./balatro.sh
+
 # Convenience targets
-dev: format lint typecheck ## Quick development check
+dev: format lint typecheck test ## Quick development check
 	@echo "$(GREEN)✓ Development checks completed$(RESET)"
 
 all: format lint typecheck ## Complete quality check
