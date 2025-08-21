@@ -24,8 +24,8 @@ Examples:
 
     parser.add_argument(
         "--model",
-        default=os.getenv("LITELLM_MODEL", "cerebras-gpt-oss-120b"),
-        help="Model name to use from LiteLLM proxy (default: cerebras-gpt-oss-120b)",
+        default=os.getenv("LITELLM_MODEL", "cerebras-qwen3-235b"),
+        help="Model name to use from LiteLLM proxy (default: cerebras-qwen3-235b)",
     )
 
     parser.add_argument(
