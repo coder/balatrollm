@@ -6,7 +6,7 @@ import os
 import sys
 from pathlib import Path
 
-from .llm import LLMBot
+from .llm import Config, LLMBot, setup_logging
 
 
 def main() -> None:
@@ -61,10 +61,7 @@ Examples:
     # Configure logging
     import logging
 
-    level = logging.DEBUG if args.verbose else logging.INFO
-    logging.basicConfig(
-        level=level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
+    setup_logging(args.verbose)
     logger = logging.getLogger(__name__)
 
     # Check if config file exists
@@ -81,7 +78,13 @@ Examples:
 
 async def run_bot(args) -> None:
     """Run the Balatro bot with the given arguments."""
-    bot = LLMBot(model=args.model, proxy_url=args.proxy_url, api_key=args.api_key)
+    config = Config(
+        model=args.model,
+        proxy_url=args.proxy_url,
+        api_key=args.api_key,
+        template="system",  # Default template, could be made configurable
+    )
+    bot = LLMBot(config)
 
     # List models if requested
     if args.list_models:
