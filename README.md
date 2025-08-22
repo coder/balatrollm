@@ -15,7 +15,15 @@
 
 ## Overview
 
-Add your project overview here.
+BalatroLLM is a bot that uses Large Language Models (LLMs) to play [Balatro](https://www.playbalatro.com/), the popular roguelike poker deck-building game. The bot analyzes game states, makes strategic decisions, and executes actions through the [BalatroBot](https://github.com/S1M0N38/balatrobot) client.
+
+The system combines multiple components to make informed decisions:
+- **Strategy templates** (`STRATEGY.md.jinja`) - Define playing style and approach
+- **Game state analysis** (`GAMESTATE.md.jinja`) - Current game situation and available options
+- **Memory system** (`MEMORY.md.jinja`) - Historical context from previous decisions
+- **Action tools** (`TOOLS.json`) - Available game actions and their parameters
+
+These components are processed together in a single LLM call, enabling the bot to understand the current situation and choose the optimal action based on its configured strategy.
 
 ## Quick Start
 
@@ -43,17 +51,33 @@ source .envrc
 
 ### Usage
 
-1. Start the LiteLLM proxy (in a separate terminal)
+1. Start Balatro with BalatroBot
+
+```bash
+./balatro.sh
+```
+
+2. Start the LiteLLM proxy (in a separate terminal)
 
 ```bash
 litellm --config config/litellm.yaml
 ```
 
-2. Run the application
+3. Run the application
 
 ```bash
 balatrollm
 ```
+
+#### Alternative: Using the Makefile
+
+For convenience, you can use the Makefile to automatically start both LiteLLM and Balatro:
+
+```bash
+make start
+```
+
+This will kill any previous instances and start both services automatically.
 
 ## Contributing
 
@@ -71,7 +95,5 @@ This project is licensed under the MIT License – see the [LICENSE](LICENSE) fi
 ---
 
 <div align="center">
-
-[Get Started](#quick-start) • [Contribute](CONTRIBUTING.md) • [Report Issues](https://github.com/S1M0N38/balatrollm/issues)
-
+  [Get Started](#quick-start) • [Contribute](CONTRIBUTING.md) • [Report Issues](https://github.com/S1M0N38/balatrollm/issues)
 </div>
