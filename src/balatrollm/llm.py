@@ -41,25 +41,35 @@ class BalatroLLMError(Exception):
 class TemplateManager:
     """Lightweight helper for managing Jinja2 templates."""
 
-    def __init__(self, template_dir: Path):
-        self.jinja_env = Environment(loader=FileSystemLoader(template_dir))
+    def __init__(self, template_dir: Path, strategy: str):
+        self.strategy = strategy
+        self.strategy_dir = template_dir / strategy
+        self.jinja_env = Environment(loader=FileSystemLoader(self.strategy_dir))
         self.jinja_env.filters["from_json"] = json.loads
 
-    def render_system_prompt(self, template_name: str) -> str:
-        """Render the system prompt template."""
-        template = self.jinja_env.get_template(f"{template_name}.md.jinja")
+    def render_strategy(self) -> str:
+        """Render the strategy template."""
+        template = self.jinja_env.get_template("STRATEGY.md.jinja")
         return template.render()
 
-    def render_game_state(
-        self, state_name: str, game_state: Dict[str, Any], responses: List[Any]
-    ) -> str:
+    def render_gamestate(self, state_name: str, game_state: Dict[str, Any]) -> str:
         """Render the game state template."""
-        template = self.jinja_env.get_template("game_state.md.jinja")
+        template = self.jinja_env.get_template("GAMESTATE.md.jinja")
         return template.render(
             state_name=state_name,
             game_state=game_state,
-            responses=responses,
         )
+
+    def render_memory(self, responses: List[Any]) -> str:
+        """Render the memory template."""
+        template = self.jinja_env.get_template("MEMORY.md.jinja")
+        return template.render(responses=responses)
+
+    def load_tools(self) -> Dict[str, Any]:
+        """Load tools from the strategy-specific TOOLS.json file."""
+        tools_file = self.strategy_dir / "TOOLS.json"
+        with open(tools_file) as f:
+            return json.load(f)
 
 
 @dataclass
@@ -69,7 +79,7 @@ class Config:
     model: str
     proxy_url: str = "http://localhost:4000"
     api_key: str = "sk-balatrollm-proxy-key"
-    template: str = "system"
+    template: str = "default"
 
     @classmethod
     def from_environment(cls) -> "Config":
@@ -78,7 +88,7 @@ class Config:
             model=os.getenv("LITELLM_MODEL", "cerebras-gpt-oss-120b"),
             proxy_url=os.getenv("LITELLM_PROXY_URL", "http://localhost:4000"),
             api_key=os.getenv("LITELLM_API_KEY", "sk-balatrollm-proxy-key"),
-            template=os.getenv("BALATROLLM_TEMPLATE", "system"),
+            template=os.getenv("BALATROLLM_TEMPLATE", "default"),
         )
 
 
@@ -94,13 +104,11 @@ class LLMBot:
 
         # Set up template manager
         template_dir = Path(__file__).parent / "templates"
-        self.template_manager = TemplateManager(template_dir)
+        self.template_manager = TemplateManager(template_dir, config.template)
         self.responses: list[ChatCompletion] = []
 
-        # Load tools from JSON file
-        tools_file = Path(__file__).parent / "tools.json"
-        with open(tools_file) as f:
-            self.tools = json.load(f)
+        # Load tools from strategy-specific file
+        self.tools = self.template_manager.load_tools()
 
         # Get project version from pyproject.toml
         self.project_version = self._get_project_version()
@@ -252,18 +260,19 @@ class LLMBot:
 
         # Generate prompt with error handling
         try:
-            system_prompt = self.template_manager.render_system_prompt(
-                self.config.template
+            strategy_content = self.template_manager.render_strategy()
+            gamestate_content = self.template_manager.render_gamestate(
+                state_name, game_state
             )
-            user_prompt = self.template_manager.render_game_state(
-                state_name, game_state, self.responses
-            )
+            memory_content = self.template_manager.render_memory(self.responses)
         except Exception as e:
             logger.error(f"Template rendering failed: {e}")
             raise RuntimeError(f"Failed to generate prompts: {e}") from e
+
+        # Combine all content into user message
+        user_content = f"{strategy_content}\n\n{gamestate_content}\n\n{memory_content}"
         messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
+            {"role": "user", "content": user_content},
         ]
 
         # Select tools based on current state
