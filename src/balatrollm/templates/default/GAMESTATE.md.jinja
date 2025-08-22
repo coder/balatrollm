@@ -1,0 +1,108 @@
+# Game State
+
+## Current Situation
+- **Phase**: {{ state_name }}
+{% if game_state.game -%}
+- **Round**: {{ game_state.game.round }} | **Ante**: {{ (game_state.game.round + 2) // 3 }}
+- **Money**: ${{ game_state.game.dollars }}{% if game_state.game.dollars >= 25 %} ✓ (earning max interest){% elif game_state.game.dollars >= 5 %} (earning ${{ (game_state.game.dollars // 5) }} interest){% endif %}
+{% if game_state.game.current_round -%}
+- **Hands**: {{ game_state.game.current_round.hands_left | default(0) }} | **Discards**: {{ game_state.game.current_round.discards_left | default(0) }}
+{% endif -%}
+{% endif %}
+
+{% if game_state.game and game_state.game.blind_on_deck %}
+## Current Challenge
+- **Blind**: {{ game_state.game.blind_on_deck }}
+{% endif %}
+
+{% if game_state.hand and game_state.hand.cards -%}
+## Hand ({{ game_state.hand.cards | length }} cards)
+{%- set value_map = {"Ace": "A", "King": "K", "Queen": "Q", "Jack": "J", "10": "T", "9": "9", "8": "8", "7": "7", "6": "6", "5": "5", "4": "4", "3": "3", "2": "2"} -%}
+{%- set suit_map = {"Spades": "♠", "Hearts": "♥", "Diamonds": "♦", "Clubs": "♣"} -%}
+{% for card in game_state.hand.cards -%}
+{%- set card_config = card.config.card -%}
+{%- set short_value = value_map.get(card_config.value, "?") -%}
+{%- set short_suit = suit_map.get(card_config.suit, "?") -%}
+{{ loop.index0 }}: {{ short_value }}{{ short_suit }}{% if not loop.last %} | {% endif %}
+{%- endfor %}
+{% else -%}
+## Hand
+Empty
+{% endif %}
+
+{% if game_state.jokers and game_state.jokers.cards %}
+## Jokers ({{ game_state.jokers.cards | length }}{% if game_state.jokers.config and game_state.jokers.config.card_limit %}/{{ game_state.jokers.config.card_limit }}{% endif %})
+{% for joker in game_state.jokers.cards -%}
+{{ loop.index0 }}: **{{ joker.label | default('Unknown Joker') }}**{% if joker.sell_cost %} (${{ joker.sell_cost }} sell){% endif %}{% if joker.debuff %} [DEBUFFED]{% endif %}
+{% endfor %}
+{% else %}
+## Jokers
+None
+{% endif %}
+
+{% if game_state.consumables and game_state.consumables.cards and (game_state.consumables.cards | length) > 0 %}
+## Consumables ({{ game_state.consumables.cards | length }})
+{% for c in game_state.consumables.cards -%}
+{{ loop.index0 }}: {{ c.label }}{% if c.sell_cost %} (${{ c.sell_cost }} sell){% endif %}
+{% endfor %}
+{% endif %}
+
+## Available Actions
+
+{% if state_name == "BLIND_SELECT" -%}
+**PRIMARY**: Use `skip_or_select_blind` to choose:
+- **select** (recommended): Play the blind to earn money and progress
+- **skip**: Only if blind is impossible or you desperately need a tag
+
+**SECONDARY**: If needed for preparation:
+- `sell_joker` / `sell_consumable`: Generate money for crucial purchases
+- `use_consumable`: Strengthen your deck before the blind
+
+{% elif state_name == "SELECTING_HAND" -%}
+**PRIMARY**: Use `play_hand_or_discard`:
+- **play**: Submit your best poker hand (select card indices)
+- **discard**: Improve weak hands (select cards to replace)
+
+**SECONDARY**: 
+- `sell_joker` / `sell_consumable`: Generate emergency funds
+- `use_consumable`: Enhance cards or hand types strategically
+
+{% elif state_name == "SHOP" -%}
+**PRIMARY**: Use `shop` with these actions:
+- **next_round**: Leave shop and proceed (do this when done shopping)
+- **buy_card**: Purchase jokers/consumables that synergize with your build
+- **reroll**: Refresh shop items (costs ${{ game_state.game.current_round.reroll_cost | default('5') }}, increases each time)
+- **redeem_voucher**: Buy permanent upgrades
+
+{% if game_state.shop_jokers and game_state.shop_jokers.cards and (game_state.shop_jokers.cards | length) > 0 -%}
+### Shop Items
+{% for card in game_state.shop_jokers.cards -%}
+{{ loop.index0 }}: **{{ card.label }}** - ${{ card.cost }}
+{% endfor %}
+{% endif -%}
+
+{% if game_state.shop_vouchers and game_state.shop_vouchers.cards and (game_state.shop_vouchers.cards | length) > 0 -%}
+### Vouchers
+{% for card in game_state.shop_vouchers.cards -%}
+{{ loop.index0 }}: **{{ card.label }}** - ${{ card.cost }}
+{% endfor %}
+{% endif -%}
+
+{% if game_state.shop_booster and game_state.shop_booster.cards and (game_state.shop_booster.cards | length) > 0 -%}
+### Boosters
+{% for card in game_state.shop_booster.cards -%}
+{{ loop.index0 }}: **{{ card.label }}** - ${{ card.cost }}
+{% endfor %}
+{% endif -%}
+
+**REMEMBER**: Only buy what clearly improves your strategy. Keep money for interest ($25+ ideal) and future rounds.
+
+{% elif state_name == "ROUND_EVAL" -%}
+**PRIMARY**: Use `cash_out` to proceed to shop
+
+**OPTIONAL**: Before cashing out:
+- `use_consumable`: Use Planet cards to upgrade hand types you just played successfully
+- `sell_joker` / `sell_consumable`: Generate money for the upcoming shop
+{% endif %}
+
+**Strategic Reminder**: Selling items gives approximately **half** their original cost. Avoid unnecessary buy/sell cycles that drain your money.

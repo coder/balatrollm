@@ -1,0 +1,442 @@
+{
+  "BLIND_SELECT": [
+    {
+      "type": "function",
+      "function": {
+        "name": "skip_or_select_blind",
+        "description": "Select or skip the current blind",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "select",
+                "skip"
+              ],
+              "description": "Whether to select or skip the blind"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for selecting or skipping the blind"
+            }
+          },
+          "required": [
+            "action",
+            "reasoning"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "sell_joker",
+        "description": "Sell a joker from your collection for money",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "index": {
+              "type": "integer",
+              "description": "0-indexed position of the joker to sell"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Reasoning for selling this specific joker"
+            }
+          },
+          "required": [
+            "index",
+            "reasoning"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "sell_consumable",
+        "description": "Sell a consumable from your collection for money",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "index": {
+              "type": "integer",
+              "description": "0-indexed position of the consumable to sell"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Reasoning for selling this consumable"
+            }
+          },
+          "required": [
+            "index",
+            "reasoning"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "use_consumable",
+        "description": "Use a consumable card (Tarot, Planet, or Spectral)",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "index": {
+              "type": "integer",
+              "description": "0-indexed position of the consumable to use"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for using this consumable now"
+            }
+          },
+          "required": [
+            "index",
+            "reasoning"
+          ]
+        }
+      }
+    }
+  ],
+  "SELECTING_HAND": [
+    {
+      "type": "function",
+      "function": {
+        "name": "play_hand_or_discard",
+        "description": "Play cards as a poker hand or discard them",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "play_hand",
+                "discard"
+              ],
+              "description": "Whether to play cards or discard them"
+            },
+            "cards": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "List of 0-indexed card positions to play or discard"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "A quick reasoning for play or discard the cards"
+            }
+          },
+          "required": [
+            "action",
+            "cards",
+            "reasoning"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "rearrange_hand",
+        "description": "Reorder cards in your hand for better organization",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "cards": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "List of 0-indexed card positions in desired new order (must include all cards)"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Reasoning for this specific arrangement"
+            }
+          },
+          "required": [
+            "cards",
+            "reasoning"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "sell_joker",
+        "description": "Sell a joker from your collection for money",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "index": {
+              "type": "integer",
+              "description": "0-indexed position of the joker to sell"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Reasoning for selling this specific joker"
+            }
+          },
+          "required": [
+            "index",
+            "reasoning"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "sell_consumable",
+        "description": "Sell a consumable from your collection for money",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "index": {
+              "type": "integer",
+              "description": "0-indexed position of the consumable to sell"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Reasoning for selling this consumable"
+            }
+          },
+          "required": [
+            "index",
+            "reasoning"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "use_consumable",
+        "description": "Use a consumable card (Tarot, Planet, or Spectral)",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "index": {
+              "type": "integer",
+              "description": "0-indexed position of the consumable to use"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for using this consumable now"
+            }
+          },
+          "required": [
+            "index",
+            "reasoning"
+          ]
+        }
+      }
+    }
+  ],
+  "SHOP": [
+    {
+      "type": "function",
+      "function": {
+        "name": "shop",
+        "description": "Perform an action in the shop",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "next_round",
+                "reroll",
+                "buy_card",
+                "redeem_voucher"
+              ],
+              "description": "The shop action to perform"
+            },
+            "index": {
+              "type": "integer",
+              "description": "0-indexed position in the relevant shop area (required for buy_card and redeem_voucher)"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for this shop action"
+            }
+          },
+          "required": [
+            "action",
+            "reasoning"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "sell_joker",
+        "description": "Sell a joker from your collection for money",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "index": {
+              "type": "integer",
+              "description": "0-indexed position of the joker to sell"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Reasoning for selling this specific joker"
+            }
+          },
+          "required": [
+            "index",
+            "reasoning"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "sell_consumable",
+        "description": "Sell a consumable from your collection for money",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "index": {
+              "type": "integer",
+              "description": "0-indexed position of the consumable to sell"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Reasoning for selling this consumable"
+            }
+          },
+          "required": [
+            "index",
+            "reasoning"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "use_consumable",
+        "description": "Use a consumable card (Tarot, Planet, or Spectral)",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "index": {
+              "type": "integer",
+              "description": "0-indexed position of the consumable to use"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for using this consumable now"
+            }
+          },
+          "required": [
+            "index",
+            "reasoning"
+          ]
+        }
+      }
+    }
+  ],
+  "ROUND_EVAL": [
+    {
+      "type": "function",
+      "function": {
+        "name": "cash_out",
+        "description": "Proceed from round completion to the shop",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "reasoning": {
+              "type": "string",
+              "description": "Brief reflection on the round performance"
+            }
+          },
+          "required": [
+            "reasoning"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "sell_joker",
+        "description": "Sell a joker from your collection for money",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "index": {
+              "type": "integer",
+              "description": "0-indexed position of the joker to sell"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Reasoning for selling this specific joker"
+            }
+          },
+          "required": [
+            "index",
+            "reasoning"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "sell_consumable",
+        "description": "Sell a consumable from your collection for money",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "index": {
+              "type": "integer",
+              "description": "0-indexed position of the consumable to sell"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Reasoning for selling this consumable"
+            }
+          },
+          "required": [
+            "index",
+            "reasoning"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "use_consumable",
+        "description": "Use a consumable card (Tarot, Planet, or Spectral)",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "index": {
+              "type": "integer",
+              "description": "0-indexed position of the consumable to use"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for using this consumable now"
+            }
+          },
+          "required": [
+            "index",
+            "reasoning"
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -47,20 +47,6 @@ None
 {% endfor %}
 {% endif %}
 
-{% if responses and responses[-3:] %}
-## Recent Actions
-{% for response in responses[-3:] -%}
-{%- if response.choices and response.choices[0].message.tool_calls -%}
-{%- set tool_call = response.choices[0].message.tool_calls[0] -%}
-{%- set args_json = tool_call.function.arguments -%}
-{%- set args = args_json | from_json -%}
-{%- if args.reasoning -%}
-{{ loop.index }}. {{ args.reasoning }}
-{% endif -%}
-{%- endif -%}
-{% endfor %}
-{% endif %}
-
 ## Available Actions
 
 {% if state_name == "BLIND_SELECT" -%}

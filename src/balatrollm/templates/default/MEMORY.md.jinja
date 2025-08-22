@@ -1,0 +1,30 @@
+# Memory & Previous Actions
+
+{% if responses and responses[-5:] %}
+## Recent Decision History
+{% for response in responses[-5:] -%}
+{%- if response.choices and response.choices[0].message.tool_calls -%}
+{%- set tool_call = response.choices[0].message.tool_calls[0] -%}
+{%- set args_json = tool_call.function.arguments -%}
+{%- set args = args_json | from_json -%}
+{%- if args.reasoning -%}
+**{{ loop.index }}. {{ tool_call.function.name }}**: {{ args.reasoning }}
+{% endif -%}
+{%- endif -%}
+{% endfor %}
+
+## Strategic Context
+Based on your recent actions, consider:
+- How your decisions are building towards a cohesive strategy
+- Whether your current approach is working or needs adjustment
+- What patterns are emerging in your play style
+- How to optimize your next decision based on what you've learned
+
+{% else %}
+## Strategic Context
+This is the beginning of the game. Focus on:
+- Establishing a clear strategic direction
+- Making decisions that set up long-term synergies
+- Building a foundation for scaling in later rounds
+- Considering the overall arc of your run strategy
+{% endif %}
