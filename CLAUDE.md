@@ -73,7 +73,7 @@ Each strategy contains:
 - `LITELLM_MODEL` (default: cerebras-qwen3-235b)
 - `LITELLM_PROXY_URL` (default: http://localhost:4000)
 - `LITELLM_API_KEY` (default: sk-balatrollm-proxy-key)
-- `BALATROLLM_TEMPLATE` (default: system)
+- `BALATROLLM_TEMPLATE` (default: default)
 
 ## Code Quality
 

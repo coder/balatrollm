@@ -82,7 +82,7 @@ async def run_bot(args) -> None:
         model=args.model,
         proxy_url=args.proxy_url,
         api_key=args.api_key,
-        template="system",  # Default template, could be made configurable
+        template="default",  # Default template, could be made configurable
     )
     bot = LLMBot(config)
 

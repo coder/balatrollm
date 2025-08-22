@@ -17,7 +17,7 @@ class TestConfig:
         assert config.model == "test-model"
         assert config.proxy_url == "http://localhost:4000"
         assert config.api_key == "sk-balatrollm-proxy-key"
-        assert config.template == "system"
+        assert config.template == "default"
 
     def test_config_from_environment(self):
         """Test config creation from environment variables."""
@@ -43,7 +43,7 @@ class TestConfig:
             assert config.model == "cerebras-gpt-oss-120b"
             assert config.proxy_url == "http://localhost:4000"
             assert config.api_key == "sk-balatrollm-proxy-key"
-            assert config.template == "system"
+            assert config.template == "default"
 
 
 class TestLLMBot:
@@ -87,7 +87,7 @@ class TestLLMBot:
 
             assert "v1.0.0" in str(path)
             assert "test-model" in str(path)
-            assert "system" in str(path)
+            assert "default" in str(path)
             assert "RedDeck" in str(path)
             assert "s1" in str(path)
             assert "TEST123" in str(path)
