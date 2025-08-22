@@ -58,7 +58,7 @@ Each strategy contains:
 
 **Key Dependencies**: balatrobot, litellm, openai, jinja2, httpx
 
-**Game Flow**: 
+**Game Flow**:
 1. Validate proxy connection and model availability
 2. Game loop: Get state → Render templates → Send to LLM → Parse response → Execute action
 3. Handle different states: BLIND_SELECT, SELECTING_HAND, SHOP, ROUND_EVAL
