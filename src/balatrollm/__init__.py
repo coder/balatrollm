@@ -11,6 +11,7 @@ from pathlib import Path
 
 from .bot import LLMBot, setup_logging
 from .config import Config
+from .benchmark import run_benchmark_analysis
 
 
 def main() -> None:
@@ -19,8 +20,14 @@ def main() -> None:
     args = parser.parse_args()
 
     _setup_logging(args.verbose)
-    _validate_config_file(args.config)
 
+    # Handle benchmark command
+    if args.command == "benchmark":
+        _run_benchmark_command(args)
+        return
+
+    # Only validate config file for game commands
+    _validate_config_file(args.litellm_config)
     asyncio.run(run_bot(args))
 
 
@@ -38,9 +45,14 @@ Examples:
   balatrollm --strategy ../custom-strategies/experimental
   balatrollm --list-models
   balatrollm --from-config runs/v0.2.0/cerebras-qwen3-235b/default/20250824_145835_RedDeck_s1_OOOO155/config.json
+  balatrollm benchmark --runs-dir runs --output-dir benchmark_results
         """,
     )
 
+    # Add subcommands
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    # Default command (play game) - no subcommand needed, just use main parser
     parser.add_argument(
         "--model",
         default=os.getenv("LITELLM_MODEL", "cerebras-qwen3-235b"),
@@ -62,7 +74,7 @@ Examples:
         help="List available models from the proxy and exit",
     )
     parser.add_argument(
-        "--config",
+        "--litellm-config",
         default="config/litellm.yaml",
         help="Path to LiteLLM configuration file (default: config/litellm.yaml)",
     )
@@ -79,12 +91,43 @@ Examples:
         help="Load configuration from a previous run's config.json file",
     )
 
+    # Benchmark subcommand
+    benchmark_parser = subparsers.add_parser(
+        "benchmark",
+        help="Analyze runs and generate leaderboards",
+        description="Analyze BalatroLLM runs and generate comprehensive leaderboards",
+    )
+    benchmark_parser.add_argument(
+        "--runs-dir",
+        type=Path,
+        default=Path("runs"),
+        help="Directory containing run data (default: runs)",
+    )
+    benchmark_parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=Path("benchmark_results"),
+        help="Output directory for benchmark results (default: benchmark_results)",
+    )
+
     return parser
 
 
 def _setup_logging(verbose: bool) -> None:
     """Configure application logging."""
     setup_logging(verbose)
+
+
+def _run_benchmark_command(args) -> None:
+    """Run the benchmark analysis command."""
+    try:
+        run_benchmark_analysis(args.runs_dir, args.output_dir)
+    except FileNotFoundError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Benchmark analysis failed: {e}")
+        sys.exit(1)
 
 
 def _validate_config_file(config_path: str) -> None:
@@ -126,7 +169,7 @@ async def _list_models(bot: LLMBot, args) -> None:
 
     if not await bot.validate_proxy_connection():
         print(f"❌ Cannot connect to LiteLLM proxy at {bot.config.base_url}")
-        print(f"Please start the proxy with: litellm --config {args.config}")
+        print(f"Please start the proxy with: litellm --config {args.litellm_config}")
         sys.exit(1)
 
     models = await bot.list_available_models()
@@ -145,7 +188,7 @@ async def _start_game(bot: LLMBot, args) -> None:
     # Validate connections
     if not await bot.validate_proxy_connection():
         print(f"❌ Cannot connect to LiteLLM proxy at {bot.config.base_url}")
-        print(f"Please start the proxy with: litellm --config {args.config}")
+        print(f"Please start the proxy with: litellm --config {args.litellm_config}")
         sys.exit(1)
 
     if not await bot.validate_model_exists():
