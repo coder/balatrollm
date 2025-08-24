@@ -16,9 +16,9 @@ class TestConfig:
         """Test basic config creation."""
         config = Config(model="test-model")
         assert config.model == "test-model"
-        assert config.proxy_url == "http://localhost:4000"
+        assert config.base_url == "http://localhost:4000"
         assert config.api_key == "sk-balatrollm-proxy-key"
-        assert config.template == "default"
+        assert config.strategy == "default"
 
     def test_config_from_environment(self):
         """Test config creation from environment variables."""
@@ -26,25 +26,25 @@ class TestConfig:
             os.environ,
             {
                 "LITELLM_MODEL": "env-model",
-                "LITELLM_PROXY_URL": "http://env:5000",
+                "LITELLM_BASE_URL": "http://env:5000",
                 "LITELLM_API_KEY": "env-key",
-                "BALATROLLM_TEMPLATE": "aggressive",
+                "BALATROLLM_STRATEGY": "aggressive",
             },
         ):
             config = Config.from_environment()
             assert config.model == "env-model"
-            assert config.proxy_url == "http://env:5000"
+            assert config.base_url == "http://env:5000"
             assert config.api_key == "env-key"
-            assert config.template == "aggressive"
+            assert config.strategy == "aggressive"
 
     def test_config_from_environment_defaults(self):
         """Test config uses defaults when environment variables not set."""
         with patch.dict(os.environ, {}, clear=True):
             config = Config.from_environment()
             assert config.model == "cerebras-gpt-oss-120b"
-            assert config.proxy_url == "http://localhost:4000"
+            assert config.base_url == "http://localhost:4000"
             assert config.api_key == "sk-balatrollm-proxy-key"
-            assert config.template == "default"
+            assert config.strategy == "default"
 
 
 class TestLLMBot:
@@ -77,7 +77,7 @@ class TestLLMBot:
 
             assert bot.config == config
             mock_openai.assert_called_once_with(
-                api_key=config.api_key, base_url=f"{config.proxy_url}/v1"
+                api_key=config.api_key, base_url=f"{config.base_url}/v1"
             )
             mock_client.assert_called_once()
 
@@ -90,7 +90,7 @@ class TestLLMBot:
             stake=1,
             seed="TEST123",
             model="test-model",
-            template="default",
+            strategy="default",
             project_version="1.0.0",
         )
 
