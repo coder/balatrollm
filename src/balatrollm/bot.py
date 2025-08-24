@@ -293,6 +293,12 @@ class LLMBot:
             "challenge": challenge,
             "started_at": datetime.now().isoformat(),
             "balatrollm_version": self.project_version,
+            # Community metadata fields with defaults
+            "name": "Unknown Name",
+            "description": "Unknown Description",
+            "author": "BalatroBench",
+            "version": self.project_version,
+            "tags": [],
         }
 
         self.data_collector = RunDataCollector(run_dir=run_dir, run_config=run_config)

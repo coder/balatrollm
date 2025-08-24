@@ -607,149 +607,196 @@ class BenchmarkAnalyzer:
     def generate_leaderboard(
         self, output_dir: Path = Path("benchmark_results")
     ) -> None:
-        """Generate leaderboard and detailed analysis files."""
+        """Generate leaderboard and detailed analysis files organized by version/strategy."""
         print("Generating leaderboard...")
 
         output_dir.mkdir(exist_ok=True)
 
-        # Sort by performance score
-        sorted_metrics = sorted(
+        # Group metrics by version and strategy
+        version_strategy_groups = defaultdict(lambda: defaultdict(list))
+        for metrics in self.aggregated_metrics.values():
+            version_strategy_groups[metrics.version][metrics.strategy].append(metrics)
+
+        # Process each version
+        for version, strategy_groups in version_strategy_groups.items():
+            version_dir = output_dir / f"v{version}"
+            version_dir.mkdir(exist_ok=True)
+
+            # Process each strategy within the version
+            for strategy, metrics_list in strategy_groups.items():
+                strategy_dir = version_dir / strategy
+                strategy_dir.mkdir(exist_ok=True)
+
+                # Sort metrics within this strategy by performance score
+                sorted_metrics = sorted(
+                    metrics_list,
+                    key=lambda x: x.performance_score,
+                    reverse=True,
+                )
+
+                # Generate strategy-specific leaderboard entries
+                leaderboard_entries = []
+                for rank, metrics in enumerate(sorted_metrics, 1):
+                    entry = LeaderboardEntry(
+                        rank=rank,
+                        version=metrics.version,
+                        model=metrics.model,
+                        strategy=metrics.strategy,
+                        performance_score=metrics.performance_score,
+                        win_rate=metrics.win_rate,
+                        avg_final_ante=metrics.avg_final_ante,
+                        avg_duration_seconds=metrics.avg_duration_seconds,
+                        total_runs=metrics.total_runs,
+                        completion_rate=metrics.completion_rate,
+                        efficiency_rating=self._get_efficiency_rating(metrics),
+                    )
+                    leaderboard_entries.append(entry)
+
+                # Write strategy-specific leaderboard.json
+                leaderboard_data = {
+                    "generated_at": datetime.now().isoformat(),
+                    "version": version,
+                    "strategy": strategy,
+                    "total_entries": len(leaderboard_entries),
+                    "total_runs_analyzed": sum(m.total_runs for m in metrics_list),
+                    "entries": [
+                        {
+                            "rank": entry.rank,
+                            "model": entry.model,
+                            "performance_score": round(entry.performance_score, 2),
+                            "win_rate": round(entry.win_rate, 3),
+                            "avg_final_ante": round(entry.avg_final_ante, 2),
+                            "avg_duration_seconds": round(
+                                entry.avg_duration_seconds, 1
+                            ),
+                            "total_runs": entry.total_runs,
+                            "completion_rate": round(entry.completion_rate, 3),
+                            "efficiency_rating": entry.efficiency_rating,
+                        }
+                        for entry in leaderboard_entries
+                    ],
+                }
+
+                leaderboard_file = strategy_dir / "leaderboard.json"
+                with open(leaderboard_file, "w") as f:
+                    json.dump(leaderboard_data, f, indent=2)
+
+                # Write individual model files within the strategy directory
+                for metrics in sorted_metrics:
+                    model_filename = metrics.model.replace("/", "-") + ".json"
+                    model_file = strategy_dir / model_filename
+
+                    model_data = {
+                        "version": metrics.version,
+                        "model": metrics.model,
+                        "strategy": metrics.strategy,
+                        "name": metrics.runs[0].raw_config.get("name", "Unknown Name"),
+                        "description": metrics.runs[0].raw_config.get(
+                            "description", "Unknown Description"
+                        ),
+                        "author": metrics.runs[0].raw_config.get(
+                            "author", "BalatroBench"
+                        ),
+                        "tags": metrics.runs[0].raw_config.get("tags", []),
+                        "summary": {
+                            "performance_score": round(metrics.performance_score, 2),
+                            "efficiency_rating": self._get_efficiency_rating(metrics),
+                            "total_runs": metrics.total_runs,
+                            "completed_runs": metrics.completed_runs,
+                            "completion_rate": round(metrics.completion_rate, 3),
+                        },
+                        "performance_metrics": {
+                            "win_rate": round(metrics.win_rate, 3),
+                            "avg_final_ante": round(metrics.avg_final_ante, 2),
+                            "avg_final_money": round(metrics.avg_final_money, 1),
+                            "avg_peak_money": round(metrics.avg_peak_money, 1),
+                            "avg_duration_seconds": round(
+                                metrics.avg_duration_seconds, 1
+                            ),
+                        },
+                        "llm_metrics": {
+                            "avg_success_rate": round(metrics.avg_success_rate, 3),
+                            "avg_response_time": round(metrics.avg_response_time, 3),
+                            "avg_total_tokens": round(metrics.avg_total_tokens, 1),
+                            "avg_tokens_per_request": round(
+                                metrics.avg_tokens_per_request, 1
+                            ),
+                            "avg_parsing_error_rate": round(
+                                metrics.avg_parsing_error_rate, 3
+                            ),
+                            "avg_timeout_error_rate": round(
+                                metrics.avg_timeout_error_rate, 3
+                            ),
+                        },
+                        "consistency_metrics": {
+                            "std_final_ante": round(metrics.std_final_ante, 2),
+                            "std_final_money": round(metrics.std_final_money, 1),
+                            "std_duration": round(metrics.std_duration, 1),
+                        },
+                        "efficiency_metrics": {
+                            "tokens_per_ante": round(metrics.tokens_per_ante, 1),
+                            "seconds_per_ante": round(metrics.seconds_per_ante, 1),
+                            "money_efficiency": round(metrics.money_efficiency, 4),
+                        },
+                        "strategy_metrics": {
+                            "avg_shop_purchases": round(metrics.avg_shop_purchases, 1),
+                            "avg_jokers_acquired": round(
+                                metrics.avg_jokers_acquired, 1
+                            ),
+                            "avg_consumables_used": round(
+                                metrics.avg_consumables_used, 1
+                            ),
+                            "avg_blinds_skipped": round(metrics.avg_blinds_skipped, 1),
+                        },
+                        "individual_runs": [
+                            {
+                                "seed": run.seed,
+                                "deck": run.deck,
+                                "stake": run.stake,
+                                "completed": run.completed,
+                                "won": run.won,
+                                "final_ante": run.final_ante,
+                                "final_money": run.final_money,
+                                "peak_money": run.peak_money,
+                                "duration_seconds": run.duration_seconds,
+                                "total_tokens": run.total_tokens,
+                                "success_rate": round(run.success_rate, 3),
+                                "parsing_errors": run.parsing_errors,
+                                "timeout_errors": run.timeout_errors,
+                            }
+                            for run in metrics.runs
+                        ],
+                    }
+
+                    with open(model_file, "w") as f:
+                        json.dump(model_data, f, indent=2)
+
+                print(f"Generated strategy leaderboard: {leaderboard_file}")
+
+        # Generate global summary statistics
+        total_entries = len(self.aggregated_metrics)
+        total_runs = len(self.run_metrics)
+
+        print(
+            f"Generated benchmark results with {total_entries} model/strategy combinations"
+        )
+        print(f"Total runs analyzed: {total_runs}")
+        print(f"Results organized by version/strategy in: {output_dir}/")
+
+        # Print top performers across all strategies for immediate feedback
+        all_sorted_metrics = sorted(
             self.aggregated_metrics.values(),
             key=lambda x: x.performance_score,
             reverse=True,
         )
 
-        # Generate leaderboard entries
-        leaderboard_entries = []
-        for rank, metrics in enumerate(sorted_metrics, 1):
-            entry = LeaderboardEntry(
-                rank=rank,
-                version=metrics.version,
-                model=metrics.model,
-                strategy=metrics.strategy,
-                performance_score=metrics.performance_score,
-                win_rate=metrics.win_rate,
-                avg_final_ante=metrics.avg_final_ante,
-                avg_duration_seconds=metrics.avg_duration_seconds,
-                total_runs=metrics.total_runs,
-                completion_rate=metrics.completion_rate,
-                efficiency_rating=self._get_efficiency_rating(metrics),
-            )
-            leaderboard_entries.append(entry)
-
-        # Write leaderboard.json
-        leaderboard_data = {
-            "generated_at": datetime.now().isoformat(),
-            "total_entries": len(leaderboard_entries),
-            "total_runs_analyzed": len(self.run_metrics),
-            "entries": [
-                {
-                    "rank": entry.rank,
-                    "version": entry.version,
-                    "model": entry.model,
-                    "strategy": entry.strategy,
-                    "performance_score": round(entry.performance_score, 2),
-                    "win_rate": round(entry.win_rate, 3),
-                    "avg_final_ante": round(entry.avg_final_ante, 2),
-                    "avg_duration_seconds": round(entry.avg_duration_seconds, 1),
-                    "total_runs": entry.total_runs,
-                    "completion_rate": round(entry.completion_rate, 3),
-                    "efficiency_rating": entry.efficiency_rating,
-                }
-                for entry in leaderboard_entries
-            ],
-        }
-
-        leaderboard_file = output_dir / "leaderboard.json"
-        with open(leaderboard_file, "w") as f:
-            json.dump(leaderboard_data, f, indent=2)
-
-        # Write detailed files for each entry
-        for metrics in sorted_metrics:
-            entry_name = (
-                f"{metrics.version}_{metrics.model}_{metrics.strategy}".replace(
-                    "/", "-"
-                )
-            )
-            entry_file = output_dir / f"{entry_name}.json"
-
-            entry_data = {
-                "version": metrics.version,
-                "model": metrics.model,
-                "strategy": metrics.strategy,
-                "summary": {
-                    "performance_score": round(metrics.performance_score, 2),
-                    "efficiency_rating": self._get_efficiency_rating(metrics),
-                    "total_runs": metrics.total_runs,
-                    "completed_runs": metrics.completed_runs,
-                    "completion_rate": round(metrics.completion_rate, 3),
-                },
-                "performance_metrics": {
-                    "win_rate": round(metrics.win_rate, 3),
-                    "avg_final_ante": round(metrics.avg_final_ante, 2),
-                    "avg_final_money": round(metrics.avg_final_money, 1),
-                    "avg_peak_money": round(metrics.avg_peak_money, 1),
-                    "avg_duration_seconds": round(metrics.avg_duration_seconds, 1),
-                },
-                "llm_metrics": {
-                    "avg_success_rate": round(metrics.avg_success_rate, 3),
-                    "avg_response_time": round(metrics.avg_response_time, 3),
-                    "avg_total_tokens": round(metrics.avg_total_tokens, 1),
-                    "avg_tokens_per_request": round(metrics.avg_tokens_per_request, 1),
-                    "avg_parsing_error_rate": round(metrics.avg_parsing_error_rate, 3),
-                    "avg_timeout_error_rate": round(metrics.avg_timeout_error_rate, 3),
-                },
-                "consistency_metrics": {
-                    "std_final_ante": round(metrics.std_final_ante, 2),
-                    "std_final_money": round(metrics.std_final_money, 1),
-                    "std_duration": round(metrics.std_duration, 1),
-                },
-                "efficiency_metrics": {
-                    "tokens_per_ante": round(metrics.tokens_per_ante, 1),
-                    "seconds_per_ante": round(metrics.seconds_per_ante, 1),
-                    "money_efficiency": round(metrics.money_efficiency, 4),
-                },
-                "strategy_metrics": {
-                    "avg_shop_purchases": round(metrics.avg_shop_purchases, 1),
-                    "avg_jokers_acquired": round(metrics.avg_jokers_acquired, 1),
-                    "avg_consumables_used": round(metrics.avg_consumables_used, 1),
-                    "avg_blinds_skipped": round(metrics.avg_blinds_skipped, 1),
-                },
-                "individual_runs": [
-                    {
-                        "seed": run.seed,
-                        "deck": run.deck,
-                        "stake": run.stake,
-                        "completed": run.completed,
-                        "won": run.won,
-                        "final_ante": run.final_ante,
-                        "final_money": run.final_money,
-                        "peak_money": run.peak_money,
-                        "duration_seconds": run.duration_seconds,
-                        "total_tokens": run.total_tokens,
-                        "success_rate": round(run.success_rate, 3),
-                        "parsing_errors": run.parsing_errors,
-                        "timeout_errors": run.timeout_errors,
-                    }
-                    for run in metrics.runs
-                ],
-            }
-
-            with open(entry_file, "w") as f:
-                json.dump(entry_data, f, indent=2)
-
-        print(f"Generated leaderboard with {len(leaderboard_entries)} entries")
-        print(f"Results saved to {output_dir}/")
-        print(f"Leaderboard: {leaderboard_file}")
-
-        # Print top 5 for immediate feedback
-        print("\nTop 5 Performers:")
-        for i, entry in enumerate(leaderboard_entries[:5]):
+        print("\nTop 5 Performers Overall:")
+        for i, metrics in enumerate(all_sorted_metrics[:5]):
             print(
-                f"{entry.rank}. {entry.model} ({entry.strategy}) - "
-                f"Score: {entry.performance_score:.1f}, "
-                f"Win Rate: {entry.win_rate:.1%}, "
-                f"Avg Ante: {entry.avg_final_ante:.1f}"
+                f"{i + 1}. {metrics.model} ({metrics.strategy}, v{metrics.version}) - "
+                f"Score: {metrics.performance_score:.1f}, "
+                f"Win Rate: {metrics.win_rate:.1%}, "
+                f"Avg Ante: {metrics.avg_final_ante:.1f}"
             )
 
 
@@ -766,4 +813,3 @@ def run_benchmark_analysis(
     analyzer.generate_leaderboard(output_dir)
 
     print("\nBenchmark analysis complete!")
-

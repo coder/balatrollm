@@ -4,14 +4,13 @@ __version__ = "0.2.0"
 
 import argparse
 import asyncio
-import json
 import os
 import sys
 from pathlib import Path
 
+from .benchmark import run_benchmark_analysis
 from .bot import LLMBot, setup_logging
 from .config import Config
-from .benchmark import run_benchmark_analysis
 
 
 def main() -> None:

@@ -31,10 +31,10 @@ class Config:
         config_file = Path(config_path)
         if not config_file.exists():
             raise FileNotFoundError(f"Config file not found: {config_file}")
-        
+
         with config_file.open() as f:
             config_data = json.load(f)
-        
+
         # Map the config.json fields to Config fields
         # config.json uses 'base_url' and 'strategy' (updated field names)
         return cls(

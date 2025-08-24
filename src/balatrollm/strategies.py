@@ -12,12 +12,12 @@ class StrategyManager:
 
     def __init__(self, strategy_path: Path | str):
         """Initialize StrategyManager with a strategy path.
-        
+
         Args:
             strategy_path: Path to strategy directory (can be absolute or relative)
         """
         self.strategy_path = Path(strategy_path)
-        
+
         # Resolve to absolute path
         if not self.strategy_path.is_absolute():
             # If relative path, check if it's a known strategy name
@@ -27,17 +27,21 @@ class StrategyManager:
             else:
                 # Resolve relative to current working directory
                 self.strategy_path = self.strategy_path.resolve()
-        
+
         if not self.strategy_path.exists():
-            raise FileNotFoundError(f"Strategy directory not found: {self.strategy_path}")
-        
+            raise FileNotFoundError(
+                f"Strategy directory not found: {self.strategy_path}"
+            )
+
         if not self.strategy_path.is_dir():
-            raise NotADirectoryError(f"Strategy path is not a directory: {self.strategy_path}")
-        
+            raise NotADirectoryError(
+                f"Strategy path is not a directory: {self.strategy_path}"
+            )
+
         # Extract strategy name from path for logging/identification
         self.strategy = self.strategy_path.name
         self.strategy_dir = self.strategy_path
-        
+
         self.jinja_env = Environment(loader=FileSystemLoader(self.strategy_dir))
         self.jinja_env.filters["from_json"] = json.loads
 
