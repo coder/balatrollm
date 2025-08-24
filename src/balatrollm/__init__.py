@@ -1,16 +1,30 @@
 """BalatroLLM project."""
 
+__version__ = "0.2.0"
+
 import argparse
 import asyncio
 import os
 import sys
 from pathlib import Path
 
-from .llm import Config, LLMBot, setup_logging
+from .bot import LLMBot, setup_logging
+from .config import Config
 
 
 def main() -> None:
     """Main CLI entry point for balatrollm."""
+    parser = _create_argument_parser()
+    args = parser.parse_args()
+
+    _setup_logging(args.verbose)
+    _validate_config_file(args.config)
+
+    asyncio.run(run_bot(args))
+
+
+def _create_argument_parser() -> argparse.ArgumentParser:
+    """Create and configure argument parser."""
     parser = argparse.ArgumentParser(
         description="LLM-powered Balatro bot using LiteLLM proxy",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -27,53 +41,54 @@ Examples:
         default=os.getenv("LITELLM_MODEL", "cerebras-qwen3-235b"),
         help="Model name to use from LiteLLM proxy (default: cerebras-qwen3-235b)",
     )
-
     parser.add_argument(
         "--proxy-url",
         default=os.getenv("LITELLM_PROXY_URL", "http://localhost:4000"),
         help="LiteLLM proxy URL (default: http://localhost:4000)",
     )
-
     parser.add_argument(
         "--api-key",
         default=os.getenv("LITELLM_API_KEY", "sk-balatrollm-proxy-key"),
         help="LiteLLM proxy API key (default: sk-balatrollm-proxy-key)",
     )
-
     parser.add_argument(
         "--list-models",
         action="store_true",
         help="List available models from the proxy and exit",
     )
-
     parser.add_argument(
         "--config",
         default="config/litellm.yaml",
         help="Path to LiteLLM configuration file (default: config/litellm.yaml)",
     )
-
+    parser.add_argument(
+        "--template",
+        default=os.getenv("BALATROLLM_TEMPLATE", "default"),
+        help="Strategy template to use (default: default)",
+    )
     parser.add_argument(
         "--verbose", "-v", action="store_true", help="Enable verbose logging"
     )
 
-    args = parser.parse_args()
+    return parser
 
-    # Configure logging
+
+def _setup_logging(verbose: bool) -> None:
+    """Configure application logging."""
+    setup_logging(verbose)
+
+
+def _validate_config_file(config_path: str) -> None:
+    """Validate LiteLLM config file exists."""
     import logging
 
-    setup_logging(args.verbose)
-    logger = logging.getLogger(__name__)
-
-    # Check if config file exists
-    config_path = Path(args.config)
-    if not config_path.exists():
-        logger.error(f"LiteLLM config file not found: {config_path}")
+    config_file = Path(config_path)
+    if not config_file.exists():
+        logger = logging.getLogger(__name__)
+        logger.error(f"LiteLLM config file not found: {config_file}")
         logger.error("Please create the config file or start the proxy manually:")
-        logger.error(f"  litellm --config {config_path}")
+        logger.error(f"  litellm --config {config_file}")
         sys.exit(1)
-
-    # Create and run the bot
-    asyncio.run(run_bot(args))
 
 
 async def run_bot(args) -> None:
@@ -82,30 +97,40 @@ async def run_bot(args) -> None:
         model=args.model,
         proxy_url=args.proxy_url,
         api_key=args.api_key,
-        template="default",  # Default template, could be made configurable
+        template=args.template,
     )
-    bot = LLMBot(config)
+    bot = LLMBot(config, verbose=args.verbose)
 
-    # List models if requested
     if args.list_models:
-        print("Checking available models from LiteLLM proxy...")
-        if not await bot.validate_proxy_connection():
-            print(f"❌ Cannot connect to LiteLLM proxy at {args.proxy_url}")
-            print(f"Please start the proxy with: litellm --config {args.config}")
-            sys.exit(1)
-
-        models = await bot.list_available_models()
-        if models:
-            print("✅ Available models:")
-            for model in models:
-                print(f"  - {model}")
-        else:
-            print("❌ No models available or failed to retrieve models")
+        await _list_models(bot, args)
         return
 
-    # Validate proxy connection and model before starting game
+    await _start_game(bot, args)
+
+
+async def _list_models(bot: LLMBot, args) -> None:
+    """List available models and exit."""
+    print("Checking available models from LiteLLM proxy...")
+
+    if not await bot.validate_proxy_connection():
+        print(f"❌ Cannot connect to LiteLLM proxy at {args.proxy_url}")
+        print(f"Please start the proxy with: litellm --config {args.config}")
+        sys.exit(1)
+
+    models = await bot.list_available_models()
+    if models:
+        print("✅ Available models:")
+        for model in models:
+            print(f"  - {model}")
+    else:
+        print("❌ No models available or failed to retrieve models")
+
+
+async def _start_game(bot: LLMBot, args) -> None:
+    """Start the game after validation."""
     print(f"🤖 Starting Balatro LLM Bot with model: {args.model}")
 
+    # Validate connections
     if not await bot.validate_proxy_connection():
         print(f"❌ Cannot connect to LiteLLM proxy at {args.proxy_url}")
         print(f"Please start the proxy with: litellm --config {args.config}")
