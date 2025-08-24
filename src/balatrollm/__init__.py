@@ -4,6 +4,7 @@ __version__ = "0.2.0"
 
 import argparse
 import asyncio
+import json
 import os
 import sys
 from pathlib import Path
@@ -31,8 +32,12 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         epilog="""
 Examples:
   balatrollm --model cerebras-gpt-oss-120b
-  balatrollm --model groq-qwen32b --proxy-url http://localhost:4000
+  balatrollm --model groq-qwen32b --base-url http://localhost:4000
+  balatrollm --strategy aggressive
+  balatrollm --strategy /path/to/my/custom/strategy
+  balatrollm --strategy ../custom-strategies/experimental
   balatrollm --list-models
+  balatrollm --from-config runs/v0.2.0/cerebras-qwen3-235b/default/20250824_145835_RedDeck_s1_OOOO155/config.json
         """,
     )
 
@@ -42,9 +47,9 @@ Examples:
         help="Model name to use from LiteLLM proxy (default: cerebras-qwen3-235b)",
     )
     parser.add_argument(
-        "--proxy-url",
-        default=os.getenv("LITELLM_PROXY_URL", "http://localhost:4000"),
-        help="LiteLLM proxy URL (default: http://localhost:4000)",
+        "--base-url",
+        default=os.getenv("LITELLM_BASE_URL", "http://localhost:4000"),
+        help="LiteLLM base URL (default: http://localhost:4000)",
     )
     parser.add_argument(
         "--api-key",
@@ -62,12 +67,16 @@ Examples:
         help="Path to LiteLLM configuration file (default: config/litellm.yaml)",
     )
     parser.add_argument(
-        "--template",
-        default=os.getenv("BALATROLLM_TEMPLATE", "default"),
-        help="Strategy template to use (default: default)",
+        "--strategy",
+        default=os.getenv("BALATROLLM_STRATEGY", "default"),
+        help="Strategy to use. Can be a built-in strategy name (default, aggressive) or a path to a strategy directory (default: default)",
     )
     parser.add_argument(
         "--verbose", "-v", action="store_true", help="Enable verbose logging"
+    )
+    parser.add_argument(
+        "--from-config",
+        help="Load configuration from a previous run's config.json file",
     )
 
     return parser
@@ -93,12 +102,15 @@ def _validate_config_file(config_path: str) -> None:
 
 async def run_bot(args) -> None:
     """Run the Balatro bot with the given arguments."""
-    config = Config(
-        model=args.model,
-        proxy_url=args.proxy_url,
-        api_key=args.api_key,
-        template=args.template,
-    )
+    if args.from_config:
+        config = Config.from_config_file(args.from_config)
+    else:
+        config = Config(
+            model=args.model,
+            base_url=args.base_url,
+            api_key=args.api_key,
+            strategy=args.strategy,
+        )
     bot = LLMBot(config, verbose=args.verbose)
 
     if args.list_models:
@@ -113,7 +125,7 @@ async def _list_models(bot: LLMBot, args) -> None:
     print("Checking available models from LiteLLM proxy...")
 
     if not await bot.validate_proxy_connection():
-        print(f"❌ Cannot connect to LiteLLM proxy at {args.proxy_url}")
+        print(f"❌ Cannot connect to LiteLLM proxy at {args.base_url}")
         print(f"Please start the proxy with: litellm --config {args.config}")
         sys.exit(1)
 
@@ -132,7 +144,7 @@ async def _start_game(bot: LLMBot, args) -> None:
 
     # Validate connections
     if not await bot.validate_proxy_connection():
-        print(f"❌ Cannot connect to LiteLLM proxy at {args.proxy_url}")
+        print(f"❌ Cannot connect to LiteLLM proxy at {args.base_url}")
         print(f"Please start the proxy with: litellm --config {args.config}")
         sys.exit(1)
 
