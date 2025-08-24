@@ -42,11 +42,18 @@ make start         # Kill previous instances and start LiteLLM + Balatro
 
 ## Architecture
 
-**LLMBot (`src/balatrollm/llm.py`)**: Main bot with Config dataclass, TemplateManager integration, LLM decision-making, response history tracking, and BalatroClient integration.
+**LLMBot (`src/balatrollm/bot.py`)**: Main bot class with Config integration, TemplateManager, LLM decision-making, response history tracking, BalatroClient integration, proxy validation, model validation, and project version management.
 
-**CLI Entry Point (`src/balatrollm/__init__.py`)**: Command-line interface with argument parsing, environment variable support, proxy validation, and async game execution.
+**CLI Entry Point (`src/balatrollm/__init__.py`)**: Command-line interface with argument parsing, environment variable support, configuration validation, and async game execution.
 
-**Template System (`src/balatrollm/templates/`)**: Strategy-based organization:
+**Configuration (`src/balatrollm/config.py`)**: Config dataclass handling model settings, proxy URLs, bot parameters, and environment variable loading.
+
+**Template System (`src/balatrollm/templates.py`)**: TemplateManager class for Jinja2-based strategy templates and tool loading.
+
+**Data Collection (`src/balatrollm/data_collection.py`)**: RunDataCollector for game execution logging, performance tracking, and run data organization.
+
+
+**Template Strategies (`src/balatrollm/templates/`)**: Strategy-based organization:
 - `default/`: Conservative strategy (financial discipline)
 - `aggressive/`: High-risk, high-reward strategy
 
@@ -83,8 +90,11 @@ Uses Ruff (linting/formatting), basedpyright (type checking), pytest (testing), 
 
 ```
 src/balatrollm/
-├── __init__.py                    # CLI entry point
-├── llm.py                         # Core LLMBot with Config and TemplateManager
+├── __init__.py                    # CLI entry point with argument parsing
+├── bot.py                         # Main LLMBot class with game logic
+├── config.py                      # Configuration dataclass
+├── templates.py                   # TemplateManager for Jinja2 templates
+├── data_collection.py             # RunDataCollector for game logging
 └── templates/                     # Strategy-based templates
     ├── default/                   # Conservative strategy
     └── aggressive/                # High-risk strategy
