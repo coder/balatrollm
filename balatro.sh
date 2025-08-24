@@ -6,6 +6,7 @@ declare -a INSTANCE_PIDS=()
 declare -a FAILED_PORTS=()
 HEADLESS=false
 FAST=false
+AUDIO=false
 FORCE_KILL=true
 KILL_ONLY=false
 STATUS_ONLY=false
@@ -38,6 +39,7 @@ Options:
                    Default: 12346 if no port specified
   --headless       Enable headless mode (sets BALATROBOT_HEADLESS=1)
   --fast           Enable fast mode (sets BALATROBOT_FAST=1)
+  --audio          Enable audio (disabled by default, sets BALATROBOT_AUDIO=1)
   --kill           Kill all running Balatro instances and exit
   --status         Show information about running Balatro instances
   -h, --help       Show this help message
@@ -47,6 +49,7 @@ Examples:
   $0 -p 12347                   # Start single instance on port 12347
   $0 -p 12346 -p 12347          # Start two instances on ports 12346 and 12347
   $0 --headless --fast          # Start with headless and fast mode on default port
+  $0 --audio                    # Start with audio enabled on default port
   $0 --kill                     # Kill all running Balatro instances
   $0 --status                   # Show running instances
 
@@ -75,6 +78,10 @@ parse_arguments() {
 			;;
 		--fast)
 			FAST=true
+			shift
+			;;
+		--audio)
+			AUDIO=true
 			shift
 			;;
 		--kill)
@@ -241,6 +248,9 @@ start_balatro_instance() {
 	fi
 	if [[ "$FAST" == "true" ]]; then
 		export BALATROBOT_FAST=1
+	fi
+	if [[ "$AUDIO" == "true" ]]; then
+		export BALATROBOT_AUDIO=1
 	fi
 
 	# Set up platform-specific Balatro configuration
