@@ -14,7 +14,7 @@ def generate_run_directory(
     stake: int,
     seed: str,
     model: str,
-    template: str,
+    strategy: str,
     project_version: str,
     challenge: Optional[str] = None,
     base_dir: Optional[Path] = None,
@@ -35,7 +35,7 @@ def generate_run_directory(
     parts.append(seed)
 
     run_dir_name = "_".join(parts)
-    return base_dir / f"v{project_version}" / model_clean / template / run_dir_name
+    return base_dir / f"v{project_version}" / model_clean / strategy / run_dir_name
 
 
 def _clean_name(name: str, chars_to_replace: str = " -", replacement: str = "") -> str:

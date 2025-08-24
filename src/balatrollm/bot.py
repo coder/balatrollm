@@ -17,7 +17,7 @@ from balatrobot.enums import State
 from . import __version__
 from .config import Config
 from .data_collection import RunDataCollector, generate_run_directory
-from .templates import TemplateManager
+from .strategies import StrategyManager
 
 logger = logging.getLogger(__name__)
 
@@ -35,17 +35,16 @@ class LLMBot:
         self.config = config
         self.verbose = verbose
         self.llm_client = AsyncOpenAI(
-            api_key=config.api_key, base_url=f"{config.proxy_url}/v1"
+            api_key=config.api_key, base_url=f"{config.base_url}/v1"
         )
         self.balatro_client = BalatroClient()
 
-        # Set up template manager
-        template_dir = Path(__file__).parent / "templates"
-        self.template_manager = TemplateManager(template_dir, config.template)
+        # Set up strategy manager
+        self.strategy_manager = StrategyManager(config.strategy)
         self.responses: list[ChatCompletion] = []
 
         # Load tools from strategy-specific file
-        self.tools = self.template_manager.load_tools()
+        self.tools = self.strategy_manager.load_tools()
 
         # Get project version
         self.project_version = __version__
@@ -66,11 +65,11 @@ class LLMBot:
             headers = {"Authorization": f"Bearer {self.config.api_key}"}
             async with httpx.AsyncClient() as client:
                 response = await client.get(
-                    f"{self.config.proxy_url}/health", timeout=5.0, headers=headers
+                    f"{self.config.base_url}/health", timeout=5.0, headers=headers
                 )
 
             if response.status_code == 200:
-                logger.info(f"LiteLLM proxy is running at {self.config.proxy_url}")
+                logger.info(f"LiteLLM proxy is running at {self.config.base_url}")
                 return True
 
             logger.error(f"LiteLLM proxy health check failed: {response.status_code}")
@@ -78,7 +77,7 @@ class LLMBot:
 
         except httpx.RequestError as e:
             logger.error(
-                f"Failed to connect to LiteLLM proxy at {self.config.proxy_url}: {e}"
+                f"Failed to connect to LiteLLM proxy at {self.config.base_url}: {e}"
             )
             return False
 
@@ -133,9 +132,9 @@ class LLMBot:
         """Generate combined prompt content from templates."""
         return "\n\n".join(
             [
-                self.template_manager.render_strategy(),
-                self.template_manager.render_gamestate(state_name, game_state),
-                self.template_manager.render_memory(self.responses),
+                self.strategy_manager.render_strategy(),
+                self.strategy_manager.render_gamestate(state_name, game_state),
+                self.strategy_manager.render_memory(self.responses),
             ]
         )
 
@@ -276,7 +275,7 @@ class LLMBot:
             stake=stake,
             seed=seed,
             model=self.config.model,
-            template=self.config.template,
+            strategy=self.config.strategy,
             project_version=self.project_version,
             challenge=challenge,
         )
@@ -285,9 +284,9 @@ class LLMBot:
         # Create data collector with run configuration
         run_config = {
             "model": self.config.model,
-            "proxy_url": self.config.proxy_url,
+            "base_url": self.config.base_url,
             "api_key": self.config.api_key,
-            "template": self.config.template,
+            "strategy": self.config.strategy,
             "deck": deck,
             "stake": stake,
             "seed": seed,
