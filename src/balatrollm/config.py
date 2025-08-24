@@ -36,11 +36,10 @@ class Config:
             config_data = json.load(f)
         
         # Map the config.json fields to Config fields
-        # config.json uses 'proxy_url' while Config uses 'base_url'
-        # config.json uses 'template' while Config uses 'strategy'
+        # config.json uses 'base_url' and 'strategy' (updated field names)
         return cls(
             model=config_data["model"],
-            base_url=config_data["proxy_url"],
+            base_url=config_data["base_url"],
             api_key=config_data["api_key"],
-            strategy=config_data["template"],
+            strategy=config_data["strategy"],
         )

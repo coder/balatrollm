@@ -125,7 +125,7 @@ async def _list_models(bot: LLMBot, args) -> None:
     print("Checking available models from LiteLLM proxy...")
 
     if not await bot.validate_proxy_connection():
-        print(f"❌ Cannot connect to LiteLLM proxy at {args.base_url}")
+        print(f"❌ Cannot connect to LiteLLM proxy at {bot.config.base_url}")
         print(f"Please start the proxy with: litellm --config {args.config}")
         sys.exit(1)
 
@@ -140,16 +140,16 @@ async def _list_models(bot: LLMBot, args) -> None:
 
 async def _start_game(bot: LLMBot, args) -> None:
     """Start the game after validation."""
-    print(f"🤖 Starting Balatro LLM Bot with model: {args.model}")
+    print(f"🤖 Starting Balatro LLM Bot with model: {bot.config.model}")
 
     # Validate connections
     if not await bot.validate_proxy_connection():
-        print(f"❌ Cannot connect to LiteLLM proxy at {args.base_url}")
+        print(f"❌ Cannot connect to LiteLLM proxy at {bot.config.base_url}")
         print(f"Please start the proxy with: litellm --config {args.config}")
         sys.exit(1)
 
     if not await bot.validate_model_exists():
-        print(f"❌ Model '{args.model}' not available")
+        print(f"❌ Model '{bot.config.model}' not available")
         print("Use --list-models to see available models")
         sys.exit(1)
 
