@@ -24,10 +24,12 @@ litellm --config config/litellm.yaml
 ```bash
 balatrollm                                        # Default settings (cerebras-qwen3-235b)
 balatrollm --model groq-qwen3-32b                 # Specific model
-balatrollm --template aggressive                  # Specific strategy
+balatrollm --strategy aggressive                 # Built-in strategy
+balatrollm --strategy /path/to/custom/strategy     # External strategy directory
+balatrollm --strategy ../my-strategies/experimental # Relative path to strategy
 balatrollm --list-models                          # List available models
 balatrollm --verbose                              # Enable verbose logging
-balatrollm --proxy-url http://localhost:4000 --api-key your-key
+balatrollm --base-url http://localhost:4000 --api-key your-key
 ```
 
 ### Development
@@ -42,18 +44,18 @@ make start         # Kill previous instances and start LiteLLM + Balatro
 
 ## Architecture
 
-**LLMBot (`src/balatrollm/bot.py`)**: Main bot class with Config integration, TemplateManager, LLM decision-making, response history tracking, BalatroClient integration, proxy validation, model validation, and project version management.
+**LLMBot (`src/balatrollm/bot.py`)**: Main bot class with Config integration, StrategyManager, LLM decision-making, response history tracking, BalatroClient integration, proxy validation, model validation, and project version management.
 
 **CLI Entry Point (`src/balatrollm/__init__.py`)**: Command-line interface with argument parsing, environment variable support, configuration validation, and async game execution.
 
 **Configuration (`src/balatrollm/config.py`)**: Config dataclass handling model settings, proxy URLs, bot parameters, and environment variable loading.
 
-**Template System (`src/balatrollm/templates.py`)**: TemplateManager class for Jinja2-based strategy templates and tool loading.
+**Strategy System (`src/balatrollm/strategies.py`)**: StrategyManager class for Jinja2-based strategy templates and tool loading.
 
 **Data Collection (`src/balatrollm/data_collection.py`)**: RunDataCollector for game execution logging, performance tracking, and run data organization.
 
 
-**Template Strategies (`src/balatrollm/templates/`)**: Strategy-based organization:
+**Strategies (`src/balatrollm/strategies/`)**: Strategy-based organization:
 - `default/`: Conservative strategy (financial discipline)
 - `aggressive/`: High-risk, high-reward strategy
 
@@ -67,7 +69,7 @@ Each strategy contains:
 
 **Game Flow**:
 1. Validate proxy connection and model availability
-2. Game loop: Get state → Render templates → Send to LLM → Parse response → Execute action
+2. Game loop: Get state → Render strategy templates → Send to LLM → Parse response → Execute action
 3. Handle different states: BLIND_SELECT, SELECTING_HAND, SHOP, ROUND_EVAL
 
 **Available Models** (`config/litellm.yaml`):
@@ -78,9 +80,9 @@ Each strategy contains:
 **Environment Variables**:
 - `CEREBRAS_API_KEY`, `GROQ_API_KEY`
 - `LITELLM_MODEL` (default: cerebras-qwen3-235b)
-- `LITELLM_PROXY_URL` (default: http://localhost:4000)
+- `LITELLM_BASE_URL` (default: http://localhost:4000)
 - `LITELLM_API_KEY` (default: sk-balatrollm-proxy-key)
-- `BALATROLLM_TEMPLATE` (default: default)
+- `BALATROLLM_STRATEGY` (default: default)
 
 ## Code Quality
 
@@ -93,9 +95,9 @@ src/balatrollm/
 ├── __init__.py                    # CLI entry point with argument parsing
 ├── bot.py                         # Main LLMBot class with game logic
 ├── config.py                      # Configuration dataclass
-├── templates.py                   # TemplateManager for Jinja2 templates
+├── strategies.py                  # StrategyManager for Jinja2 templates
 ├── data_collection.py             # RunDataCollector for game logging
-└── templates/                     # Strategy-based templates
+└── strategies/                    # Strategy-based templates
     ├── default/                   # Conservative strategy
     └── aggressive/                # High-risk strategy
         ├── STRATEGY.md.jinja      # Strategy guide
@@ -120,5 +122,19 @@ tests/test_llm.py                  # Test suite
 
 ## Strategy System
 
-**Default** (`--template default`): Conservative, financially disciplined approach
-**Aggressive** (`--template aggressive`): High-risk, high-reward approach with aggressive spending
+The `--strategy` flag accepts either built-in strategy names or paths to custom strategy directories:
+
+**Built-in Strategies**:
+- **Default** (`--strategy default`): Conservative, financially disciplined approach
+- **Aggressive** (`--strategy aggressive`): High-risk, high-reward approach with aggressive spending
+
+**Custom Strategy Paths**:
+- Absolute paths: `--strategy /path/to/my/custom/strategy`
+- Relative paths: `--strategy ../custom-strategies/experimental`
+- The system will automatically resolve built-in strategy names first, then fall back to path resolution
+
+Each strategy directory must contain:
+- `STRATEGY.md.jinja`: Strategy-specific guide
+- `GAMESTATE.md.jinja`: Game state representation  
+- `MEMORY.md.jinja`: Response history tracking
+- `TOOLS.json`: Strategy-specific function definitions
