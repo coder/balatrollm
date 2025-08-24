@@ -44,7 +44,8 @@ exclude = [".venv", "balatrobot", "balatro"]
 lint.extend-select = ["I"]
 lint.task-tags = ["FIX", "TODO", "HACK", "WARN", "PERF", "NOTE", "TEST"]
 
-[tool.pyright]
+[tool.basedpyright]
+exclude = ["**/__pycache__", ".venv", "balatrobot", "balatro"]
 typeCheckingMode = "basic"
 
 [tool.pytest.ini_options]
