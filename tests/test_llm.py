@@ -5,7 +5,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from balatrollm.llm import Config, LLMBot
+from balatrollm.bot import LLMBot
+from balatrollm.config import Config
 
 
 class TestConfig:
@@ -57,20 +58,20 @@ class TestLLMBot:
     @pytest.fixture
     def mock_balatro_client(self):
         """Mock BalatroClient."""
-        with patch("balatrollm.llm.BalatroClient") as mock:
+        with patch("balatrollm.bot.BalatroClient") as mock:
             yield mock.return_value
 
     @pytest.fixture
     def bot(self, config, mock_balatro_client):
         """Test bot instance."""
-        with patch("balatrollm.llm.AsyncOpenAI"):
+        with patch("balatrollm.bot.AsyncOpenAI"):
             return LLMBot(config)
 
     def test_bot_initialization(self, config):
         """Test bot initializes correctly."""
         with (
-            patch("balatrollm.llm.AsyncOpenAI") as mock_openai,
-            patch("balatrollm.llm.BalatroClient") as mock_client,
+            patch("balatrollm.bot.AsyncOpenAI") as mock_openai,
+            patch("balatrollm.bot.BalatroClient") as mock_client,
         ):
             bot = LLMBot(config)
 
@@ -80,18 +81,25 @@ class TestLLMBot:
             )
             mock_client.assert_called_once()
 
-    def test_generate_save_path(self, bot):
-        """Test save path generation."""
-        with patch.object(bot, "project_version", "1.0.0"):
-            path = bot._generate_save_path("Red Deck", 1, "TEST123")
+    def test_run_directory_generation(self, bot):
+        """Test run directory generation."""
+        from balatrollm.data_collection import generate_run_directory
 
-            assert "v1.0.0" in str(path)
-            assert "test-model" in str(path)
-            assert "default" in str(path)
-            assert "RedDeck" in str(path)
-            assert "s1" in str(path)
-            assert "TEST123" in str(path)
-            assert path.suffix == ".jsonl"
+        path = generate_run_directory(
+            deck="Red Deck",
+            stake=1,
+            seed="TEST123",
+            model="test-model",
+            template="default",
+            project_version="1.0.0",
+        )
+
+        assert "v1.0.0" in str(path)
+        assert "test-model" in str(path)
+        assert "default" in str(path)
+        assert "RedDeck" in str(path)
+        assert "s1" in str(path)
+        assert "TEST123" in str(path)
 
     def test_get_tools_for_state(self, bot):
         """Test tools selection for different states."""
