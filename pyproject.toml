@@ -40,6 +40,7 @@ publish-url = "https://upload.pypi.org/legacy/"
 balatrobot = { git = "https://github.com/S1M0N38/balatrobot.git", rev = "main" }
 
 [tool.ruff]
+exclude = [".venv", "balatrobot", "balatro"]
 lint.extend-select = ["I"]
 lint.task-tags = ["FIX", "TODO", "HACK", "WARN", "PERF", "NOTE", "TEST"]
 
