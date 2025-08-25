@@ -145,7 +145,16 @@ def _validate_config_file(config_path: str) -> None:
 async def run_bot(args) -> None:
     """Run the Balatro bot with the given arguments."""
     if args.from_config:
-        config = Config.from_config_file(args.from_config)
+        # Load config from file, but allow CLI arguments to override base_url and api_key
+        config = Config.from_config_file(
+            args.from_config,
+            base_url=args.base_url
+            if args.base_url != os.getenv("LITELLM_BASE_URL", "http://localhost:4000")
+            else None,
+            api_key=args.api_key
+            if args.api_key != os.getenv("LITELLM_API_KEY", "sk-balatrollm-proxy-key")
+            else None,
+        )
     else:
         config = Config(
             model=args.model,
