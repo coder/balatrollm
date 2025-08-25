@@ -88,6 +88,14 @@ Each strategy contains:
 
 Uses Ruff (linting/formatting), basedpyright (type checking), pytest (testing), conventional commits, and Release Please automation.
 
+**Modern Type Hints**: Use built-in types for Python 3.9+ instead of typing module equivalents:
+- Use `dict` instead of `Dict`
+- Use `list` instead of `List`
+- Use `tuple` instead of `Tuple`
+- Use `set` instead of `Set`
+- Use `str | None` instead of `Optional[str]`
+- Use `int | str` instead of `Union[int, str]`
+
 ## Project Structure
 
 ```
@@ -135,6 +143,6 @@ The `--strategy` flag accepts either built-in strategy names or paths to custom 
 
 Each strategy directory must contain:
 - `STRATEGY.md.jinja`: Strategy-specific guide
-- `GAMESTATE.md.jinja`: Game state representation  
+- `GAMESTATE.md.jinja`: Game state representation
 - `MEMORY.md.jinja`: Response history tracking
 - `TOOLS.json`: Strategy-specific function definitions
