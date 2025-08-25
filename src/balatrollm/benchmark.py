@@ -6,7 +6,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 
 @dataclass
@@ -20,12 +20,12 @@ class RunMetrics:
     deck: str
     stake: int
     seed: str
-    challenge: Optional[str]
+    challenge: str | None
 
     # Timing and completion
     started_at: datetime
-    completed_at: Optional[datetime]
-    duration_seconds: Optional[float]
+    completed_at: datetime | None
+    duration_seconds: float | None
     completed: bool
 
     # Game outcome
@@ -57,9 +57,9 @@ class RunMetrics:
     blinds_skipped: int
 
     # Raw data for detailed analysis
-    raw_config: Dict[str, Any] = field(default_factory=dict)
-    raw_gamestates: List[Dict[str, Any]] = field(default_factory=list)
-    raw_responses: List[Dict[str, Any]] = field(default_factory=list)
+    raw_config: dict[str, Any] = field(default_factory=dict)
+    raw_gamestates: list[dict[str, Any]] = field(default_factory=list)
+    raw_responses: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
@@ -113,7 +113,7 @@ class AggregatedMetrics:
     performance_score: float
 
     # All individual runs for detailed analysis
-    runs: List[RunMetrics] = field(default_factory=list)
+    runs: list[RunMetrics] = field(default_factory=list)
 
 
 @dataclass
@@ -138,8 +138,8 @@ class BenchmarkAnalyzer:
 
     def __init__(self, runs_dir: Path = Path("runs")):
         self.runs_dir = runs_dir
-        self.run_metrics: List[RunMetrics] = []
-        self.aggregated_metrics: Dict[Tuple[str, str, str], AggregatedMetrics] = {}
+        self.run_metrics: list[RunMetrics] = []
+        self.aggregated_metrics: dict[tuple[str, str, str], AggregatedMetrics] = {}
 
     def analyze_all_runs(self) -> None:
         """Analyze all runs in the runs directory."""
@@ -186,7 +186,7 @@ class BenchmarkAnalyzer:
 
     def _analyze_single_run(
         self, run_dir: Path, version: str, model: str, strategy: str
-    ) -> Optional[RunMetrics]:
+    ) -> RunMetrics | None:
         """Analyze a single run directory."""
         config_file = run_dir / "config.json"
         gamestates_file = run_dir / "gamestates.jsonl"
@@ -273,7 +273,7 @@ class BenchmarkAnalyzer:
             raw_responses=responses,
         )
 
-    def _load_jsonl(self, file_path: Path) -> List[Dict[str, Any]]:
+    def _load_jsonl(self, file_path: Path) -> list[dict[str, Any]]:
         """Load JSONL file."""
         data = []
         if file_path.exists():
@@ -286,7 +286,7 @@ class BenchmarkAnalyzer:
                             continue
         return data
 
-    def _extract_game_metrics(self, gamestates: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _extract_game_metrics(self, gamestates: list[dict[str, Any]]) -> dict[str, Any]:
         """Extract game performance metrics from gamestates."""
         if not gamestates:
             return {}
@@ -351,7 +351,7 @@ class BenchmarkAnalyzer:
             "blinds_skipped": blinds_skipped,
         }
 
-    def _extract_llm_metrics(self, responses: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _extract_llm_metrics(self, responses: list[dict[str, Any]]) -> dict[str, Any]:
         """Extract LLM performance metrics from responses."""
         if not responses:
             return {}

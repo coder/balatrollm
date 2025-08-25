@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -50,7 +50,7 @@ class StrategyManager:
         template = self.jinja_env.get_template("STRATEGY.md.jinja")
         return template.render()
 
-    def render_gamestate(self, state_name: str, game_state: Dict[str, Any]) -> str:
+    def render_gamestate(self, state_name: str, game_state: dict[str, Any]) -> str:
         """Render the game state template."""
         template = self.jinja_env.get_template("GAMESTATE.md.jinja")
         return template.render(
@@ -58,12 +58,12 @@ class StrategyManager:
             game_state=game_state,
         )
 
-    def render_memory(self, responses: List[Any]) -> str:
+    def render_memory(self, responses: list[Any]) -> str:
         """Render the memory template."""
         template = self.jinja_env.get_template("MEMORY.md.jinja")
         return template.render(responses=responses)
 
-    def load_tools(self) -> Dict[str, Any]:
+    def load_tools(self) -> dict[str, Any]:
         """Load tools from the strategy-specific TOOLS.json file."""
         tools_file = self.strategy_dir / "TOOLS.json"
         with open(tools_file) as f:

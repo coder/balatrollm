@@ -5,7 +5,7 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import httpx
 from openai import AsyncOpenAI
@@ -50,7 +50,10 @@ class LLMBot:
         self.project_version = __version__
 
         # Data collector will be initialized when starting a run
-        self.data_collector: Optional[RunDataCollector] = None
+        self.data_collector: RunDataCollector | None = None
+
+        # Track run success status
+        self._run_successful = False
 
     def __enter__(self):
         self.balatro_client.connect()
@@ -81,7 +84,7 @@ class LLMBot:
             )
             return False
 
-    async def list_available_models(self) -> List[str]:
+    async def list_available_models(self) -> list[str]:
         """Get list of available models from the LiteLLM proxy."""
         try:
             models = await self.llm_client.models.list()
@@ -103,7 +106,7 @@ class LLMBot:
         )
         return False
 
-    def _get_tools_for_state(self, current_state: State) -> List[Dict[str, Any]]:
+    def _get_tools_for_state(self, current_state: State) -> list[dict[str, Any]]:
         """Get OpenAI tools definition for the given state."""
         state_name = current_state.name
         if state_name not in self.tools:
@@ -214,7 +217,7 @@ class LLMBot:
         logger.info(f"LLM tool call: {function_name} with args: {function_args}")
         return tool_call
 
-    def execute_tool_call(self, tool_call: Any) -> Dict[str, Any]:
+    def execute_tool_call(self, tool_call: Any) -> dict[str, Any]:
         """Execute the action decided by the LLM."""
         function = getattr(tool_call, "function", tool_call)
         name = function.name
@@ -251,9 +254,14 @@ class LLMBot:
         """
         logger.info("Starting LLM bot game loop")
 
+        # Reset success status for new run
+        self._run_successful = False
+
         try:
             game_state = await self._initialize_game_run(deck, stake, seed, challenge)
             await self._run_game_loop(game_state)
+            # If we reach this point, the run completed successfully
+            self._run_successful = True
 
         except KeyboardInterrupt:
             logger.info("Game interrupted by user")
@@ -266,8 +274,8 @@ class LLMBot:
                 await self._finalize_run_data()
 
     async def _initialize_game_run(
-        self, deck: str, stake: int, seed: str, challenge: Optional[str]
-    ) -> Dict[str, Any]:
+        self, deck: str, stake: int, seed: str, challenge: str | None
+    ) -> dict[str, Any]:
         """Initialize a new game run with data collection setup."""
         # Generate run directory
         run_dir = generate_run_directory(
@@ -281,27 +289,33 @@ class LLMBot:
         )
         logger.info(f"Run data will be saved to: {run_dir}")
 
-        # Create data collector with run configuration
+        # Create community-ready config (for submission)
         run_config = {
             "model": self.config.model,
-            "base_url": self.config.base_url,
-            "api_key": self.config.api_key,
             "strategy": self.config.strategy,
             "deck": deck,
             "stake": stake,
             "seed": seed,
             "challenge": challenge,
-            "started_at": datetime.now().isoformat(),
-            "balatrollm_version": self.project_version,
-            # Community metadata fields with defaults
+            "version": self.project_version,
+            # Community metadata fields
             "name": "Unknown Name",
             "description": "Unknown Description",
             "author": "BalatroBench",
-            "version": self.project_version,
             "tags": [],
         }
 
-        self.data_collector = RunDataCollector(run_dir=run_dir, run_config=run_config)
+        # Create initial stats tracking (runtime data)
+        initial_stats = {
+            "started_at": datetime.now().isoformat(),
+            "completed_successfully": False,
+            "total_decisions": 0,
+            "run_duration_seconds": 0,
+        }
+
+        self.data_collector = RunDataCollector(
+            run_dir=run_dir, run_config=run_config, initial_stats=initial_stats
+        )
 
         # Set up logging to write to run.log file
         log_path = run_dir / "run.log"
@@ -320,7 +334,7 @@ class LLMBot:
         logger.info(f"Game log will be saved to: {log_path}")
         return self.balatro_client.send_message("start_run", start_run_args)
 
-    async def _run_game_loop(self, game_state: Dict[str, Any]) -> None:
+    async def _run_game_loop(self, game_state: dict[str, Any]) -> None:
         """Main game loop that processes game states until completion."""
         while True:
             current_state = State(game_state["state"])
@@ -333,8 +347,8 @@ class LLMBot:
             game_state = await self._handle_game_state(current_state, game_state)
 
     async def _handle_game_state(
-        self, current_state: State, game_state: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, current_state: State, game_state: dict[str, Any]
+    ) -> dict[str, Any]:
         """Handle a specific game state and return the updated game state."""
         match current_state:
             case (
@@ -349,7 +363,7 @@ class LLMBot:
                 await asyncio.sleep(1)
                 return self.balatro_client.send_message("get_game_state")
 
-    async def _process_llm_decision(self, game_state: Dict[str, Any]) -> Dict[str, Any]:
+    async def _process_llm_decision(self, game_state: dict[str, Any]) -> dict[str, Any]:
         """Process an LLM decision for the current game state."""
         tool_call = await self.get_tool_call(game_state)
         result = self.execute_tool_call(tool_call)
@@ -357,7 +371,7 @@ class LLMBot:
         return result
 
     def _log_game_progression(
-        self, game_state: Dict[str, Any], tool_call: Any, result: Dict[str, Any]
+        self, game_state: dict[str, Any], tool_call: Any, result: dict[str, Any]
     ) -> None:
         """Log game state progression to data collector."""
         if not self.data_collector:
@@ -380,29 +394,46 @@ class LLMBot:
         )
 
     async def _finalize_run_data(self) -> None:
-        """Finalize run data and update final config."""
+        """Finalize run data and update final stats."""
         if not self.data_collector:
             return
 
         logger.info("Finalizing run data...")
-        log_path = self.data_collector.run_dir / "run.log"
 
-        final_config = {
-            "completed_at": datetime.now().isoformat(),
+        # Calculate run duration
+        started_at = datetime.fromisoformat(
+            self.data_collector.initial_stats["started_at"]
+        )
+        completed_at = datetime.now()
+        run_duration = (completed_at - started_at).total_seconds()
+
+        # Calculate comprehensive statistics from game data
+        comprehensive_stats = self.data_collector.calculate_comprehensive_stats()
+
+        # Create basic final stats
+        basic_final_stats = {
+            "completed_at": completed_at.isoformat(),
+            "completed_successfully": self._run_successful,
             "total_responses": len(self.responses),
-            "log_file": "run.log" if log_path.exists() else None,
+            "run_duration_seconds": run_duration,
         }
-        self.data_collector.update_config(final_config)
 
-        if log_path.exists():
-            logger.info(f"Game log saved to: {log_path}")
-        else:
-            logger.warning(f"Game log not found at: {log_path}")
+        # Merge basic stats with comprehensive stats
+        final_stats = {**basic_final_stats, **comprehensive_stats}
 
-        logger.info(f"Run data finalized in: {self.data_collector.run_dir}")
+        # Add failure reason if not successful
+        if not self._run_successful:
+            final_stats["failure_reason"] = "Run incomplete or interrupted"
+
+        # Update stats (not config)
+        self.data_collector.update_stats(final_stats)
+
+        logger.info(
+            f"Run data finalized with {len(final_stats)} metrics in: {self.data_collector.run_dir}"
+        )
 
 
-def setup_logging(verbose: bool = False, log_file: Optional[Path] = None) -> None:
+def setup_logging(verbose: bool = False, log_file: Path | None = None) -> None:
     """Configure logging for the application."""
     level = logging.DEBUG if verbose else logging.INFO
 
