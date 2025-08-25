@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.3.0](https://github.com/S1M0N38/balatrollm/compare/v0.2.0...v0.3.0) (2025-08-25)
+
+
+### Features
+
+* add additional fields to config.json for community metadata ([68d011b](https://github.com/S1M0N38/balatrollm/commit/68d011b16393e2bfda2bee9d9180df0c6e67fb05))
+* add audio support to balatro.sh ([91e0d69](https://github.com/S1M0N38/balatrollm/commit/91e0d690f561ad86bb7380db0942d45d1f3e425d))
+* add benchmark subcommand to CLI ([745b61f](https://github.com/S1M0N38/balatrollm/commit/745b61fe5d8e36edcd6cd825885c7d5ea994cba3))
+* add comprehensive benchmark analysis system ([87f190b](https://github.com/S1M0N38/balatrollm/commit/87f190b9ea9f6d37508dbc143f97a116d1273bd9))
+* enhance CLI with strategy system support ([849a027](https://github.com/S1M0N38/balatrollm/commit/849a0279d187e5c006a369064600f96e82e7154f))
+* enhance configuration system with version validation and CLI overrides ([5400f64](https://github.com/S1M0N38/balatrollm/commit/5400f6407e209c6db5668be589b21ccf710b7dfe))
+* improve data collection and logging ([c2685a9](https://github.com/S1M0N38/balatrollm/commit/c2685a9c5d26c84170f590c2a8ce34312c2f0c54))
+* re-work templates into four standard files ([8410f0a](https://github.com/S1M0N38/balatrollm/commit/8410f0ad04f96f18b21c33d8a193966c9db82bd9))
+* update Bot to use new template system ([f1937a4](https://github.com/S1M0N38/balatrollm/commit/f1937a4da432a7545a794bfc961d230f6013bcda))
+* update core classes to use strategy system ([296233c](https://github.com/S1M0N38/balatrollm/commit/296233ca8511f6152f9f2a0f8686b538d27b42a8))
+* update environment configuration for strategy system ([94fa214](https://github.com/S1M0N38/balatrollm/commit/94fa214a31078ca5a25c596db6aba066e17df681))
+
+
+### Bug Fixes
+
+* change the default template to `default` ([4a84cc8](https://github.com/S1M0N38/balatrollm/commit/4a84cc86695eeed3a7b01d7dc56e1c89b1878637))
+* update config field references for consistency ([ea4dc0b](https://github.com/S1M0N38/balatrollm/commit/ea4dc0be46d307a1fca431cd154e3b65225b4d4f))
+
+
+### Documentation
+
+* add modern type hints guidelines to development documentation ([374b365](https://github.com/S1M0N38/balatrollm/commit/374b365ea35e128475c94a4c33cca70942aca7c1))
+* update CLAUDE.md ([756171b](https://github.com/S1M0N38/balatrollm/commit/756171b9621dbcecab2aaf27294fc5022f994b19))
+* update CLAUDE.md ([487f8b6](https://github.com/S1M0N38/balatrollm/commit/487f8b6a792c18d02b7b6a332386899447446888))
+* update CLAUDE.md for strategy system ([1157c7e](https://github.com/S1M0N38/balatrollm/commit/1157c7e9c6922c2ae56ab9558e2d44b83a689263))
+* update README.md ([ca19807](https://github.com/S1M0N38/balatrollm/commit/ca19807621a53ae3d15da9e2844c240c3213a33a))
+
 ## [0.2.0](https://github.com/S1M0N38/balatrollm/compare/v0.1.0...v0.2.0) (2025-08-21)
 
 
