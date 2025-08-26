@@ -11,13 +11,14 @@
   <p><em>A Balatro bot powered by LLMs</em></p>
 </div>
 
----
+______________________________________________________________________
 
 ## Overview
 
 BalatroLLM is a bot that uses Large Language Models (LLMs) to play [Balatro](https://www.playbalatro.com/), the popular roguelike poker deck-building game. The bot analyzes game states, makes strategic decisions, and executes actions through the [BalatroBot](https://github.com/S1M0N38/balatrobot) client.
 
 The system combines multiple components to make informed decisions:
+
 - **Strategy templates** (`STRATEGY.md.jinja`) - Define playing style and approach
 - **Game state analysis** (`GAMESTATE.md.jinja`) - Current game situation and available options
 - **Memory system** (`MEMORY.md.jinja`) - Historical context from previous decisions
@@ -30,54 +31,163 @@ These components are processed together in a single LLM call, enabling the bot t
 ### Prerequisites
 
 - [uv](https://docs.astral.sh/uv/) package manager
-- Balatro instance with [BalatroBot](https://github.com/S1M0N38/balatrobot) running.
+- Balatro instance with [BalatroBot](https://github.com/S1M0N38/balatrobot) mod installed
 
 ### Setup
 
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/S1M0N38/balatrollm.git
 cd balatrollm
 
-# Create and activate environment
-uv sync --all-extras
+# 2. Create and activate environment
+uv sync
 
-# Configure environment
+# 3. Configure environment
 cp .envrc.example .envrc
+# edit .envrc with your API keys
 
-# Activate environment
+# 4. Activate environment
 source .envrc
 ```
 
+#### Environment Variables
+
+**Provider API Keys** (required by LiteLLM or direct provider access)
+
+```bash
+export CEREBRAS_API_KEY="your-cerebras-key"
+export GROQ_API_KEY="your-groq-key"
+export OPENAI_API_KEY="your-openai-key"          # Optional
+export ANTHROPIC_API_KEY="your-anthropic-key"    # Optional
+```
+
+The CLI uses sensible defaults for all other configuration:
+
+- Default model: `cerebras/gpt-oss-120b`
+- Default base URL: `http://localhost:4000`
+- Default API key: `sk-balatrollm-proxy-key`
+- Default strategy: `default`
+
 ### Usage
 
-1. Start Balatro with BalatroBot
+#### Quick Start
 
 ```bash
-./balatro.sh
-```
-
-2. Start the LiteLLM proxy (in a separate terminal)
-
-```bash
+# 1. Start LiteLLM proxy (in separate terminal)
 litellm --config config/litellm.yaml
-```
 
-3. Run the application
+# 2. Start Balatro with BalatroBot mod (in separate terminal)
+./balatro.sh
 
-```bash
+# 3. Run the bot with default settings
 balatrollm
 ```
 
-#### Alternative: Using the Makefile
-
-For convenience, you can use the Makefile to automatically start both LiteLLM and Balatro:
+#### `balatrollm` - Command Line Interface
 
 ```bash
-make start
+balatrollm --help
 ```
 
-This will kill any previous instances and start both services automatically.
+```
+usage: balatrollm [-h] [--model MODEL] [--base-url BASE_URL]
+                  [--api-key API_KEY] [--list-models]
+                  [--litellm-config LITELLM_CONFIG] [--strategy STRATEGY]
+                  [--verbose] [--config CONFIG]
+                  {benchmark} ...
+
+LLM-powered Balatro bot using LiteLLM proxy
+
+positional arguments:
+  {benchmark}           Available commands
+    benchmark           Analyze runs and generate leaderboards
+
+options:
+  -h, --help            show this help message and exit
+  --model MODEL         Model name to use from LiteLLM proxy (default:
+                        cerebras/gpt-oss-120b)
+  --base-url BASE_URL   LiteLLM base URL (default: http://localhost:4000)
+  --api-key API_KEY     LiteLLM proxy API key (default: sk-balatrollm-proxy-
+                        key)
+  --list-models         List available models from the proxy and exit
+  --litellm-config LITELLM_CONFIG
+                        Path to LiteLLM configuration file (default:
+                        config/litellm.yaml)
+  --strategy STRATEGY   Strategy to use. Can be a built-in strategy name
+                        (default, aggressive) or a path to a strategy
+                        directory (default: default)
+  --verbose, -v         Enable verbose logging
+  --config CONFIG       Load configuration from a previous run's config.json
+                        file
+
+Examples:
+  balatrollm --model cerebras/gpt-oss-120b
+  balatrollm --model groq/qwen/qwen3-32b --base-url http://localhost:4000
+  balatrollm --strategy aggressive
+  balatrollm --strategy path/to/my/strategy/directory
+  balatrollm --list-models
+  balatrollm --config runs/version/provider/model/strategy/run/config.json
+  balatrollm benchmark --runs-dir runs --output-dir benchmark_results
+```
+
+#### `Makefile` - Development Workflow
+
+```bash
+make help
+```
+
+```
+BalatroLLM Development Makefile
+
+Available targets:
+  help               Show this help message
+  install            Install package dependencies
+  install-dev        Install package with development dependencies
+  lint               Run ruff linter (check only)
+  lint-fix           Run ruff linter with auto-fixes
+  format             Run ruff formatter
+  typecheck          Run type checker
+  quality            Run all code quality checks
+  test               Run tests
+  test-cov           Run tests with coverage report
+  all                Run all code quality checks and tests
+  clean              Clean build artifacts and caches
+  setup              Kill previous instances and start LiteLLM server + Balatro
+  teardown           Stop LiteLLM server and Balatro processes
+```
+
+#### `balatro.sh` - Game Automation
+
+```bash
+./balatro.sh --help
+```
+
+```
+Usage: ./balatro.sh [OPTIONS]
+       ./balatro.sh -p PORT [OPTIONS]
+       ./balatro.sh --kill
+       ./balatro.sh --status
+
+Options:
+  -p, --port PORT  Specify port for Balatro instance (can be used multiple times)
+                   Default: 12346 if no port specified
+  --headless       Enable headless mode (sets BALATROBOT_HEADLESS=1)
+  --fast           Enable fast mode (sets BALATROBOT_FAST=1)
+  --audio          Enable audio (disabled by default, sets BALATROBOT_AUDIO=1)
+  --kill           Kill all running Balatro instances and exit
+  --status         Show information about running Balatro instances
+  -h, --help       Show this help message
+
+Examples:
+  ./balatro.sh                            # Start single instance on default port 12346
+  ./balatro.sh -p 12347                   # Start single instance on port 12347
+  ./balatro.sh -p 12346 -p 12347          # Start two instances on ports 12346 and 12347
+  ./balatro.sh --headless --fast          # Start with headless and fast mode on default port
+  ./balatro.sh --audio                    # Start with audio enabled on default port
+  ./balatro.sh --kill                     # Kill all running Balatro instances
+  ./balatro.sh --status                   # Show running instances
+```
 
 ## Contributing
 
@@ -92,7 +202,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
 
----
+______________________________________________________________________
 
 <div align="center">
   [Get Started](#quick-start) • [Contribute](CONTRIBUTING.md) • [Report Issues](https://github.com/S1M0N38/balatrollm/issues)
