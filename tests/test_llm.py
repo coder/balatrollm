@@ -1,6 +1,5 @@
 """Tests for LLM bot functionality."""
 
-import os
 from unittest.mock import Mock, patch
 
 import pytest
@@ -20,31 +19,13 @@ class TestConfig:
         assert config.api_key == "sk-balatrollm-proxy-key"
         assert config.strategy == "default"
 
-    def test_config_from_environment(self):
-        """Test config creation from environment variables."""
-        with patch.dict(
-            os.environ,
-            {
-                "LITELLM_MODEL": "env-model",
-                "LITELLM_BASE_URL": "http://env:5000",
-                "LITELLM_API_KEY": "env-key",
-                "BALATROLLM_STRATEGY": "aggressive",
-            },
-        ):
-            config = Config.from_environment()
-            assert config.model == "env-model"
-            assert config.base_url == "http://env:5000"
-            assert config.api_key == "env-key"
-            assert config.strategy == "aggressive"
-
-    def test_config_from_environment_defaults(self):
-        """Test config uses defaults when environment variables not set."""
-        with patch.dict(os.environ, {}, clear=True):
-            config = Config.from_environment()
-            assert config.model == "cerebras-gpt-oss-120b"
-            assert config.base_url == "http://localhost:4000"
-            assert config.api_key == "sk-balatrollm-proxy-key"
-            assert config.strategy == "default"
+    def test_config_from_defaults(self):
+        """Test config creation with default values."""
+        config = Config.from_defaults()
+        assert config.model == "cerebras/gpt-oss-120b"
+        assert config.base_url == "http://localhost:4000"
+        assert config.api_key == "sk-balatrollm-proxy-key"
+        assert config.strategy == "default"
 
 
 class TestLLMBot:
@@ -89,17 +70,35 @@ class TestLLMBot:
             deck="Red Deck",
             stake=1,
             seed="TEST123",
-            model="test-model",
+            model="test/model-name",
             strategy="default",
             project_version="1.0.0",
         )
 
         assert "v1.0.0" in str(path)
-        assert "test-model" in str(path)
+        assert "test/model-name" in str(path)  # Now expects provider/model format
         assert "default" in str(path)
         assert "RedDeck" in str(path)
         assert "s1" in str(path)
         assert "TEST123" in str(path)
+
+    def test_parse_provider_model(self, bot):
+        """Test provider/model parsing for directory structure."""
+        from balatrollm.data_collection import _parse_provider_model
+
+        # Test provider/model format with nested paths
+        assert _parse_provider_model("groq/qwen/qwen3-32b") == "groq/qwen--qwen3-32b"
+        assert (
+            _parse_provider_model("openrouter/openai/gpt-5")
+            == "openrouter/openai--gpt-5"
+        )
+        assert _parse_provider_model("cerebras/gpt-oss-120b") == "cerebras/gpt-oss-120b"
+
+        # Test simple provider/model format
+        assert _parse_provider_model("lmstudio/deepseek-r1") == "lmstudio/deepseek-r1"
+
+        # Test model without provider (fallback)
+        assert _parse_provider_model("gpt4") == "gpt4"
 
     def test_get_tools_for_state(self, bot):
         """Test tools selection for different states."""
