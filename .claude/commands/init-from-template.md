@@ -5,16 +5,19 @@ Transform this generic template into a personalized starting point for your Pyth
 ### Workflow
 
 1. **Collect Project Information**
+
    - Get current git remote URL to extract owner and repository name
    - Prompt user for project name if different from repository name
    - Validate project name follows Python package naming conventions
 
 2. **Update Project Structure**
+
    - Rename `src/template_python/` directory to `src/{project_name}/`
    - Update all file references from `template_python` to `{project_name}`
    - Replace `template-python` with `{project-name}` in hyphenated contexts
 
 3. **Update Configuration Files**
+
    - Update `pyproject.toml`:
      - Change project name from "template-python" to "{project-name}"
      - Update description placeholder
@@ -28,21 +31,25 @@ Transform this generic template into a personalized starting point for your Pyth
      - Remove template-specific content
 
 4. **Update Source Code**
+
    - Update `src/{project_name}/__init__.py`
    - Update any import statements in test files
    - Update entry point script references
 
 5. **Git Operations**
+
    - Stage all changes
    - Create initial commit: "feat: initialize project from template"
    - Optionally set up remote origin if not already configured
 
 6. **Environment Setup and Validation**
+
    - Check for `uv` command availability (exit with error if not found)
    - Run `uv sync --all-extras` to install all dependencies including dev dependencies
    - Activate virtual environment with `source .venv/bin/activate`
 
 7. **Quality Checks**
+
    - Run `pytest` to execute test suite
    - Run `ruff check` for linting validation
    - Run `ruff format` for code formatting
@@ -80,8 +87,9 @@ $ARGUMENTS
 ```
 
 Optional arguments:
+
 - `--project-name`: Override project name (default: use git repository name)
-- `--author-name`: Override author name (default: use git config user.name)  
+- `--author-name`: Override author name (default: use git config user.name)
 - `--author-email`: Override author email (default: use git config user.email)
 - `--description`: Set project description
 - `--skip-git`: Don't create initial commit

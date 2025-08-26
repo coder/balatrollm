@@ -46,7 +46,6 @@ The environment setup is now ready to use. Every time you are working on the pro
 source .envrc
 ```
 
-
 > You can use [direnv](https://github.com/direnv/direnv) to automatically activate the environment when you enter the project directory.
 
 ## Release Cycle
@@ -75,6 +74,7 @@ The project follows an automated release process using GitHub Actions:
    - Publishes it to PyPI using trusted publishing
 
 5. **Lock File Update**: After a release is created, an additional workflow:
+
    - Checks out the repository
    - Updates the `uv.lock` file with `uv lock`
    - Commits and pushes the updated lock file with the message "chore(deps): update uv.lock for version X.Y.Z"
