@@ -1,30 +1,60 @@
 model_list:
-  # Cerebras Profile - High performance cloud inference
-  - model_name: cerebras-gpt-oss-120b
+  # Cerebras
+  - model_name: cerebras/gpt-oss-120b
     litellm_params:
       model: cerebras/gpt-oss-120b
       api_key: os.environ/CEREBRAS_API_KEY
       api_base: https://api.cerebras.ai/v1
       reasoning_effort: "medium"
-  - model_name: cerebras-gpt-oss-20b
+  - model_name: cerebras/qwen-3-32b
     litellm_params:
-      model: cerebras/gpt-oss-20b
+      model: cerebras/qwen-3-32b
       api_key: os.environ/CEREBRAS_API_KEY
       api_base: https://api.cerebras.ai/v1
       reasoning_effort: "medium"
-  - model_name: cerebras-qwen3-235b
+  - model_name: cerebras/qwen-3-235b-a22b-thinking-2507
     litellm_params:
       model: cerebras/qwen-3-235b-a22b-thinking-2507
       api_key: os.environ/CEREBRAS_API_KEY
       api_base: https://api.cerebras.ai/v1
-  # Groq Profile - Fast inference with Qwen model
-  - model_name: groq-qwen3-32b
+  - model_name: cerebras/qwen-3-235b-a22b-instruct-2507
+    litellm_params:
+      model: cerebras/qwen-3-235b-a22b-instruct-2507
+      api_key: os.environ/CEREBRAS_API_KEY
+      api_base: https://api.cerebras.ai/v1
+  # Groq
+  - model_name: groq/openai/gpt-oss-120b
+    litellm_params:
+      model: groq/openai/gpt-oss-120b
+      api_key: os.environ/GROQ_API_KEY
+      api_base: https://api.groq.com/openai/v1
+  - model_name: groq/openai/gpt-oss-20b
+    litellm_params:
+      model: groq/openai/gpt-oss-20b
+      api_key: os.environ/GROQ_API_KEY
+      api_base: https://api.groq.com/openai/v1
+  - model_name: groq/qwen/qwen3-32b
     litellm_params:
       model: groq/qwen/qwen3-32b
       api_key: os.environ/GROQ_API_KEY
       api_base: https://api.groq.com/openai/v1
+  - model_name: groq/deepseek-r1-distill-llama-70b
+    litellm_params:
+      model: groq/deepseek-r1-distill-llama-70b
+      api_key: os.environ/GROQ_API_KEY
+      api_base: https://api.groq.com/openai/v1
+  - model_name: groq/llama-3.3-70b-versatile
+    litellm_params:
+      model: groq/llama-3.3-70b-versatile
+      api_key: os.environ/GROQ_API_KEY
+      api_base: https://api.groq.com/openai/v1
+  - model_name: groq/llama-3.1-8b-instant
+    litellm_params:
+      model: groq/llama-3.1-8b-instant
+      api_key: os.environ/GROQ_API_KEY
+      api_base: https://api.groq.com/openai/v1
   # LM Studio Local - Local development and testing
-  - model_name: local-deepseek
+  - model_name: lmstudio/deepseek-r1-0528-qwen3-8b
     litellm_params:
       model: openai/deepseek-r1-0528-qwen3-8b
       api_key: dummy-key
