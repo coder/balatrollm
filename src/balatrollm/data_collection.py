@@ -25,7 +25,7 @@ def generate_run_directory(
 
     # Clean names for filesystem safety
     deck_clean = _clean_name(deck)
-    model_clean = _clean_name(model, "/:", "-")
+    provider_model = _parse_provider_model(model)
     challenge_clean = _clean_name(challenge) if challenge else None
 
     # Build run directory name
@@ -35,7 +35,23 @@ def generate_run_directory(
     parts.append(seed)
 
     run_dir_name = "_".join(parts)
-    return base_dir / f"v{project_version}" / model_clean / strategy / run_dir_name
+    return base_dir / f"v{project_version}" / provider_model / strategy / run_dir_name
+
+
+def _parse_provider_model(model: str) -> str:
+    """Parse provider/model format and sanitize for filesystem safety."""
+    # Handle provider/model format (e.g., groq/qwen/qwen3-32b -> groq/qwen--qwen3-32b)
+    if "/" in model:
+        provider, model_name = model.split("/", 1)  # Split on first / only
+        # Sanitize model name: replace / with -- for filesystem safety
+        sanitized_model = model_name.replace("/", "--")
+        # Clean other problematic characters
+        provider_clean = _clean_name(provider, ": ", "-")
+        model_clean = _clean_name(sanitized_model, ": ", "-")
+        return f"{provider_clean}/{model_clean}"
+
+    # Fallback: treat as single model name without provider
+    return _clean_name(model, "/: ", "-")
 
 
 def _clean_name(name: str, chars_to_replace: str = " -", replacement: str = "") -> str:
@@ -166,22 +182,48 @@ class RunDataCollector:
         if not gamestates_path.exists():
             return {}
 
-        # Load and analyze game states
+        # Load game states
+        game_states = self._load_game_states(gamestates_path)
+        if not game_states:
+            return {}
+
+        # Extract final state data
+        final_state = game_states[-1].get("game_state_after", {})
+        game_data = final_state.get("game", {})
+
+        # Calculate metrics in logical groups
+        core_metrics = self._calculate_core_performance_metrics(
+            game_states, final_state, game_data
+        )
+        efficiency_metrics = self._calculate_efficiency_metrics(
+            game_states, final_state, game_data
+        )
+        strategic_metrics = self._calculate_strategic_metrics(game_states, game_data)
+        advanced_metrics = self._calculate_advanced_analytics(game_states)
+        llm_metrics = self._calculate_llm_performance_metrics(game_states)
+
+        # Combine all metrics
+        return {
+            **core_metrics,
+            **efficiency_metrics,
+            **strategic_metrics,
+            **advanced_metrics,
+            **llm_metrics,
+        }
+
+    def _load_game_states(self, gamestates_path: Path) -> list[dict[str, Any]]:
+        """Load and parse game states from JSONL file."""
         game_states = []
         with open(gamestates_path, "r") as f:
             for line in f:
                 game_states.append(json.loads(line))
+        return game_states
 
-        if not game_states:
-            return {}
-
-        # Extract core performance metrics
-        final_state = game_states[-1]["game_state_after"] if game_states else {}
-
-        game_data = final_state.get("game", {})
-
-        stats = {
-            # Core Performance Metrics
+    def _calculate_core_performance_metrics(
+        self, game_states: list[dict], final_state: dict, game_data: dict
+    ) -> dict[str, Any]:
+        """Calculate core game performance metrics."""
+        return {
             "run_won": game_data.get("won", False),
             "final_score": final_state.get("chips", 0),
             "final_money": game_data.get("dollars", 0),
@@ -189,19 +231,32 @@ class RunDataCollector:
             "final_round": game_data.get("round", 0),
             "blinds_defeated": self._count_blinds_defeated(game_states),
             "boss_blinds_defeated": self._count_boss_blinds_defeated(game_states),
-            # Efficiency & Speed Metrics
-            "total_decisions": len(game_states),
+        }
+
+    def _calculate_efficiency_metrics(
+        self, game_states: list[dict], final_state: dict, game_data: dict
+    ) -> dict[str, Any]:
+        """Calculate efficiency and speed metrics."""
+        total_decisions = len(game_states)
+        return {
+            "total_decisions": total_decisions,
             "decisions_per_minute": self._calculate_decisions_per_minute(game_states),
             "score_per_decision": self._safe_divide(
-                final_state.get("chips", 0), len(game_states)
+                final_state.get("chips", 0), total_decisions
             ),
             "money_per_decision": self._safe_divide(
-                game_data.get("dollars", 0), len(game_states)
+                game_data.get("dollars", 0), total_decisions
             ),
             "average_response_time_ms": self._calculate_average_response_time(
                 game_states
             ),
-            # Strategic Depth Metrics
+        }
+
+    def _calculate_strategic_metrics(
+        self, game_states: list[dict], game_data: dict
+    ) -> dict[str, Any]:
+        """Calculate strategic depth metrics."""
+        return {
             "jokers_acquired": self._count_jokers_acquired(game_states),
             "consumables_used": self._count_consumables_used(game_states),
             "shop_visits": self._count_shop_visits(game_states),
@@ -210,7 +265,11 @@ class RunDataCollector:
             "peak_money_reached": self._calculate_peak_money(game_states),
             "hands_played_total": game_data.get("hands_played", 0),
             "discards_used_total": self._calculate_total_discards_used(game_states),
-            # Advanced Analytics
+        }
+
+    def _calculate_advanced_analytics(self, game_states: list[dict]) -> dict[str, Any]:
+        """Calculate advanced analytics metrics."""
+        return {
             "money_efficiency_ratio": self._calculate_money_efficiency(game_states),
             "resource_management_score": self._calculate_resource_management_score(
                 game_states
@@ -221,7 +280,13 @@ class RunDataCollector:
             ),
             "risk_assessment_score": self._calculate_risk_score(game_states),
             "joker_synergy_score": self._calculate_joker_synergy(game_states),
-            # LLM Performance Metrics
+        }
+
+    def _calculate_llm_performance_metrics(
+        self, game_states: list[dict]
+    ) -> dict[str, Any]:
+        """Calculate LLM-specific performance metrics."""
+        return {
             "failed_requests": self._count_failed_requests(),
             "total_reasoning_length": self._calculate_total_reasoning_length(
                 game_states
@@ -230,8 +295,6 @@ class RunDataCollector:
                 game_states
             ),
         }
-
-        return stats
 
     def _calculate_ante_reached(self, game_states: list[dict]) -> int:
         """Calculate the highest ante reached."""

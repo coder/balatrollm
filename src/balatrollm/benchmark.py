@@ -1,4 +1,4 @@
-"""Benchmark analysis and leaderboard generation for BalatroLLM runs."""
+"""Benchmark analysis and leaderboard generation for BalatroLLM runs (v0.3.0+)."""
 
 import json
 import statistics
@@ -58,7 +58,7 @@ class RunMetrics:
 
     # Raw data for detailed analysis
     raw_config: dict[str, Any] = field(default_factory=dict)
-    raw_gamestates: list[dict[str, Any]] = field(default_factory=list)
+    raw_stats: dict[str, Any] = field(default_factory=dict)
     raw_responses: list[dict[str, Any]] = field(default_factory=list)
 
 
@@ -79,6 +79,7 @@ class AggregatedMetrics:
     # Performance aggregates
     avg_duration_seconds: float
     avg_final_ante: float
+    avg_final_round: float
     avg_final_money: float
     avg_peak_money: float
     win_rate: float
@@ -155,31 +156,40 @@ class BenchmarkAnalyzer:
 
             version = version_dir.name[1:]  # Remove 'v' prefix
 
-            for model_dir in version_dir.iterdir():
-                if not model_dir.is_dir():
+            # Handle hierarchical provider/model structure
+            for provider_dir in version_dir.iterdir():
+                if not provider_dir.is_dir():
                     continue
 
-                model = model_dir.name
+                provider = provider_dir.name
 
-                for strategy_dir in model_dir.iterdir():
-                    if not strategy_dir.is_dir():
+                for model_dir in provider_dir.iterdir():
+                    if not model_dir.is_dir():
                         continue
 
-                    strategy = strategy_dir.name
+                    model_name = model_dir.name
+                    # Combine provider and model for full model identifier
+                    full_model = f"{provider}/{model_name}"
 
-                    for run_dir in strategy_dir.iterdir():
-                        if not run_dir.is_dir():
+                    for strategy_dir in model_dir.iterdir():
+                        if not strategy_dir.is_dir():
                             continue
 
-                        try:
-                            metrics = self._analyze_single_run(
-                                run_dir, version, model, strategy
-                            )
-                            if metrics:
-                                self.run_metrics.append(metrics)
-                                run_count += 1
-                        except Exception as e:
-                            print(f"Warning: Error analyzing {run_dir}: {e}")
+                        strategy = strategy_dir.name
+
+                        for run_dir in strategy_dir.iterdir():
+                            if not run_dir.is_dir():
+                                continue
+
+                            try:
+                                metrics = self._analyze_single_run(
+                                    run_dir, version, full_model, strategy
+                                )
+                                if metrics:
+                                    self.run_metrics.append(metrics)
+                                    run_count += 1
+                            except Exception as e:
+                                print(f"Warning: Error analyzing {run_dir}: {e}")
 
         print(f"Analyzed {run_count} runs")
         self._aggregate_metrics()
@@ -189,15 +199,19 @@ class BenchmarkAnalyzer:
     ) -> RunMetrics | None:
         """Analyze a single run directory."""
         config_file = run_dir / "config.json"
-        gamestates_file = run_dir / "gamestates.jsonl"
+        stats_file = run_dir / "stats.json"
         responses_file = run_dir / "responses.jsonl"
 
-        if not config_file.exists():
+        # Require both config and stats files
+        if not config_file.exists() or not stats_file.exists():
             return None
 
-        # Load config
+        # Load config and stats
         with open(config_file) as f:
             config = json.load(f)
+
+        with open(stats_file) as f:
+            stats = json.load(f)
 
         # Parse run directory name for metadata
         run_name = run_dir.name
@@ -211,30 +225,33 @@ class BenchmarkAnalyzer:
         seed = parts[-1]
         challenge = parts[3] if len(parts) > 4 else None
 
-        # Parse timestamps
-        started_at = datetime.fromisoformat(config.get("started_at", ""))
-        completed_at_str = config.get("completed_at")
+        # Extract timestamps from stats
+        started_at = datetime.fromisoformat(stats["started_at"])
+        completed_at_str = stats.get("completed_at")
         completed_at = (
             datetime.fromisoformat(completed_at_str) if completed_at_str else None
         )
+        duration_seconds = stats.get("run_duration_seconds")
 
-        duration_seconds = None
-        if completed_at:
-            duration_seconds = (completed_at - started_at).total_seconds()
+        # Extract game outcome from stats
+        won = stats.get("run_won", False)
+        final_ante = stats.get("ante_reached", 0)
+        final_round = stats.get("final_round", 0)
+        final_money = stats.get("final_money", 0)
+        peak_money = stats.get("peak_money_reached", final_money)
 
-        # Load and analyze gamestates
-        gamestates = []
-        if gamestates_file.exists():
-            gamestates = self._load_jsonl(gamestates_file)
+        # Extract strategy metrics from stats
+        jokers_acquired = stats.get("jokers_acquired", 0)
+        consumables_used = stats.get("consumables_used", 0)
+        hands_played = stats.get("hands_played_total", 0)
+        shop_visits = stats.get("shop_visits", 0)
 
-        # Load and analyze responses
+        # Load and analyze responses for LLM metrics
         responses = []
         if responses_file.exists():
             responses = self._load_jsonl(responses_file)
 
-        # Extract game metrics
-        game_metrics = self._extract_game_metrics(gamestates)
-        llm_metrics = self._extract_llm_metrics(responses)
+        llm_metrics = self._extract_llm_metrics(responses, stats)
 
         return RunMetrics(
             version=version,
@@ -247,29 +264,29 @@ class BenchmarkAnalyzer:
             started_at=started_at,
             completed_at=completed_at,
             duration_seconds=duration_seconds,
-            completed=completed_at is not None,
-            won=game_metrics.get("won", False),
-            final_ante=game_metrics.get("final_ante", 0),
-            final_round=game_metrics.get("final_round", 0),
-            final_money=game_metrics.get("final_money", 0),
-            peak_money=game_metrics.get("peak_money", 0),
+            completed=stats.get("completed_successfully", False),
+            won=won,
+            final_ante=final_ante,
+            final_round=final_round,
+            final_money=final_money,
+            peak_money=peak_money,
             total_requests=len(responses),
-            total_responses=config.get("total_responses", 0),
+            total_responses=stats.get("total_responses", len(responses)),
             success_rate=llm_metrics.get("success_rate", 0.0),
             avg_response_time=llm_metrics.get("avg_response_time", 0.0),
             total_tokens=llm_metrics.get("total_tokens", 0),
             avg_tokens_per_request=llm_metrics.get("avg_tokens_per_request", 0.0),
-            hands_played=game_metrics.get("hands_played", 0),
-            total_chips_scored=game_metrics.get("total_chips_scored", 0),
-            avg_chips_per_hand=game_metrics.get("avg_chips_per_hand", 0.0),
+            hands_played=hands_played,
+            total_chips_scored=0,  # Not easily extractable from v0.3.0 format
+            avg_chips_per_hand=0.0,  # Not easily extractable from v0.3.0 format
             parsing_errors=llm_metrics.get("parsing_errors", 0),
             timeout_errors=llm_metrics.get("timeout_errors", 0),
-            shop_purchases=game_metrics.get("shop_purchases", 0),
-            jokers_acquired=game_metrics.get("jokers_acquired", 0),
-            consumables_used=game_metrics.get("consumables_used", 0),
-            blinds_skipped=game_metrics.get("blinds_skipped", 0),
+            shop_purchases=shop_visits,  # Use shop_visits as proxy
+            jokers_acquired=jokers_acquired,
+            consumables_used=consumables_used,
+            blinds_skipped=0,  # Not directly available in stats
             raw_config=config,
-            raw_gamestates=gamestates,
+            raw_stats=stats,
             raw_responses=responses,
         )
 
@@ -286,76 +303,27 @@ class BenchmarkAnalyzer:
                             continue
         return data
 
-    def _extract_game_metrics(self, gamestates: list[dict[str, Any]]) -> dict[str, Any]:
-        """Extract game performance metrics from gamestates."""
-        if not gamestates:
-            return {}
-
-        final_state = gamestates[-1].get("game_state_after", {})
-        game_info = final_state.get("game", {})
-
-        # Track progression through gamestates
-        peak_money = 0
-        hands_played = 0
-        total_chips = 0
-        shop_purchases = 0
-        jokers_acquired = 0
-        consumables_used = 0
-        blinds_skipped = 0
-
-        for state_entry in gamestates:
-            state = state_entry.get("game_state_after", {})
-            game = state.get("game", {})
-
-            # Track peak money
-            money = game.get("dollars", 0)
-            peak_money = max(peak_money, money)
-
-            # Track game actions from function calls
-            function_call = state_entry.get("function", {})
-            if function_call:
-                name = function_call.get("name", "")
-                args = function_call.get("arguments", {})
-
-                if name == "play_hand_or_discard" and args.get("action") == "play_hand":
-                    hands_played += 1
-                    # Estimate chips from game state change
-                    chips_before = (
-                        state_entry.get("game_state_before", {})
-                        .get("game", {})
-                        .get("chips", 0)
-                    )
-                    chips_after = game.get("chips", 0)
-                    total_chips += max(0, chips_after - chips_before)
-
-                elif name == "skip_or_select_blind" and args.get("action") == "skip":
-                    blinds_skipped += 1
-
-                # TODO: Add tracking for shop purchases, jokers, consumables
-                # This requires more detailed analysis of game state changes
-
-        avg_chips_per_hand = total_chips / hands_played if hands_played > 0 else 0
-
-        return {
-            "won": game_info.get("won", False),
-            "final_ante": game_info.get("round", 0),  # Current round as proxy for ante
-            "final_round": game_info.get("round", 0),
-            "final_money": game_info.get("dollars", 0),
-            "peak_money": peak_money,
-            "hands_played": hands_played,
-            "total_chips_scored": total_chips,
-            "avg_chips_per_hand": avg_chips_per_hand,
-            "shop_purchases": shop_purchases,
-            "jokers_acquired": jokers_acquired,
-            "consumables_used": consumables_used,
-            "blinds_skipped": blinds_skipped,
-        }
-
-    def _extract_llm_metrics(self, responses: list[dict[str, Any]]) -> dict[str, Any]:
-        """Extract LLM performance metrics from responses."""
+    def _extract_llm_metrics(
+        self, responses: list[dict[str, Any]], stats: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Extract LLM performance metrics from responses and stats."""
         if not responses:
-            return {}
+            # Fallback to stats if available
+            return {
+                "success_rate": 1.0
+                - (
+                    stats.get("failed_requests", 0)
+                    / max(stats.get("total_responses", 1), 1)
+                ),
+                "avg_response_time": stats.get("average_response_time_ms", 0)
+                / 1000.0,  # Convert to seconds
+                "total_tokens": 0,  # Not available in stats
+                "avg_tokens_per_request": 0.0,
+                "parsing_errors": stats.get("failed_requests", 0),
+                "timeout_errors": 0,
+            }
 
+        # Process responses and count errors
         successful_responses = 0
         total_tokens = 0
         total_response_time = 0
@@ -363,10 +331,8 @@ class BenchmarkAnalyzer:
         timeout_errors = 0
 
         for response in responses:
-            # Check if response was successful
-            error = response.get("error")
-            if error:
-                error_type = error.get("code", "")
+            if self._is_error_response(response):
+                error_type = response.get("error", {}).get("code", "")
                 if "timeout" in error_type.lower():
                     timeout_errors += 1
                 else:
@@ -374,17 +340,44 @@ class BenchmarkAnalyzer:
                 continue
 
             successful_responses += 1
+            token_usage, response_time = self._extract_response_metrics(response)
+            total_tokens += token_usage
+            total_response_time += response_time
 
-            # Extract token usage
-            body = response.get("response", {}).get("body", {})
-            usage = body.get("usage", {})
-            total_tokens += usage.get("total_tokens", 0)
+        return self._calculate_final_metrics(
+            len(responses),
+            successful_responses,
+            total_tokens,
+            total_response_time,
+            parsing_errors,
+            timeout_errors,
+        )
 
-            # Extract timing info
-            time_info = body.get("time_info", {})
-            total_response_time += time_info.get("total_time", 0)
+    def _is_error_response(self, response: dict[str, Any]) -> bool:
+        """Check if response contains an error."""
+        return response.get("error") is not None
 
-        total_requests = len(responses)
+    def _extract_response_metrics(self, response: dict[str, Any]) -> tuple[int, float]:
+        """Extract token usage and response time from a successful response."""
+        body = response.get("response", {}).get("body", {})
+        usage = body.get("usage", {})
+        time_info = body.get("time_info", {})
+
+        token_usage = usage.get("total_tokens", 0)
+        response_time = time_info.get("total_time", 0)
+
+        return token_usage, response_time
+
+    def _calculate_final_metrics(
+        self,
+        total_requests: int,
+        successful_responses: int,
+        total_tokens: int,
+        total_response_time: float,
+        parsing_errors: int,
+        timeout_errors: int,
+    ) -> dict[str, Any]:
+        """Calculate final LLM metrics."""
         success_rate = (
             successful_responses / total_requests if total_requests > 0 else 0
         )
@@ -431,6 +424,7 @@ class BenchmarkAnalyzer:
 
             # Performance metrics
             final_antes = [r.final_ante for r in analysis_runs]
+            final_rounds = [r.final_round for r in analysis_runs]
             final_moneys = [r.final_money for r in analysis_runs]
             peak_moneys = [r.peak_money for r in analysis_runs]
             durations = [
@@ -438,6 +432,7 @@ class BenchmarkAnalyzer:
             ]
 
             avg_final_ante = statistics.mean(final_antes) if final_antes else 0
+            avg_final_round = statistics.mean(final_rounds) if final_rounds else 0
             avg_final_money = statistics.mean(final_moneys) if final_moneys else 0
             avg_peak_money = statistics.mean(peak_moneys) if peak_moneys else 0
             avg_duration = statistics.mean(durations) if durations else 0
@@ -537,6 +532,7 @@ class BenchmarkAnalyzer:
                 completion_rate=completion_rate,
                 avg_duration_seconds=avg_duration,
                 avg_final_ante=avg_final_ante,
+                avg_final_round=avg_final_round,
                 avg_final_money=avg_final_money,
                 avg_peak_money=avg_peak_money,
                 win_rate=win_rate,
@@ -610,6 +606,19 @@ class BenchmarkAnalyzer:
         """Generate leaderboard and detailed analysis files organized by version/strategy."""
         print("Generating leaderboard...")
 
+        # Check if output directory exists and ask for confirmation
+        if output_dir.exists() and any(output_dir.iterdir()):
+            print(f"Output directory '{output_dir}' already exists and contains files.")
+            response = (
+                input("Do you want to overwrite the existing content? (y/N): ")
+                .strip()
+                .lower()
+            )
+            if response not in ("y", "yes"):
+                print("Benchmark analysis cancelled.")
+                return
+            print("Proceeding with overwrite...")
+
         output_dir.mkdir(exist_ok=True)
 
         # Group metrics by version and strategy
@@ -627,10 +636,10 @@ class BenchmarkAnalyzer:
                 strategy_dir = version_dir / strategy
                 strategy_dir.mkdir(exist_ok=True)
 
-                # Sort metrics within this strategy by performance score
+                # Sort metrics within this strategy by average final round reached
                 sorted_metrics = sorted(
                     metrics_list,
-                    key=lambda x: x.performance_score,
+                    key=lambda x: x.avg_final_round,
                     reverse=True,
                 )
 
@@ -786,7 +795,7 @@ class BenchmarkAnalyzer:
         # Print top performers across all strategies for immediate feedback
         all_sorted_metrics = sorted(
             self.aggregated_metrics.values(),
-            key=lambda x: x.performance_score,
+            key=lambda x: x.avg_final_round,
             reverse=True,
         )
 
@@ -796,7 +805,7 @@ class BenchmarkAnalyzer:
                 f"{i + 1}. {metrics.model} ({metrics.strategy}, v{metrics.version}) - "
                 f"Score: {metrics.performance_score:.1f}, "
                 f"Win Rate: {metrics.win_rate:.1%}, "
-                f"Avg Ante: {metrics.avg_final_ante:.1f}"
+                f"Avg Round: {metrics.avg_final_round:.1f}"
             )
 
 
