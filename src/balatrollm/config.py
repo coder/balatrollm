@@ -1,7 +1,6 @@
 """Configuration management for BalatroLLM."""
 
 import json
-import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -18,13 +17,13 @@ class Config:
     strategy: str = "default"  # Can be strategy name or path to strategy directory
 
     @classmethod
-    def from_environment(cls) -> "Config":
-        """Create configuration from environment variables."""
+    def from_defaults(cls) -> "Config":
+        """Create configuration with default values."""
         return cls(
-            model=os.getenv("LITELLM_MODEL", "cerebras-gpt-oss-120b"),
-            base_url=os.getenv("LITELLM_BASE_URL", "http://localhost:4000"),
-            api_key=os.getenv("LITELLM_API_KEY", "sk-balatrollm-proxy-key"),
-            strategy=os.getenv("BALATROLLM_STRATEGY", "default"),
+            model="cerebras/gpt-oss-120b",
+            base_url="http://localhost:4000",
+            api_key="sk-balatrollm-proxy-key",
+            strategy="default",
         )
 
     @classmethod
@@ -58,10 +57,10 @@ class Config:
                     f"Please use a config file from the same version or update your repository."
                 )
 
-        # Create config with values from file, CLI overrides, or environment defaults
+        # Create config with values from file, CLI overrides, or defaults
         return cls(
             model=config_data["model"],
-            base_url=base_url or os.getenv("LITELLM_BASE_URL", "http://localhost:4000"),
-            api_key=api_key or os.getenv("LITELLM_API_KEY", "sk-balatrollm-proxy-key"),
+            base_url=base_url or "http://localhost:4000",
+            api_key=api_key or "sk-balatrollm-proxy-key",
             strategy=config_data["strategy"],
         )

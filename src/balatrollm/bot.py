@@ -471,7 +471,7 @@ async def main():
     """Example usage of the LLM bot."""
     from .config import Config
 
-    config = Config.from_environment()
+    config = Config.from_defaults()
     bot = LLMBot(config)
 
     # Validate proxy connection and model before starting game

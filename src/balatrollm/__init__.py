@@ -4,7 +4,6 @@ __version__ = "0.3.0"
 
 import argparse
 import asyncio
-import os
 import sys
 from pathlib import Path
 
@@ -37,13 +36,12 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  balatrollm --model cerebras-gpt-oss-120b
-  balatrollm --model groq-qwen32b --base-url http://localhost:4000
+  balatrollm --model cerebras/gpt-oss-120b
+  balatrollm --model groq/qwen/qwen3-32b --base-url http://localhost:4000
   balatrollm --strategy aggressive
-  balatrollm --strategy /path/to/my/custom/strategy
-  balatrollm --strategy ../custom-strategies/experimental
+  balatrollm --strategy path/to/my/strategy/directory
   balatrollm --list-models
-  balatrollm --from-config runs/v0.2.0/cerebras-qwen3-235b/default/20250824_145835_RedDeck_s1_OOOO155/config.json
+  balatrollm --config runs/version/provider/model/strategy/run/config.json
   balatrollm benchmark --runs-dir runs --output-dir benchmark_results
         """,
     )
@@ -54,17 +52,17 @@ Examples:
     # Default command (play game) - no subcommand needed, just use main parser
     parser.add_argument(
         "--model",
-        default=os.getenv("LITELLM_MODEL", "cerebras-qwen3-235b"),
-        help="Model name to use from LiteLLM proxy (default: cerebras-qwen3-235b)",
+        default="cerebras/gpt-oss-120b",
+        help="Model name to use from LiteLLM proxy (default: cerebras/gpt-oss-120b)",
     )
     parser.add_argument(
         "--base-url",
-        default=os.getenv("LITELLM_BASE_URL", "http://localhost:4000"),
+        default="http://localhost:4000",
         help="LiteLLM base URL (default: http://localhost:4000)",
     )
     parser.add_argument(
         "--api-key",
-        default=os.getenv("LITELLM_API_KEY", "sk-balatrollm-proxy-key"),
+        default="sk-balatrollm-proxy-key",
         help="LiteLLM proxy API key (default: sk-balatrollm-proxy-key)",
     )
     parser.add_argument(
@@ -79,14 +77,14 @@ Examples:
     )
     parser.add_argument(
         "--strategy",
-        default=os.getenv("BALATROLLM_STRATEGY", "default"),
+        default="default",
         help="Strategy to use. Can be a built-in strategy name (default, aggressive) or a path to a strategy directory (default: default)",
     )
     parser.add_argument(
         "--verbose", "-v", action="store_true", help="Enable verbose logging"
     )
     parser.add_argument(
-        "--from-config",
+        "--config",
         help="Load configuration from a previous run's config.json file",
     )
 
@@ -144,16 +142,14 @@ def _validate_config_file(config_path: str) -> None:
 
 async def run_bot(args) -> None:
     """Run the Balatro bot with the given arguments."""
-    if args.from_config:
+    if args.config:
         # Load config from file, but allow CLI arguments to override base_url and api_key
         config = Config.from_config_file(
-            args.from_config,
+            args.config,
             base_url=args.base_url
-            if args.base_url != os.getenv("LITELLM_BASE_URL", "http://localhost:4000")
+            if args.base_url != "http://localhost:4000"
             else None,
-            api_key=args.api_key
-            if args.api_key != os.getenv("LITELLM_API_KEY", "sk-balatrollm-proxy-key")
-            else None,
+            api_key=args.api_key if args.api_key != "sk-balatrollm-proxy-key" else None,
         )
     else:
         config = Config(
