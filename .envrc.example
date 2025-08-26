@@ -4,10 +4,6 @@
 # Load the virtual environment
 source .venv/bin/activate
 
-# Example environment variables:
-# export MY_VARIABLE="some_value"
-# export ANOTHER_VARIABLE="another_value"
-
 # Python-specific variables
 export PYTHONUNBUFFERED="1"
 export PYTHONPATH="${PWD}/src:${PYTHONPATH}"
@@ -15,23 +11,14 @@ export PYTHONPATH="${PWD}/src:${PYTHONPATH}"
 # Disable git lfs
 export GIT_LFS_SKIP_SMUDGE=1
 
-# Example: Django settings module
-# export DJANGO_SETTINGS_MODULE="myproject.settings.local"
-
-# Example: Flask app
-# export FLASK_APP="myapp:create_app()"
-# export FLASK_ENV="development"
-
-# LITELLM PROXY CONFIGURATION
-# The bot now uses LiteLLM proxy for unified model access
-export LITELLM_MODEL="cerebras-gpt-oss-120b"           # Available models: cerebras-gpt-oss-120b, groq-qwen32b, local-deepseek, openai-gpt4o, anthropic-sonnet
-export LITELLM_BASE_URL="http://localhost:4000"
-export LITELLM_API_KEY="sk-balatrollm-proxy-key"
-
 # BALATROLLM CONFIGURATION
-export BALATROLLM_STRATEGY="default"                   # Available strategies: default, aggressive
+# The CLI uses sensible defaults - no configuration needed!
+# - Default model: cerebras/gpt-oss-120b
+# - Default base URL: http://localhost:4000
+# - Default API key: sk-balatrollm-proxy-key
+# - Default strategy: default
 
-# PROVIDER API KEYS (used by LiteLLM proxy)
+# PROVIDER API KEYS (used by LiteLLM or direct provider access)
 # You need to set the API keys for the providers you want to use
 
 # CEREBRAS
@@ -40,20 +27,10 @@ export CEREBRAS_API_KEY="your-cerebras-api-key"
 # GROQ
 export GROQ_API_KEY="your-groq-api-key"
 
-# OPENAI (optional)
+# OPENAI
 export OPENAI_API_KEY="your-openai-api-key"
 
-# ANTHROPIC (optional)
+# ANTHROPIC
 export ANTHROPIC_API_KEY="your-anthropic-api-key"
 
-# LMSTUDIO (for local-deepseek model)
-# No API key needed, just make sure LM Studio is running on localhost:1234
-
-# TTS
-
-# Edge-TTS
-export TTS_API_KEY="your_api_key_here"
-export TTS_MODEL="tts-1"
-export TTS_VOICE="en-US-AvaNeural"
-export TTS_SPEED=1.0
-export TTS_BASE_URL="https://api.groq.com/openai/v1"
+# OTHER PROVIDERS ...
