@@ -1,0 +1,5 @@
+wrap = "keep"
+number = true
+end_of_line = "lf"
+validate = true
+exclude = ["balatrobot/**", "balatrobench/**", "CHANGELOG.md", ".venv/**"]
