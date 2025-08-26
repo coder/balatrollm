@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install install-dev lint lint-fix format typecheck test test-cov quality clean start all dev
+.PHONY: help install install-dev lint lint-fix format typecheck test test-cov quality clean setup teardown all
 
 # Colors for output
 YELLOW := \033[33m
@@ -49,6 +49,10 @@ typecheck: ## Run type checker
 	@echo "$(YELLOW)Running type checker...$(RESET)"
 	$(TYPECHECK)
 
+quality: lint typecheck format ## Run all code quality checks
+	@echo "$(GREEN)✓ All checks completed$(RESET)"
+
+# Test targets
 test: ## Run tests
 	@echo "$(YELLOW)Running tests...$(RESET)"
 	pytest
@@ -57,8 +61,8 @@ test-cov: ## Run tests with coverage report
 	@echo "$(YELLOW)Running tests with coverage...$(RESET)"
 	pytest --cov=src/balatrollm --cov-report=term-missing --cov-report=html
 
-quality: lint format typecheck test ## Run all code quality checks
-	@echo "$(GREEN)✓ All quality checks completed$(RESET)"
+all: lint format typecheck test ## Run all code quality checks and tests
+	@echo "$(GREEN)✓ All checks completed$(RESET)"
 
 # Build targets
 clean: ## Clean build artifacts and caches
@@ -70,8 +74,8 @@ clean: ## Clean build artifacts and caches
 	find . -type f -name "*.pyc" -delete
 	@echo "$(GREEN)✓ Cleanup completed$(RESET)"
 
-# Game targetmaks
-start: ## Kill previous instances and start LiteLLM server + Balatro
+# Game targets
+setup: ## Kill previous instances and start LiteLLM server + Balatro
 	@echo "$(YELLOW)Stopping all previous instances...$(RESET)"
 	@pkill -f litellm 2>/dev/null || true
 	@./balatro.sh --kill 2>/dev/null || true
@@ -81,9 +85,9 @@ start: ## Kill previous instances and start LiteLLM server + Balatro
 	@echo "$(YELLOW)Starting Balatro...$(RESET)"
 	@./balatro.sh
 
-# Convenience targets
-dev: format lint typecheck test ## Quick development check
-	@echo "$(GREEN)✓ Development checks completed$(RESET)"
-
-all: format lint typecheck ## Complete quality check
-	@echo "$(GREEN)✓ All checks completed successfully$(RESET)"
+teardown: ## Stop LiteLLM server and Balatro processes
+	@echo "$(YELLOW)Stopping LiteLLM proxy server...$(RESET)"
+	@pkill -f litellm 2>/dev/null || true
+	@echo "$(YELLOW)Stopping Balatro...$(RESET)"
+	@./balatro.sh --kill 2>/dev/null || true
+	@echo "$(GREEN)✓ Services stopped$(RESET)"
