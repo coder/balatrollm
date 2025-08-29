@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.4.0](https://github.com/S1M0N38/balatrollm/compare/v0.3.0...v0.4.0) (2025-08-29)
+
+
+### Features
+
+* add new models and update old ones to new format ([c99cb0a](https://github.com/S1M0N38/balatrollm/commit/c99cb0a2588a97282364bf9faffd39b125afd7e4))
+* add setup and teardown targets ([e18a048](https://github.com/S1M0N38/balatrollm/commit/e18a04896256035a8a6f3941243b4ebbe56d7bfd))
+* **config:** add metadata fields and simplify structure ([aae7d16](https://github.com/S1M0N38/balatrollm/commit/aae7d1680345180ab6cb0e7d57c157ab8bc1d907))
+* remove support for env vars update flags ([fe93936](https://github.com/S1M0N38/balatrollm/commit/fe93936aed3473a39c2ae1f28ddf60e432dae940))
+* update benchmark and data collection to new dir structure ([1d21cbe](https://github.com/S1M0N38/balatrollm/commit/1d21cbebf3e9460d81a55b64bfb2746ad939a9ea))
+
+
+### Documentation
+
+* remove the footer form the readme ([db5d4c2](https://github.com/S1M0N38/balatrollm/commit/db5d4c22ab060074db8367fc2c07d99ca03c955a))
+* update CLAUDE.md with help text from commands ([f3b78af](https://github.com/S1M0N38/balatrollm/commit/f3b78afe1341fabf95bd1098274c3f14e8322272))
+* update documentation to reflect architecture changes ([181b4be](https://github.com/S1M0N38/balatrollm/commit/181b4bed5f8d75bf00bbf3899972a2a00bac0835))
+* update README.md ([da45438](https://github.com/S1M0N38/balatrollm/commit/da45438c1ec6fbdb515e80a80cf1ed6e6489e12e))
+
 ## [0.3.0](https://github.com/S1M0N38/balatrollm/compare/v0.2.0...v0.3.0) (2025-08-25)
 
 
