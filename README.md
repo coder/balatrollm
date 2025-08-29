@@ -91,44 +91,24 @@ balatrollm --help
 ```
 
 ```
-usage: balatrollm [-h] [--model MODEL] [--base-url BASE_URL]
-                  [--api-key API_KEY] [--list-models]
-                  [--litellm-config LITELLM_CONFIG] [--strategy STRATEGY]
-                  [--verbose] [--config CONFIG]
+usage: balatrollm [-h] [--model MODEL] [--list-models] [--strategy STRATEGY]
+                  [--base-url BASE_URL] [--api-key API_KEY] [--config CONFIG]
                   {benchmark} ...
 
 LLM-powered Balatro bot using LiteLLM proxy
 
 positional arguments:
-  {benchmark}           Available commands
-    benchmark           Analyze runs and generate leaderboards
+  {benchmark}          Available commands
+    benchmark          Analyze runs and generate leaderboards
 
 options:
-  -h, --help            show this help message and exit
-  --model MODEL         Model name to use from LiteLLM proxy (default:
-                        cerebras/gpt-oss-120b)
-  --base-url BASE_URL   LiteLLM base URL (default: http://localhost:4000)
-  --api-key API_KEY     LiteLLM proxy API key (default: sk-balatrollm-proxy-
-                        key)
-  --list-models         List available models from the proxy and exit
-  --litellm-config LITELLM_CONFIG
-                        Path to LiteLLM configuration file (default:
-                        config/litellm.yaml)
-  --strategy STRATEGY   Strategy to use. Can be a built-in strategy name
-                        (default, aggressive) or a path to a strategy
-                        directory (default: default)
-  --verbose, -v         Enable verbose logging
-  --config CONFIG       Load configuration from a previous run's config.json
-                        file
-
-Examples:
-  balatrollm --model cerebras/gpt-oss-120b
-  balatrollm --model groq/qwen/qwen3-32b --base-url http://localhost:4000
-  balatrollm --strategy aggressive
-  balatrollm --strategy path/to/my/strategy/directory
-  balatrollm --list-models
-  balatrollm --config runs/version/provider/model/strategy/run/config.json
-  balatrollm benchmark --runs-dir runs --output-dir benchmark_results
+  -h, --help           show this help message and exit
+  --model MODEL        Model name to use from LiteLLM proxy (default: cerebras/gpt-oss-120b)
+  --list-models        List available models from the proxy and exit
+  --strategy STRATEGY  Name of the strategy to use (default: default)
+  --base-url BASE_URL  LiteLLM base URL (default: http://localhost:4000)
+  --api-key API_KEY    LiteLLM proxy API key (default: sk-balatrollm-proxy- key)
+  --config CONFIG      Load configuration from a previous run's config.json file
 ```
 
 #### `Makefile` - Development Workflow

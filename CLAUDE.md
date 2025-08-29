@@ -25,44 +25,35 @@ litellm --config config/litellm.yaml
 ### Running the Application
 
 ```
-usage: balatrollm [-h] [--model MODEL] [--base-url BASE_URL]
-                  [--api-key API_KEY] [--list-models]
-                  [--litellm-config LITELLM_CONFIG] [--strategy STRATEGY]
-                  [--verbose] [--config CONFIG]
+usage: balatrollm [-h] [--model MODEL] [--list-models] [--strategy STRATEGY]
+                  [--base-url BASE_URL] [--api-key API_KEY] [--config CONFIG]
                   {benchmark} ...
 
 LLM-powered Balatro bot using LiteLLM proxy
 
 positional arguments:
-  {benchmark}           Available commands
-    benchmark           Analyze runs and generate leaderboards
+  {benchmark}          Available commands
+    benchmark          Analyze runs and generate leaderboards
 
 options:
-  -h, --help            show this help message and exit
-  --model MODEL         Model name to use from LiteLLM proxy (default:
-                        cerebras/gpt-oss-120b)
-  --base-url BASE_URL   LiteLLM base URL (default: http://localhost:4000)
-  --api-key API_KEY     LiteLLM proxy API key (default: sk-balatrollm-proxy-
-                        key)
-  --list-models         List available models from the proxy and exit
-  --litellm-config LITELLM_CONFIG
-                        Path to LiteLLM configuration file (default:
-                        config/litellm.yaml)
-  --strategy STRATEGY   Strategy to use. Can be a built-in strategy name
-                        (default, aggressive) or a path to a strategy
-                        directory (default: default)
-  --verbose, -v         Enable verbose logging
-  --config CONFIG       Load configuration from a previous run's config.json
-                        file
+  -h, --help           show this help message and exit
+  --model MODEL        Model name to use from LiteLLM proxy (default:
+                       cerebras/gpt-oss-120b)
+  --list-models        List available models from the proxy and exit
+  --strategy STRATEGY  Name of the strategy to use (default: default)
+  --base-url BASE_URL  LiteLLM base URL (default: http://localhost:4000)
+  --api-key API_KEY    LiteLLM proxy API key (default: sk-balatrollm-proxy-
+                       key)
+  --config CONFIG      Load configuration from a previous run's config.json
+                       file
 
 Examples:
   balatrollm --model cerebras/gpt-oss-120b
   balatrollm --model groq/qwen/qwen3-32b --base-url http://localhost:4000
   balatrollm --strategy aggressive
-  balatrollm --strategy path/to/my/strategy/directory
   balatrollm --list-models
-  balatrollm --config runs/version/provider/model/strategy/run/config.json
-  balatrollm benchmark --runs-dir runs --output-dir benchmark_results
+  balatrollm --config runs/v0.3.0/default/cerebras/gpt-oss-120b/20240101_120000_RedDeck_s1_OOOO155/config.json
+  balatrollm benchmark --runs-dir runs --output-dir benchmarks
 ```
 
 ### Development
@@ -117,15 +108,17 @@ Examples:
 
 ## Architecture
 
-**LLMBot (`src/balatrollm/bot.py`)**: Main bot class with Config integration, StrategyManager, LLM decision-making, response history tracking, BalatroClient integration, proxy validation, model validation, and project version management.
+**LLMBot (`src/balatrollm/bot.py`)**: Main bot class with clean architecture featuring Config integration, StrategyManager for template rendering, LLM decision-making with retry logic, response history tracking, and BalatroClient integration.
 
-**CLI Entry Point (`src/balatrollm/__init__.py`)**: Command-line interface with argument parsing, configuration validation, and async game execution.
+**CLI Entry Point (`src/balatrollm/__init__.py`)**: Simplified command-line interface with argument parsing and async game execution using modern Python patterns.
 
-**Configuration (`src/balatrollm/config.py`)**: Config dataclass handling model settings and bot parameters. Base URLs and API keys use CLI defaults for security.
+**Configuration (`src/balatrollm/config.py`)**: Config dataclass with metadata fields (name, description, author, tags) for enhanced run tracking and version management.
 
-**Strategy System (`src/balatrollm/strategies.py`)**: StrategyManager class for Jinja2-based strategy templates and tool loading.
+**Strategy System (`src/balatrollm/strategies.py`)**: Lightweight StrategyManager class for managing Jinja2-based strategy templates with built-in strategy support only.
 
-**Data Collection (`src/balatrollm/data_collection.py`)**: RunDataCollector for game execution logging, performance tracking, and run data organization.
+**Data Collection (`src/balatrollm/data_collection.py`)**: RunStatsCollector for structured game execution logging, comprehensive performance tracking, and organized run data storage.
+
+**Benchmarking (`src/balatrollm/benchmark.py`)**: Comprehensive benchmark analysis system with aggregated statistics, leaderboard generation, and hierarchical result organization.
 
 **Strategies (`src/balatrollm/strategies/`)**: Strategy-based organization:
 
@@ -143,9 +136,10 @@ Each strategy contains:
 
 **Game Flow**:
 
-1. Validate proxy connection and model availability
-2. Game loop: Get state → Render strategy templates → Send to LLM → Parse response → Execute action
-3. Handle different states: BLIND_SELECT, SELECTING_HAND, SHOP, ROUND_EVAL
+1. Initialize game with run directory and data collection setup
+2. Main game loop: Get state → Render strategy templates → Send to LLM with retry logic → Parse response → Execute action
+3. Handle game states: BLIND_SELECT, SELECTING_HAND, SHOP, ROUND_EVAL, GAME_OVER
+4. Collect comprehensive statistics and generate run reports
 
 **Available Models** (`config/litellm.yaml`):
 
@@ -188,7 +182,8 @@ src/balatrollm/
         └── TOOLS.json             # Function definitions
 
 balatro.sh                         # Game automation script
-runs/                              # Game execution logs (organized by version/model/strategy)
+runs/                              # Game execution logs (organized by version/strategy/provider/model)
+benchmarks/                        # Benchmark results (organized by version/strategy/provider/model)
 tests/test_llm.py                  # Test suite
 ```
 
@@ -199,25 +194,27 @@ tests/test_llm.py                  # Test suite
 
 ## Results Tracking
 
-- `runs/[version]/[provider]/[model-name]/[strategy]/[timestamp]_[deck]_[seed].jsonl`
+**Run Data Structure:**
+
+- `runs/[version]/[strategy]/[provider]/[model-name]/[timestamp]_[deck]_[seed]/`
 - JSONL format for performance analysis across providers, models, and strategies
 - Provider/model parsing: `groq/qwen/qwen3-32b` → `groq/qwen--qwen3-32b` (filesystem safe)
-- Enables grouping by provider (e.g., all Cerebras models) or specific model comparisons
+- Strategy-first organization enables easy comparison across providers/models within strategies
+
+**Benchmark Results Structure:**
+
+- `benchmarks/[version]/[strategy]/[provider]/[model-name].json` - Detailed model analysis
+- `benchmarks/[version]/[strategy]/leaderboard.json` - Strategy-specific leaderboard
+- Hierarchical structure matches runs organization for consistency
 
 ## Strategy System
 
-The `--strategy` flag accepts either built-in strategy names or paths to custom strategy directories:
+The `--strategy` flag accepts built-in strategy names:
 
 **Built-in Strategies**:
 
 - **Default** (`--strategy default`): Conservative, financially disciplined approach
 - **Aggressive** (`--strategy aggressive`): High-risk, high-reward approach with aggressive spending
-
-**Custom Strategy Paths**:
-
-- Absolute paths: `--strategy /path/to/my/custom/strategy`
-- Relative paths: `--strategy ../custom-strategies/experimental`
-- The system will automatically resolve built-in strategy names first, then fall back to path resolution
 
 Each strategy directory must contain:
 
