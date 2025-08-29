@@ -10,39 +10,37 @@ from jinja2 import Environment, FileSystemLoader
 class StrategyManager:
     """Lightweight helper for managing Jinja2 strategy templates."""
 
-    def __init__(self, strategy_path: Path | str):
+    def __init__(
+        self, strategy: str, strategies_dir=Path(__file__).parent / "strategies"
+    ):
         """Initialize StrategyManager with a strategy path.
 
         Args:
-            strategy_path: Path to strategy directory (can be absolute or relative)
+            strategy: name of the strategy
+            strategies_dir: path to the strategies directory
         """
-        self.strategy_path = Path(strategy_path)
 
-        # Resolve to absolute path
-        if not self.strategy_path.is_absolute():
-            # If relative path, check if it's a known strategy name
-            builtin_strategies_dir = Path(__file__).parent / "strategies"
-            if (builtin_strategies_dir / self.strategy_path).exists():
-                self.strategy_path = builtin_strategies_dir / self.strategy_path
-            else:
-                # Resolve relative to current working directory
-                self.strategy_path = self.strategy_path.resolve()
+        self.strategy_path = strategies_dir / strategy
 
-        if not self.strategy_path.exists():
+        required_files = [
+            "STRATEGY.md.jinja",
+            "GAMESTATE.md.jinja",
+            "MEMORY.md.jinja",
+            "TOOLS.json",
+        ]
+
+        missing_files = []
+        for file_name in required_files:
+            if not (self.strategy_path / file_name).exists():
+                missing_files.append(file_name)
+
+        if missing_files:
             raise FileNotFoundError(
-                f"Strategy directory not found: {self.strategy_path}"
+                f"Strategy directory missing required files: {missing_files}. "
+                f"Required files: {required_files}"
             )
 
-        if not self.strategy_path.is_dir():
-            raise NotADirectoryError(
-                f"Strategy path is not a directory: {self.strategy_path}"
-            )
-
-        # Extract strategy name from path for logging/identification
-        self.strategy = self.strategy_path.name
-        self.strategy_dir = self.strategy_path
-
-        self.jinja_env = Environment(loader=FileSystemLoader(self.strategy_dir))
+        self.jinja_env = Environment(loader=FileSystemLoader(self.strategy_path))
         self.jinja_env.filters["from_json"] = json.loads
 
     def render_strategy(self) -> str:
@@ -65,6 +63,6 @@ class StrategyManager:
 
     def load_tools(self) -> dict[str, Any]:
         """Load tools from the strategy-specific TOOLS.json file."""
-        tools_file = self.strategy_dir / "TOOLS.json"
+        tools_file = self.strategy_path / "TOOLS.json"
         with open(tools_file) as f:
             return json.load(f)
