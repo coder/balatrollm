@@ -1,7 +1,7 @@
 """Configuration management for BalatroLLM."""
 
 import json
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 from . import __version__
@@ -12,24 +12,36 @@ class Config:
     """Configuration for LLMBot."""
 
     model: str
-    base_url: str = "http://localhost:4000"
-    api_key: str = "sk-balatrollm-proxy-key"
-    strategy: str = "default"  # Can be strategy name or path to strategy directory
+    strategy: str = "default"
+    deck: str = "Red Deck"
+    stake: int = 1
+    seed: str = "OOOO155"
+    challenge: str | None = None
+    version: str = __version__
+    name: str = "Unknown Name"
+    description: str = "Unknown Description"
+    author: str = "BalatroBench"
+    tags: list[str] = field(default_factory=list)
 
     @classmethod
     def from_defaults(cls) -> "Config":
         """Create configuration with default values."""
         return cls(
             model="cerebras/gpt-oss-120b",
-            base_url="http://localhost:4000",
-            api_key="sk-balatrollm-proxy-key",
             strategy="default",
+            deck="Red Deck",
+            stake=1,
+            seed="OOOO155",
+            challenge=None,
+            version="",
+            name="Unknown Name",
+            description="Unknown Description",
+            author="BalatroBench",
+            tags=[],
         )
 
     @classmethod
-    def from_config_file(
-        cls, config_path: str, base_url: str | None = None, api_key: str | None = None
-    ) -> "Config":
+    def from_config_file(cls, config_path: Path) -> "Config":
         """Create configuration from a previous run's config.json file.
 
         Loads model and strategy from config.json, uses CLI overrides if provided,
@@ -37,8 +49,6 @@ class Config:
 
         Args:
             config_path: Path to the config.json file
-            base_url: Optional CLI override for base_url
-            api_key: Optional CLI override for api_key
         """
         config_file = Path(config_path)
         if not config_file.exists():
@@ -56,11 +66,23 @@ class Config:
                     f"does not match current repository version '{__version__}'. "
                     f"Please use a config file from the same version or update your repository."
                 )
+        return cls(**config_data)
 
-        # Create config with values from file, CLI overrides, or defaults
-        return cls(
-            model=config_data["model"],
-            base_url=base_url or "http://localhost:4000",
-            api_key=api_key or "sk-balatrollm-proxy-key",
-            strategy=config_data["strategy"],
-        )
+    def to_config_file(self, config_path: Path) -> None:
+        """Write configuration to a JSON file.
+
+        Saves the current configuration instance to a JSON file with proper
+        formatting and version information.
+
+        Args:
+            config_path: Path to the config file to write
+        """
+        # Convert dataclass to dictionary and ensure version is current
+        config_data = asdict(self)
+        config_data["version"] = __version__
+
+        # Create parent directory if it doesn't exist
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+
+        with config_path.open("w") as f:
+            json.dump(config_data, f, indent=2)
