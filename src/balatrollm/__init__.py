@@ -17,16 +17,52 @@ def main() -> None:
     parser = _create_argument_parser()
     args = parser.parse_args()
 
-    _setup_logging(args.verbose)
+    setup_logging()
 
-    # Handle benchmark command
-    if args.command == "benchmark":
-        _run_benchmark_command(args)
+    match args.command:
+        case "benchmark":
+            cmd_benchmark(args)
+        case None:
+            asyncio.run(cmd_balatrollm(args))
+        case _:
+            print(f"Unknown command: {args.command}")
+            sys.exit(1)
+
+
+async def cmd_balatrollm(args) -> None:
+    """Run the balatrollm command."""
+
+    if args.config:
+        config = Config.from_config_file(args.config)
+    else:
+        config = Config(
+            model=args.model,
+            strategy=args.strategy,
+        )
+
+    bot = LLMBot(config, base_url=args.base_url, api_key=args.api_key)
+
+    if args.list_models:
+        models = await bot.list_available_models()
+        for model in models:
+            print(model)
         return
 
-    # Only validate config file for game commands
-    _validate_config_file(args.litellm_config)
-    asyncio.run(run_bot(args))
+    else:
+        with bot:
+            await bot.play_game()
+
+
+def cmd_benchmark(args) -> None:
+    """Run the benchmark command."""
+    try:
+        run_benchmark_analysis(args.runs_dir, args.output_dir)
+    except FileNotFoundError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Benchmark analysis failed: {e}")
+        sys.exit(1)
 
 
 def _create_argument_parser() -> argparse.ArgumentParser:
@@ -34,16 +70,6 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="LLM-powered Balatro bot using LiteLLM proxy",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  balatrollm --model cerebras/gpt-oss-120b
-  balatrollm --model groq/qwen/qwen3-32b --base-url http://localhost:4000
-  balatrollm --strategy aggressive
-  balatrollm --strategy path/to/my/strategy/directory
-  balatrollm --list-models
-  balatrollm --config runs/version/provider/model/strategy/run/config.json
-  balatrollm benchmark --runs-dir runs --output-dir benchmark_results
-        """,
     )
 
     # Add subcommands
@@ -56,6 +82,17 @@ Examples:
         help="Model name to use from LiteLLM proxy (default: cerebras/gpt-oss-120b)",
     )
     parser.add_argument(
+        "--list-models",
+        action="store_true",
+        help="List available models from the proxy and exit",
+    )
+    parser.add_argument(
+        "--strategy",
+        default="default",
+        type=str,
+        help="Name of the strategy to use (default: default)",
+    )
+    parser.add_argument(
         "--base-url",
         default="http://localhost:4000",
         help="LiteLLM base URL (default: http://localhost:4000)",
@@ -64,24 +101,6 @@ Examples:
         "--api-key",
         default="sk-balatrollm-proxy-key",
         help="LiteLLM proxy API key (default: sk-balatrollm-proxy-key)",
-    )
-    parser.add_argument(
-        "--list-models",
-        action="store_true",
-        help="List available models from the proxy and exit",
-    )
-    parser.add_argument(
-        "--litellm-config",
-        default="config/litellm.yaml",
-        help="Path to LiteLLM configuration file (default: config/litellm.yaml)",
-    )
-    parser.add_argument(
-        "--strategy",
-        default="default",
-        help="Strategy to use. Can be a built-in strategy name (default, aggressive) or a path to a strategy directory (default: default)",
-    )
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose logging"
     )
     parser.add_argument(
         "--config",
@@ -103,110 +122,8 @@ Examples:
     benchmark_parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path("benchmark_results"),
-        help="Output directory for benchmark results (default: benchmark_results)",
+        default=Path("benchmarks"),
+        help="Output directory for benchmark results (default: benchmarks)",
     )
 
     return parser
-
-
-def _setup_logging(verbose: bool) -> None:
-    """Configure application logging."""
-    setup_logging(verbose)
-
-
-def _run_benchmark_command(args) -> None:
-    """Run the benchmark analysis command."""
-    try:
-        run_benchmark_analysis(args.runs_dir, args.output_dir)
-    except FileNotFoundError as e:
-        print(f"Error: {e}")
-        sys.exit(1)
-    except Exception as e:
-        print(f"Benchmark analysis failed: {e}")
-        sys.exit(1)
-
-
-def _validate_config_file(config_path: str) -> None:
-    """Validate LiteLLM config file exists."""
-    import logging
-
-    config_file = Path(config_path)
-    if not config_file.exists():
-        logger = logging.getLogger(__name__)
-        logger.error(f"LiteLLM config file not found: {config_file}")
-        logger.error("Please create the config file or start the proxy manually:")
-        logger.error(f"  litellm --config {config_file}")
-        sys.exit(1)
-
-
-async def run_bot(args) -> None:
-    """Run the Balatro bot with the given arguments."""
-    if args.config:
-        # Load config from file, but allow CLI arguments to override base_url and api_key
-        config = Config.from_config_file(
-            args.config,
-            base_url=args.base_url
-            if args.base_url != "http://localhost:4000"
-            else None,
-            api_key=args.api_key if args.api_key != "sk-balatrollm-proxy-key" else None,
-        )
-    else:
-        config = Config(
-            model=args.model,
-            base_url=args.base_url,
-            api_key=args.api_key,
-            strategy=args.strategy,
-        )
-    bot = LLMBot(config, verbose=args.verbose)
-
-    if args.list_models:
-        await _list_models(bot, args)
-        return
-
-    await _start_game(bot, args)
-
-
-async def _list_models(bot: LLMBot, args) -> None:
-    """List available models and exit."""
-    print("Checking available models from LiteLLM proxy...")
-
-    if not await bot.validate_proxy_connection():
-        print(f"❌ Cannot connect to LiteLLM proxy at {bot.config.base_url}")
-        print(f"Please start the proxy with: litellm --config {args.litellm_config}")
-        sys.exit(1)
-
-    models = await bot.list_available_models()
-    if models:
-        print("✅ Available models:")
-        for model in models:
-            print(f"  - {model}")
-    else:
-        print("❌ No models available or failed to retrieve models")
-
-
-async def _start_game(bot: LLMBot, args) -> None:
-    """Start the game after validation."""
-    print(f"🤖 Starting Balatro LLM Bot with model: {bot.config.model}")
-
-    # Validate connections
-    if not await bot.validate_proxy_connection():
-        print(f"❌ Cannot connect to LiteLLM proxy at {bot.config.base_url}")
-        print(f"Please start the proxy with: litellm --config {args.litellm_config}")
-        sys.exit(1)
-
-    if not await bot.validate_model_exists():
-        print(f"❌ Model '{bot.config.model}' not available")
-        print("Use --list-models to see available models")
-        sys.exit(1)
-
-    print("✅ Proxy connection validated, starting game...")
-
-    try:
-        with bot:
-            await bot.play_game()
-    except KeyboardInterrupt:
-        print("\n🛑 Game interrupted by user")
-    except Exception as e:
-        print(f"❌ Game failed: {e}")
-        sys.exit(1)
