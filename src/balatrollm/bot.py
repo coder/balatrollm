@@ -176,11 +176,11 @@ class LLMBot:
 
         return result
 
-    async def _init_game(self) -> dict[str, Any]:
+    async def _init_game(self, base_dir: Path = Path.cwd()) -> dict[str, Any]:
         """Initialize a new game run with data collection setup."""
 
         # Generate run directory
-        run_dir = generate_run_directory(self.config)
+        run_dir = generate_run_directory(self.config, base_dir=base_dir)
         logger.info(f"Run data will be saved to: {run_dir}")
 
         self.config.to_config_file(run_dir / "config.json")

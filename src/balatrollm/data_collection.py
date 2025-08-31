@@ -11,12 +11,9 @@ from openai.types.chat import ChatCompletion
 from balatrollm.config import Config
 
 
-def generate_run_directory(
-    config: Config,
-    base_dir: Path | None = None,
-) -> Path:
+def generate_run_directory(config: Config, base_dir: Path) -> Path:
     """Generate structured directory path for the run."""
-    base_dir = base_dir or Path.cwd() / "runs"
+    base_dir = base_dir / "runs"
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     provider, model_name = config.model.split(sep="/", maxsplit=1)
