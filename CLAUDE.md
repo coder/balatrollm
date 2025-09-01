@@ -25,9 +25,7 @@ litellm --config config/litellm.yaml
 ### Running the Application
 
 ```
-usage: balatrollm [-h] [--model MODEL] [--list-models] [--strategy STRATEGY]
-                  [--base-url BASE_URL] [--api-key API_KEY] [--config CONFIG]
-                  {benchmark} ...
+usage: balatrollm [-h] [--model MODEL] [--list-models] [--strategy STRATEGY] [--base-url BASE_URL] [--api-key API_KEY] [--config CONFIG] [--runs-dir RUNS_DIR] [--runs RUNS] {benchmark} ...
 
 LLM-powered Balatro bot using LiteLLM proxy
 
@@ -37,23 +35,14 @@ positional arguments:
 
 options:
   -h, --help           show this help message and exit
-  --model MODEL        Model name to use from LiteLLM proxy (default:
-                       cerebras/gpt-oss-120b)
+  --model MODEL        Model name to use from LiteLLM proxy (default: cerebras/gpt-oss-120b)
   --list-models        List available models from the proxy and exit
   --strategy STRATEGY  Name of the strategy to use (default: default)
   --base-url BASE_URL  LiteLLM base URL (default: http://localhost:4000)
-  --api-key API_KEY    LiteLLM proxy API key (default: sk-balatrollm-proxy-
-                       key)
-  --config CONFIG      Load configuration from a previous run's config.json
-                       file
-
-Examples:
-  balatrollm --model cerebras/gpt-oss-120b
-  balatrollm --model groq/qwen/qwen3-32b --base-url http://localhost:4000
-  balatrollm --strategy aggressive
-  balatrollm --list-models
-  balatrollm --config runs/v0.3.0/default/cerebras/gpt-oss-120b/20240101_120000_RedDeck_s1_OOOO155/config.json
-  balatrollm benchmark --runs-dir runs --output-dir benchmarks
+  --api-key API_KEY    LiteLLM proxy API key (default: sk-balatrollm-proxy-key)
+  --config CONFIG      Load configuration from a previous run's config.json file
+  --runs-dir RUNS_DIR  Base directory for storing run data (default: current directory)
+  --runs RUNS          Number of times to run the bot with the same configuration (default: 1)
 ```
 
 ### Development
