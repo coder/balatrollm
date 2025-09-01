@@ -20,7 +20,14 @@ logger = logging.getLogger(__name__)
 
 
 def setup_logging(log_file: Path | None = None) -> None:
-    """Configure logging for the application."""
+    """Configure logging for the application.
+
+    Sets up both console and optional file logging with consistent formatting.
+
+    Args:
+        log_file: Optional path to write log output to a file. If None,
+            only console logging is configured.
+    """
     level = logging.INFO
 
     # Create formatter
@@ -54,9 +61,29 @@ def setup_logging(log_file: Path | None = None) -> None:
 
 
 class LLMBot:
-    """LLM-powered Balatro bot."""
+    """LLM-powered Balatro bot.
+
+    Manages game state processing, LLM communication, and strategy execution
+    for automated Balatro gameplay.
+
+    Attributes:
+        config: Bot configuration containing model and strategy settings.
+        llm_client: AsyncOpenAI client for LLM communication.
+        balatro_client: BalatroClient for game interaction.
+        strategy_manager: Manager for loading and rendering strategy templates.
+        responses: List of LLM responses for memory and debugging.
+        tools: Game state-specific tool definitions loaded from strategy.
+        data_collector: Collector for structured run data and statistics.
+    """
 
     def __init__(self, config: Config, base_url: str, api_key: str):
+        """Initialize the LLM bot.
+
+        Args:
+            config: Bot configuration containing model and strategy settings.
+            base_url: Base URL for the LiteLLM proxy server.
+            api_key: API key for LiteLLM proxy authentication.
+        """
         self.config = config
         self.llm_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
         self.balatro_client = BalatroClient()
@@ -73,7 +100,12 @@ class LLMBot:
         self.balatro_client.disconnect()
 
     async def list_available_models(self) -> list[str]:
-        """Get list of available models from the LiteLLM proxy."""
+        """Get list of available models from the LiteLLM proxy.
+
+        Returns:
+            List of model IDs available from the proxy.
+            Returns empty list if request fails.
+        """
         try:
             models = await self.llm_client.models.list()
             return [model.id for model in models.data]
@@ -81,8 +113,21 @@ class LLMBot:
             logger.error(f"Failed to get models: {e}")
             return []
 
-    async def get_llm_response(self, game_state: dict):
-        """Get LLM response for current game state."""
+    async def get_llm_response(self, game_state: dict) -> ChatCompletion:
+        """Get LLM response for current game state.
+
+        Renders strategy templates and makes LLM request with appropriate tools
+        for the current game state.
+
+        Args:
+            game_state: Current game state dictionary from BalatroClient.
+
+        Returns:
+            ChatCompletion response from the LLM.
+
+        Raises:
+            Exception: If LLM request fails after all retries.
+        """
         state_name = State(game_state["state"]).name
 
         # Generate prompts
@@ -101,8 +146,20 @@ class LLMBot:
 
     async def _make_llm_request_with_retries(
         self, messages: list, tools: list, max_retries: int = 3
-    ):
-        """Make LLM request with exponential backoff retry logic."""
+    ) -> ChatCompletion:
+        """Make LLM request with exponential backoff retry logic.
+
+        Args:
+            messages: List of chat messages to send to the LLM.
+            tools: List of tool definitions available for this game state.
+            max_retries: Maximum number of retry attempts (default: 3).
+
+        Returns:
+            ChatCompletion response from the LLM.
+
+        Raises:
+            Exception: If all retry attempts fail.
+        """
         retry_delay = 1.0
 
         for attempt in range(max_retries):
@@ -140,8 +197,25 @@ class LLMBot:
                 await asyncio.sleep(retry_delay)
                 retry_delay *= 2
 
-    def process_and_execute_tool_call(self, response) -> dict[str, Any]:
-        """Extract tool call from LLM response and execute it."""
+        # This should never be reached due to raise in the exception handler
+        raise RuntimeError("All retry attempts exhausted without raising exception")
+
+    def process_and_execute_tool_call(self, response: ChatCompletion) -> dict[str, Any]:
+        """Extract tool call from LLM response and execute it.
+
+        Parses the first tool call from the LLM response and executes it
+        via the BalatroClient.
+
+        Args:
+            response: ChatCompletion response containing tool calls.
+
+        Returns:
+            Dictionary containing the result from executing the tool call.
+
+        Raises:
+            ValueError: If response has no tool calls or invalid format.
+            json.JSONDecodeError: If tool call arguments are invalid JSON.
+        """
         if not response.choices:
             raise ValueError("No response choices returned from LLM")
 
@@ -177,7 +251,17 @@ class LLMBot:
         return result
 
     async def _init_game(self, base_dir: Path = Path.cwd()) -> dict[str, Any]:
-        """Initialize a new game run with data collection setup."""
+        """Initialize a new game run with data collection setup.
+
+        Creates run directory, sets up data collection, configures logging,
+        and starts a new Balatro game run.
+
+        Args:
+            base_dir: Base directory for storing run data (default: current directory).
+
+        Returns:
+            Initial game state dictionary from starting the run.
+        """
 
         # Generate run directory
         run_dir = generate_run_directory(self.config, base_dir=base_dir)
@@ -202,7 +286,14 @@ class LLMBot:
         return self.balatro_client.send_message("start_run", start_run_args)
 
     async def _run_game_loop(self, game_state: dict[str, Any]) -> None:
-        """Main game loop that processes game states until completion."""
+        """Main game loop that processes game states until completion.
+
+        Continuously processes game states, making LLM decisions and executing
+        actions until the game ends.
+
+        Args:
+            game_state: Initial game state dictionary to start processing.
+        """
         while True:
             current_state = State(game_state["state"])
             logger.info(f"Current state: {current_state}")
@@ -223,19 +314,22 @@ class LLMBot:
                     await asyncio.sleep(1)
                     game_state = self.balatro_client.send_message("get_game_state")
 
-    async def play_game(self) -> None:
+    async def play_game(self, runs_dir: Path = Path.cwd()) -> None:
         """Main game loop.
 
+        Initializes a new game and runs the main game loop until completion
+        or interruption.
+
         Args:
-            deck: Deck name to use
-            stake: Stake level (1-8)
-            seed: Seed for run generation
-            challenge: Optional challenge name
+            runs_dir: Base directory for storing run data (default: current directory).
+
+        Raises:
+            Exception: If game loop fails due to unexpected errors.
         """
         logger.info("Starting LLM bot game loop")
 
         try:
-            game_state = await self._init_game()
+            game_state = await self._init_game(base_dir=runs_dir)
             await self._run_game_loop(game_state)
 
         except KeyboardInterrupt:
