@@ -255,7 +255,9 @@ class RunStatsCollector:
         stats.run_won = final_state["game"].get(
             "won", False
         )  # TODO: check if "won" is the right key
-        stats.completed = stats.run_won or final_state["state"] == "GAME_OVER"
+        stats.completed = (
+            stats.run_won or final_state["state"] == 4
+        )  # 4 is GAME_OVER game state
         stats.final_round = final_state["game"]["round"]
         stats.ante_reached = (
             max(1, (stats.final_round // 3) + 1) if stats.final_round > 0 else 1
