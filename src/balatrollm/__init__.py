@@ -13,7 +13,11 @@ from .config import Config
 
 
 def main() -> None:
-    """Main CLI entry point for balatrollm."""
+    """Main CLI entry point for balatrollm.
+
+    Parses command line arguments and executes the appropriate command.
+    Supports both the main balatrollm command and benchmark subcommand.
+    """
     parser = _create_argument_parser()
     args = parser.parse_args()
 
@@ -30,7 +34,18 @@ def main() -> None:
 
 
 async def cmd_balatrollm(args) -> None:
-    """Run the balatrollm command."""
+    """Run the balatrollm command.
+
+    Creates a bot configuration and runs the main game loop.
+
+    Args:
+        args: Parsed command line arguments containing model, strategy,
+            base_url, api_key, config file path, runs count, and other options.
+    """
+    # Validate runs argument
+    if args.runs < 1:
+        print("Error: --runs must be at least 1")
+        sys.exit(1)
 
     if args.config:
         config = Config.from_config_file(args.config)
@@ -48,13 +63,42 @@ async def cmd_balatrollm(args) -> None:
             print(model)
         return
 
-    else:
-        with bot:
-            await bot.play_game()
+    # Run the bot multiple times
+    for run_number in range(1, args.runs + 1):
+        if args.runs > 1:
+            print(f"\n=== Run {run_number}/{args.runs} ===")
+
+        try:
+            with bot:
+                await bot.play_game(runs_dir=args.runs_dir)
+        except KeyboardInterrupt:
+            print(f"\nInterrupted after {run_number - 1} completed runs")
+            break
+        except Exception as e:
+            print(f"Run {run_number} failed: {e}")
+            if args.runs > 1:
+                print("Continuing to next run...")
+            else:
+                raise
+
+        # Sleep between runs to prevent errors
+        if run_number < args.runs:
+            print("Waiting 3 seconds before next run...")
+            await asyncio.sleep(3)
 
 
 def cmd_benchmark(args) -> None:
-    """Run the benchmark command."""
+    """Run the benchmark command.
+
+    Analyzes run data and generates comprehensive leaderboards.
+
+    Args:
+        args: Parsed command line arguments containing runs_dir and output_dir.
+
+    Raises:
+        FileNotFoundError: If the runs directory doesn't exist.
+        Exception: If benchmark analysis fails for any other reason.
+    """
     try:
         run_benchmark_analysis(args.runs_dir, args.output_dir)
     except FileNotFoundError as e:
@@ -66,7 +110,14 @@ def cmd_benchmark(args) -> None:
 
 
 def _create_argument_parser() -> argparse.ArgumentParser:
-    """Create and configure argument parser."""
+    """Create and configure argument parser.
+
+    Sets up command line argument parsing for both the main balatrollm
+    command and the benchmark subcommand.
+
+    Returns:
+        Configured ArgumentParser instance with all commands and options.
+    """
     parser = argparse.ArgumentParser(
         description="LLM-powered Balatro bot using LiteLLM proxy",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -106,6 +157,18 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         "--config",
         help="Load configuration from a previous run's config.json file",
     )
+    parser.add_argument(
+        "--runs-dir",
+        type=lambda p: Path(p).resolve(),
+        default=Path.cwd().resolve(),
+        help="Base directory for storing run data (default: current directory)",
+    )
+    parser.add_argument(
+        "--runs",
+        type=int,
+        default=1,
+        help="Number of times to run the bot with the same configuration (default: 1)",
+    )
 
     # Benchmark subcommand
     benchmark_parser = subparsers.add_parser(
@@ -115,8 +178,8 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     )
     benchmark_parser.add_argument(
         "--runs-dir",
-        type=Path,
-        default=Path("runs"),
+        type=lambda p: Path(p).resolve(),
+        default=Path("runs").resolve(),
         help="Directory containing run data (default: runs)",
     )
     benchmark_parser.add_argument(
