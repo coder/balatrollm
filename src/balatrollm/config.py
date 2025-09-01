@@ -9,7 +9,24 @@ from . import __version__
 
 @dataclass
 class Config:
-    """Configuration for LLMBot."""
+    """Configuration for LLMBot.
+
+    Stores all configuration parameters for bot execution including
+    model settings, game parameters, and metadata.
+
+    Attributes:
+        model: LLM model identifier (e.g., 'cerebras/gpt-oss-120b').
+        strategy: Strategy name to use for game decisions (default: 'default').
+        deck: Balatro deck type to use (default: 'Red Deck').
+        stake: Difficulty stake level (default: 1).
+        seed: Game seed for reproducible runs (default: 'OOOO155').
+        challenge: Optional challenge mode identifier.
+        version: Software version string.
+        name: Human-readable configuration name.
+        description: Configuration description.
+        author: Configuration author identifier.
+        tags: List of tags for categorization.
+    """
 
     model: str
     strategy: str = "default"
@@ -25,7 +42,11 @@ class Config:
 
     @classmethod
     def from_defaults(cls) -> "Config":
-        """Create configuration with default values."""
+        """Create configuration with default values.
+
+        Returns:
+            Config instance with all default parameter values.
+        """
         return cls(
             model="cerebras/gpt-oss-120b",
             strategy="default",
@@ -48,7 +69,14 @@ class Config:
         otherwise falls back to environment defaults for base_url and api_key.
 
         Args:
-            config_path: Path to the config.json file
+            config_path: Path to the config.json file.
+
+        Returns:
+            Config instance loaded from the JSON file.
+
+        Raises:
+            FileNotFoundError: If the config file doesn't exist.
+            ValueError: If config version doesn't match current repository version.
         """
         config_file = Path(config_path)
         if not config_file.exists():
@@ -75,7 +103,7 @@ class Config:
         formatting and version information.
 
         Args:
-            config_path: Path to the config file to write
+            config_path: Path to the config file to write.
         """
         # Convert dataclass to dictionary and ensure version is current
         config_data = asdict(self)
