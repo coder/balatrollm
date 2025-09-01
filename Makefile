@@ -13,6 +13,7 @@ PYTHON := python3
 UV := uv
 RUFF := ruff
 TYPECHECK := basedpyright
+RUNS ?= 5
 
 help: ## Show this help message
 	@echo "$(BLUE)BalatroLLM Development Makefile$(RESET)"
@@ -92,16 +93,16 @@ teardown: ## Stop LiteLLM server and Balatro processes
 	@./balatro.sh --kill 2>/dev/null || true
 	@echo "$(GREEN)✓ Services stopped$(RESET)"
 
-balatrobench: ## Run benchmark for all models and generate analysis
-	@echo "$(YELLOW)Starting benchmark runs for all models...$(RESET)"
+balatrobench: ## Run benchmark for all models and generate analysis (RUNS=5)
+	@echo "$(YELLOW)Starting benchmark runs for all models ($(RUNS) runs each)...$(RESET)"
 	@echo "$(YELLOW)Running cerebras/gpt-oss-120b...$(RESET)"
-	@balatrollm --runs-dir ./balatrobench --runs 3 --model cerebras/gpt-oss-120b || true
+	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model cerebras/gpt-oss-120b || true
 	@echo "$(YELLOW)Running cerebras/qwen-3-235b-a22b-thinking-2507...$(RESET)"
-	@balatrollm --runs-dir ./balatrobench --runs 3 --model cerebras/qwen-3-235b-a22b-thinking-2507 || true
+	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model cerebras/qwen-3-235b-a22b-thinking-2507 || true
 	@echo "$(YELLOW)Running cerebras/qwen-3-235b-a22b-instruct-2507...$(RESET)"
-	@balatrollm --runs-dir ./balatrobench --runs 3 --model cerebras/qwen-3-235b-a22b-instruct-2507 || true
+	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model cerebras/qwen-3-235b-a22b-instruct-2507 || true
 	@echo "$(YELLOW)Running groq/openai/gpt-oss-20b...$(RESET)"
-	@balatrollm --runs-dir ./balatrobench --runs 3 --model groq/openai/gpt-oss-20b || true
+	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model groq/openai/gpt-oss-20b || true
 	@echo "$(YELLOW)Generating benchmark analysis...$(RESET)"
 	@balatrollm benchmark --runs-dir balatrobench/runs --output-dir balatrobench/benchmarks
 	@echo "$(GREEN)✓ Benchmark completed$(RESET)"
