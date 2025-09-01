@@ -13,7 +13,28 @@ from .data_collection import RunStats
 
 @dataclass
 class AveragedStats:
-    """Simple container for averaged stats."""
+    """Simple container for averaged stats.
+
+    Stores averaged performance metrics calculated across multiple runs
+    with the same configuration.
+
+    Attributes:
+        avg_final_round: Average final round reached across runs.
+        avg_ante_reached: Average ante level reached across runs.
+        avg_jokers_bought: Average number of jokers bought per run.
+        avg_jokers_sold: Average number of jokers sold per run.
+        avg_consumables_used: Average number of consumables used per run.
+        avg_rerolls: Average number of shop rerolls per run.
+        avg_money_spent: Average money spent per run.
+        avg_successful_calls: Average successful LLM calls per run.
+        avg_error_calls: Average number of error calls per run.
+        avg_failed_calls: Average number of failed calls per run.
+        avg_total_input_tokens: Average total input tokens per run.
+        avg_total_output_tokens: Average total output tokens per run.
+        avg_total_reasoning_tokens: Average total reasoning tokens per run.
+        avg_total_tokens: Average total tokens per run.
+        avg_total_response_time_ms: Average total response time per run.
+    """
 
     avg_final_round: float
     avg_ante_reached: float
@@ -37,6 +58,20 @@ class AveragedStats:
 
 @dataclass
 class RunsData:
+    """Aggregated data for multiple runs with identical configuration.
+
+    Combines statistics from multiple runs sharing the same model,
+    strategy, and version for comparative analysis.
+
+    Attributes:
+        config: Shared configuration across all runs.
+        total_runs: Total number of runs in this group.
+        completed_runs: Number of runs that completed (won or game over).
+        won_runs: Number of runs that were won.
+        averaged_stats: Averaged statistics across all runs.
+        stats: List of individual run statistics.
+    """
+
     config: Config
 
     # Run statistics
@@ -52,14 +87,34 @@ class RunsData:
 
 
 class BenchmarkAnalyzer:
-    """Analyzes BalatroLLM runs and generates leaderboards."""
+    """Analyzes BalatroLLM runs and generates leaderboards.
+
+    Processes structured run data to generate comprehensive performance
+    analysis and rankings organized by version and strategy.
+
+    Attributes:
+        runs_dir: Directory containing run data to analyze.
+        aggregated_data: Dictionary mapping config keys to aggregated run data.
+    """
 
     def __init__(self, runs_dir: Path = Path("runs")):
+        """Initialize the benchmark analyzer.
+
+        Args:
+            runs_dir: Directory containing run data to analyze (default: 'runs').
+        """
         self.runs_dir = runs_dir
         self.aggregated_data: dict[str, RunsData] = {}
 
     def analyze_all_runs(self) -> None:
-        """Analyze all runs in the runs directory."""
+        """Analyze all runs in the runs directory.
+
+        Processes all run data in the directory structure and aggregates
+        statistics by configuration.
+
+        Raises:
+            FileNotFoundError: If the runs directory doesn't exist.
+        """
         print("Analyzing all runs...")
 
         if not self.runs_dir.exists():
@@ -81,28 +136,28 @@ class BenchmarkAnalyzer:
     def _analyze_runs(
         self, version_dir: Path, version: str
     ) -> list[tuple[RunStats, Config]]:
-        """Analyze runs using the directory structure: version/strategy/provider/model/run"""
+        """Analyze runs using the directory structure: version/strategy/provider/model/run.
+
+        Args:
+            version_dir: Directory containing runs for a specific version.
+            version: Version string for this directory.
+
+        Returns:
+            List of tuples containing (RunStats, Config) for each valid run.
+        """
         run_stats = []
 
         for strategy_dir in version_dir.iterdir():
             if not strategy_dir.is_dir():
                 continue
 
-            strategy = strategy_dir.name
-
             for provider_dir in strategy_dir.iterdir():
                 if not provider_dir.is_dir():
                     continue
 
-                provider = provider_dir.name
-
                 for model_dir in provider_dir.iterdir():
                     if not model_dir.is_dir():
                         continue
-
-                    model_name = model_dir.name
-                    # Combine provider and model for full model identifier
-                    full_model = f"{provider}/{model_name}"
 
                     for run_dir in model_dir.iterdir():
                         if not run_dir.is_dir():
@@ -115,7 +170,14 @@ class BenchmarkAnalyzer:
         return run_stats
 
     def _load_run_data(self, run_dir: Path) -> tuple[RunStats, Config] | None:
-        """Load data from a single run directory."""
+        """Load data from a single run directory.
+
+        Args:
+            run_dir: Directory containing a single run's data files.
+
+        Returns:
+            Tuple of (RunStats, Config) if loading succeeds, None if it fails.
+        """
         config_file = run_dir / "config.json"
         stats_file = run_dir / "stats.json"
 
@@ -138,7 +200,14 @@ class BenchmarkAnalyzer:
             return None
 
     def _aggregate_data(self, all_run_stats: list[tuple[RunStats, Config]]) -> None:
-        """Aggregate data by identical config."""
+        """Aggregate data by identical config.
+
+        Groups runs by identical configuration and calculates averaged statistics
+        for each unique configuration.
+
+        Args:
+            all_run_stats: List of (RunStats, Config) tuples from all runs.
+        """
         print("Aggregating data...")
 
         # Group runs by identical config content (excluding run-specific fields)
@@ -181,7 +250,17 @@ class BenchmarkAnalyzer:
         print(f"Aggregated {len(self.aggregated_data)} unique configurations")
 
     def _calculate_averaged_stats(self, stats_list: list[RunStats]) -> AveragedStats:
-        """Calculate averaged stats using the AveragedStats dataclass."""
+        """Calculate averaged stats using the AveragedStats dataclass.
+
+        Args:
+            stats_list: List of RunStats to average.
+
+        Returns:
+            AveragedStats containing averaged values across all runs.
+
+        Raises:
+            ValueError: If stats_list is empty.
+        """
         if not stats_list:
             raise ValueError("Cannot calculate averages for empty stats list")
 
@@ -222,7 +301,14 @@ class BenchmarkAnalyzer:
         )
 
     def generate_leaderboard(self, output_dir: Path = Path("benchmarks")) -> None:
-        """Generate leaderboard and detailed analysis files organized by version/strategy."""
+        """Generate leaderboard and detailed analysis files organized by version/strategy.
+
+        Creates hierarchical benchmark results with strategy-specific leaderboards
+        and individual model performance files.
+
+        Args:
+            output_dir: Directory to write benchmark results (default: 'benchmarks').
+        """
         print("Generating leaderboard...")
 
         # Check if output directory exists and ask for confirmation
@@ -371,7 +457,15 @@ class BenchmarkAnalyzer:
 def run_benchmark_analysis(
     runs_dir: Path = Path("runs"), output_dir: Path = Path("benchmarks")
 ) -> None:
-    """Analyze BalatroLLM runs and generate comprehensive leaderboards."""
+    """Analyze BalatroLLM runs and generate comprehensive leaderboards.
+
+    Main entry point for benchmark analysis that creates analyzer and
+    processes all run data.
+
+    Args:
+        runs_dir: Directory containing run data to analyze (default: 'runs').
+        output_dir: Directory to write benchmark results (default: 'benchmarks').
+    """
     print("BalatroLLM Benchmark Analyzer")
     print(f"Analyzing runs in: {runs_dir}")
     print(f"Output directory: {output_dir}")
