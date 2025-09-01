@@ -8,7 +8,15 @@ from jinja2 import Environment, FileSystemLoader
 
 
 class StrategyManager:
-    """Lightweight helper for managing Jinja2 strategy templates."""
+    """Lightweight helper for managing Jinja2 strategy templates.
+
+    Manages loading and rendering of strategy-specific templates for
+    game state representation, strategy guidance, and memory management.
+
+    Attributes:
+        strategy_path: Path to the strategy directory containing templates.
+        jinja_env: Jinja2 environment configured for template rendering.
+    """
 
     def __init__(
         self, strategy: str, strategies_dir=Path(__file__).parent / "strategies"
@@ -16,8 +24,12 @@ class StrategyManager:
         """Initialize StrategyManager with a strategy path.
 
         Args:
-            strategy: name of the strategy
-            strategies_dir: path to the strategies directory
+            strategy: Name of the strategy to load.
+            strategies_dir: Path to the strategies directory
+                (default: strategies/ relative to this module).
+
+        Raises:
+            FileNotFoundError: If strategy directory is missing required template files.
         """
 
         self.strategy_path = strategies_dir / strategy
@@ -44,12 +56,24 @@ class StrategyManager:
         self.jinja_env.filters["from_json"] = json.loads
 
     def render_strategy(self) -> str:
-        """Render the strategy template."""
+        """Render the strategy template.
+
+        Returns:
+            Rendered strategy guidance content as a string.
+        """
         template = self.jinja_env.get_template("STRATEGY.md.jinja")
         return template.render()
 
     def render_gamestate(self, state_name: str, game_state: dict[str, Any]) -> str:
-        """Render the game state template."""
+        """Render the game state template.
+
+        Args:
+            state_name: Name of the current game state (e.g., 'BLIND_SELECT').
+            game_state: Game state dictionary from BalatroClient.
+
+        Returns:
+            Rendered game state representation as a string.
+        """
         template = self.jinja_env.get_template("GAMESTATE.md.jinja")
         return template.render(
             state_name=state_name,
@@ -57,12 +81,27 @@ class StrategyManager:
         )
 
     def render_memory(self, responses: list[Any]) -> str:
-        """Render the memory template."""
+        """Render the memory template.
+
+        Args:
+            responses: List of previous LLM responses for context.
+
+        Returns:
+            Rendered memory/history content as a string.
+        """
         template = self.jinja_env.get_template("MEMORY.md.jinja")
         return template.render(responses=responses)
 
     def load_tools(self) -> dict[str, Any]:
-        """Load tools from the strategy-specific TOOLS.json file."""
+        """Load tools from the strategy-specific TOOLS.json file.
+
+        Returns:
+            Dictionary mapping game states to available tool definitions.
+
+        Raises:
+            FileNotFoundError: If TOOLS.json file is missing.
+            json.JSONDecodeError: If TOOLS.json contains invalid JSON.
+        """
         tools_file = self.strategy_path / "TOOLS.json"
         with open(tools_file) as f:
             return json.load(f)
