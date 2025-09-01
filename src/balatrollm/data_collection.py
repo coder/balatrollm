@@ -12,7 +12,18 @@ from balatrollm.config import Config
 
 
 def generate_run_directory(config: Config, base_dir: Path) -> Path:
-    """Generate structured directory path for the run."""
+    """Generate structured directory path for the run.
+
+    Creates a hierarchical directory structure organized by version,
+    strategy, provider, model, and run timestamp.
+
+    Args:
+        config: Bot configuration containing model, strategy, and run parameters.
+        base_dir: Base directory for organizing run data.
+
+    Returns:
+        Path to the generated run directory.
+    """
     base_dir = base_dir / "runs"
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
@@ -44,6 +55,37 @@ def generate_run_directory(config: Config, base_dir: Path) -> Path:
 
 @dataclass
 class RunStats:
+    """Statistics collected from a single game run.
+
+    Tracks game performance, strategy metrics, and LLM performance
+    for comprehensive run analysis.
+
+    Attributes:
+        run_won: Whether the game run was won.
+        completed: Whether the run completed (won or game over).
+        ante_reached: Highest ante level reached.
+        final_round: Final round number achieved.
+        jokers_bought: List of joker names purchased during the run.
+        jokers_sold: List of joker names sold during the run.
+        consumables_used: List of consumable names used during the run.
+        rerolls: Number of shop rerolls performed.
+        money_spent: Total money spent during the run.
+        hands_played: Dictionary mapping hand types to play counts.
+        successful_calls: Number of successful LLM API calls.
+        error_calls: List of error messages from failed LLM calls.
+        failed_calls: List of failure messages from LLM calls.
+        avg_input_tokens: Average input tokens per LLM call.
+        avg_output_tokens: Average output tokens per LLM call.
+        avg_reasoning_tokens: Average reasoning tokens per LLM call.
+        avg_total_tokens: Average total tokens per LLM call.
+        avg_response_time_ms: Average response time in milliseconds.
+        total_input_tokens: Total input tokens across all calls.
+        total_output_tokens: Total output tokens across all calls.
+        total_reasoning_tokens: Total reasoning tokens across all calls.
+        total_tokens: Total tokens across all calls.
+        total_response_time_ms: Total response time in milliseconds.
+    """
+
     # Game Performance
     run_won: bool = False
     completed: bool = False
@@ -76,7 +118,16 @@ class RunStats:
 
 @dataclass
 class RunStatsCollector:
-    """Collects run data in structured directory format."""
+    """Collects run data in structured directory format.
+
+    Manages structured logging of game execution data, LLM requests/responses,
+    and final statistics calculation.
+
+    Attributes:
+        run_dir: Directory path for storing this run's data.
+        config: Bot configuration for this run.
+        request_count: Counter for LLM request numbering.
+    """
 
     run_dir: Path
     config: Config
@@ -87,18 +138,32 @@ class RunStatsCollector:
         self.run_dir.mkdir(parents=True, exist_ok=True)
 
     def write_config(self) -> None:
-        """Write the run configuration."""
+        """Write the run configuration.
+
+        Saves the bot configuration to config.json in the run directory.
+        """
         with open(self.run_dir / "config.json", "w") as f:
             json.dump(asdict(self.config), f, indent=2)
 
     def write_stats(self) -> None:
-        """Calculate and write final run statistics."""
+        """Calculate and write final run statistics.
+
+        Computes comprehensive statistics from logged data and saves
+        to stats.json in the run directory.
+        """
         stats = self.calculate_stats()
         with open(self.run_dir / "stats.json", "w") as f:
             json.dump(asdict(stats), f, indent=2)
 
     def write_request(self, request_data: dict[str, Any]) -> str:
-        """Write an LLM request to requests.jsonl in OpenAI batch format."""
+        """Write an LLM request to requests.jsonl in OpenAI batch format.
+
+        Args:
+            request_data: Dictionary containing the LLM request parameters.
+
+        Returns:
+            Unique request ID for matching with responses.
+        """
         self.request_count += 1
         request_id = f"req_{self.request_count:03d}"
 
@@ -120,7 +185,17 @@ class RunStatsCollector:
         error: Exception | None = None,
         status_code: int = 200,
     ) -> None:
-        """Write an LLM response to responses.jsonl in OpenAI batch format."""
+        """Write an LLM response to responses.jsonl in OpenAI batch format.
+
+        Args:
+            request_id: Unique ID matching the original request.
+            response: Successful ChatCompletion response (mutually exclusive with error).
+            error: Exception that occurred during request (mutually exclusive with response).
+            status_code: HTTP status code for error responses (default: 200).
+
+        Raises:
+            ValueError: If neither response nor error is provided.
+        """
         if response:
             batch_response = {
                 "id": request_id,
@@ -150,7 +225,14 @@ class RunStatsCollector:
             f.write(json.dumps(batch_response) + "\n")
 
     def calculate_stats(self) -> RunStats:
-        """Calculate comprehensive run statistics from logged data."""
+        """Calculate comprehensive run statistics from logged data.
+
+        Analyzes gamestates.jsonl and responses.jsonl to compute game performance,
+        strategy metrics, and LLM performance statistics.
+
+        Returns:
+            RunStats instance containing all calculated statistics.
+        """
         stats = RunStats()
 
         # Load game states
