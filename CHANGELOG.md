@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.5.0](https://github.com/S1M0N38/balatrollm/compare/v0.4.0...v0.5.0) (2025-09-01)
+
+
+### Features
+
+* add benchmark command in Makefile ([dcf0c56](https://github.com/S1M0N38/balatrollm/commit/dcf0c56384c10f8124bfa5097ba35261999b2162))
+* add multi-run support and improve CLI argument handling ([fd9219a](https://github.com/S1M0N38/balatrollm/commit/fd9219a75011a2bac33764b38ee11c8014551047))
+* enhance bot architecture with comprehensive docstrings ([02bfa5b](https://github.com/S1M0N38/balatrollm/commit/02bfa5b2557fbd500533a828d855c72c4664c88d))
+* make base_dir configurable ([c285c10](https://github.com/S1M0N38/balatrollm/commit/c285c1010db084d005c019a7b041654bde19daae))
+* make number of runs configurable in Makefile ([c47d373](https://github.com/S1M0N38/balatrollm/commit/c47d373a81ed393b4aca78fdd456121afbd84606))
+* report averaged stats in leaderboard ([be5e381](https://github.com/S1M0N38/balatrollm/commit/be5e3819540e66310fd15e4197eafab9676004d8))
+* update MEMORY.md.jinja with raw tool_calls ([4493674](https://github.com/S1M0N38/balatrollm/commit/4493674f38cde8a7a5d1619c46c2839127dac1fd))
+
+
+### Bug Fixes
+
+* add game state 4 to completed ([c6df03d](https://github.com/S1M0N38/balatrollm/commit/c6df03de1206d1281e0412da4f3b96caaa927fb2))
+
+
+### Documentation
+
+* add balatrobench command to README and CLAUDE ([6e1e9d5](https://github.com/S1M0N38/balatrollm/commit/6e1e9d595ea8c0192583813c805750f4368d7e5d))
+* add comprehensive documentation to benchmark system ([e93dcf7](https://github.com/S1M0N38/balatrollm/commit/e93dcf79365820a8ae5707885bdb212282f1208d))
+* add comprehensive documentation to Config class ([34308c2](https://github.com/S1M0N38/balatrollm/commit/34308c2c59fc34c9424b0706766262319620dd24))
+* add comprehensive documentation to data collection system ([48e7cdf](https://github.com/S1M0N38/balatrollm/commit/48e7cdf71159a99afb615238afed661e1408a979))
+* add comprehensive documentation to strategy system ([4e61cb7](https://github.com/S1M0N38/balatrollm/commit/4e61cb7fb3b43c85b04a21149b71550e19290208))
+* update CLI documentation with new options ([69cd0d0](https://github.com/S1M0N38/balatrollm/commit/69cd0d05224af3a50a876d24f0b7dd37f7576200))
+
 ## [0.4.0](https://github.com/S1M0N38/balatrollm/compare/v0.3.0...v0.4.0) (2025-08-29)
 
 
