@@ -137,6 +137,7 @@ Available targets:
   clean              Clean build artifacts and caches
   setup              Kill previous instances and start LiteLLM server + Balatro
   teardown           Stop LiteLLM server and Balatro processes
+  balatrobench       Run benchmark for all models and generate analysis
 ```
 
 #### `balatro.sh` - Game Automation
