@@ -39,15 +39,15 @@ class AveragedStats:
     avg_final_round: float
     avg_ante_reached: float
 
-    avg_jokers_bought: float  # count the elements in the lists
-    avg_jokers_sold: float  # count the elements in the lists
-    avg_consumables_used: float  # count the elements in the lists
+    avg_jokers_bought: float
+    avg_jokers_sold: float
+    avg_consumables_used: float
     avg_rerolls: float
     avg_money_spent: float
 
     avg_successful_calls: float
-    avg_error_calls: float  # count the elements in the lists
-    avg_failed_calls: float  # count the elements in the lists
+    avg_error_calls: float
+    avg_failed_calls: float
 
     avg_total_input_tokens: float
     avg_total_output_tokens: float
@@ -361,21 +361,19 @@ class BenchmarkAnalyzer:
                 leaderboard_entries = []
                 for rank, data in enumerate(sorted_data, 1):
                     # Convert config dataclass to dict for JSON serialization
+                    averaged_stats_dict = asdict(data.averaged_stats)
+                    # Round all float values in averaged_stats
+                    for key, value in averaged_stats_dict.items():
+                        if isinstance(value, float):
+                            averaged_stats_dict[key] = round(value, 2)
+
                     entry = {
                         "rank": rank,
                         "config": asdict(data.config),
                         "total_runs": data.total_runs,
                         "completed_runs": data.completed_runs,
                         "won_runs": data.won_runs,
-                        "avg_final_round": round(
-                            data.averaged_stats.avg_final_round, 2
-                        ),
-                        "avg_ante_reached": round(
-                            data.averaged_stats.avg_ante_reached, 2
-                        ),
-                        "avg_total_tokens": round(
-                            data.averaged_stats.avg_total_tokens, 2
-                        ),
+                        "averaged_stats": averaged_stats_dict,
                     }
                     leaderboard_entries.append(entry)
 
