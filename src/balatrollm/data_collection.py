@@ -72,8 +72,8 @@ class RunStats:
         money_spent: Total money spent during the run.
         hands_played: Dictionary mapping hand types to play counts.
         successful_calls: Number of successful LLM API calls.
-        error_calls: List of error messages from failed LLM calls.
-        failed_calls: List of failure messages from LLM calls.
+        invalid_calls: Number of invalid tool call responses from LLM.
+        failed_calls: List of failure tool call from LLM calls.
         avg_input_tokens: Average input tokens per LLM call.
         avg_output_tokens: Average output tokens per LLM call.
         avg_reasoning_tokens: Average reasoning tokens per LLM call.
@@ -102,7 +102,7 @@ class RunStats:
 
     # LLM Performance
     successful_calls: int = 0
-    error_calls: list[str] = field(default_factory=list)
+    invalid_responses: int = 0
     failed_calls: list[str] = field(default_factory=list)
     avg_input_tokens: float = 0.0
     avg_output_tokens: float = 0.0
@@ -132,6 +132,7 @@ class RunStatsCollector:
     run_dir: Path
     config: Config
     request_count: int = 0
+    failed_calls: list[str] = field(default_factory=list)
 
     def __post_init__(self):
         """Create directory structure and write config."""
@@ -262,6 +263,7 @@ class RunStatsCollector:
         stats.ante_reached = (
             max(1, (stats.final_round // 3) + 1) if stats.final_round > 0 else 1
         )
+        stats.failed_calls = self.failed_calls
 
         # Strategy Metrics
         for state in game_states:
@@ -370,6 +372,7 @@ class RunStatsCollector:
                     ):
                         stats.successful_calls += 1
                         body = response.get("response", {}).get("body", {})
+                        message = body.get("choices", [{}])[0].get("message", {})
                         usage = body.get("usage", {})
 
                         if "prompt_tokens" in usage:
@@ -380,17 +383,8 @@ class RunStatsCollector:
                             reasoning_tokens.append(usage["reasoning_tokens"])
                         if "total_tokens" in usage:
                             total_tokens.append(usage["total_tokens"])
-
-                    elif response.get("error") is not None:
-                        error = response.get("error", {})
-                        error_msg = f"{error.get('code', 'UnknownError')}: {error.get('message', '')}"
-                        stats.error_calls.append(error_msg)
-
-                    elif response.get("response", {}).get("status_code", 200) != 200:
-                        status_code = response.get("response", {}).get("status_code")
-                        body = response.get("response", {}).get("body", {})
-                        error_msg = body.get("error", f"HTTP {status_code}")
-                        stats.failed_calls.append(f"Status {status_code}: {error_msg}")
+                        if message.get("tool_calls") is None:
+                            stats.invalid_responses += 1
 
             # Calculate totals
             stats.total_input_tokens = sum(input_tokens)
