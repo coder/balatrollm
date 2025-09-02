@@ -11,7 +11,6 @@ model_list:
       model: cerebras/qwen-3-32b
       api_key: os.environ/CEREBRAS_API_KEY
       api_base: https://api.cerebras.ai/v1
-      reasoning_effort: "medium"
   - model_name: cerebras/qwen-3-235b-a22b-thinking-2507
     litellm_params:
       model: cerebras/qwen-3-235b-a22b-thinking-2507
