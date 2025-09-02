@@ -96,7 +96,7 @@ class LLMBot:
         # We need to keep track that in order to notify the LLM for the next request.
         self.last_response_is_invalid: str | None = None
 
-        # The last tool call is a valid tool call but an BotError occurred
+        # The last tool call is a valid tool call but a BalatroError occurred
         # (e.g. play hand with 6 cards)
         self.last_tool_called_failed: str | None = None
 
