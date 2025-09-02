@@ -261,7 +261,7 @@ class LLMBot:
         except json.JSONDecodeError as e:
             msg = f"Invalid JSON in tool call arguments: {e}"
             self.last_response_is_invalid = msg
-            logging.warning(msg)
+            logger.warning(msg)
             result = self.balatro_client.send_message("get_game_state", {})
             return result
 
