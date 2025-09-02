@@ -55,7 +55,7 @@ async def cmd_balatrollm(args) -> None:
             strategy=args.strategy,
         )
 
-    bot = LLMBot(config, base_url=args.base_url, api_key=args.api_key)
+    bot = LLMBot(config, base_url=args.base_url, api_key=args.api_key, port=args.port)
 
     if args.list_models:
         models = await bot.list_available_models()
@@ -168,6 +168,12 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         type=int,
         default=1,
         help="Number of times to run the bot with the same configuration (default: 1)",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=12346,
+        help="Port for BalatroBot client connection (default: 12346)",
     )
 
     # Benchmark subcommand

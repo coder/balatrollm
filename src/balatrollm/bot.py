@@ -76,17 +76,18 @@ class LLMBot:
         data_collector: Collector for structured run data and statistics.
     """
 
-    def __init__(self, config: Config, base_url: str, api_key: str):
+    def __init__(self, config: Config, base_url: str, api_key: str, port: int = 12346):
         """Initialize the LLM bot.
 
         Args:
             config: Bot configuration containing model and strategy settings.
             base_url: Base URL for the LiteLLM proxy server.
             api_key: API key for LiteLLM proxy authentication.
+            port: Port for BalatroBot client connection.
         """
         self.config = config
         self.llm_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
-        self.balatro_client = BalatroClient()
+        self.balatro_client = BalatroClient(port=port)
         self.strategy_manager = StrategyManager(config.strategy)
         self.responses: list[ChatCompletion] = []
         self.tools = self.strategy_manager.load_tools()
