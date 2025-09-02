@@ -101,8 +101,8 @@ balatrobench: ## Run benchmark for all models and generate analysis (RUNS=5)
 	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model cerebras/qwen-3-235b-a22b-thinking-2507 || true
 	@echo "$(YELLOW)Running cerebras/qwen-3-235b-a22b-instruct-2507...$(RESET)"
 	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model cerebras/qwen-3-235b-a22b-instruct-2507 || true
-	@echo "$(YELLOW)Running groq/openai/gpt-oss-20b...$(RESET)"
-	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model groq/openai/gpt-oss-20b || true
+	@echo "$(YELLOW)Running cerebras/qwen-3-32b...$(RESET)"
+	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model cerebras/qwen-3-32b || true
 	@echo "$(YELLOW)Generating benchmark analysis...$(RESET)"
 	@balatrollm benchmark --runs-dir balatrobench/runs --output-dir balatrobench/benchmarks
 	@echo "$(GREEN)✓ Benchmark completed$(RESET)"
