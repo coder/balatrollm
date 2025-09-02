@@ -72,8 +72,7 @@ class RunStats:
         money_spent: Total money spent during the run.
         hands_played: Dictionary mapping hand types to play counts.
         successful_calls: Number of successful LLM API calls.
-        invalid_calls: Number of invalid tool call responses from LLM.
-        failed_calls: List of failure tool call from LLM calls.
+        failed_calls: List of failed tool calls from LLM calls.
         avg_input_tokens: Average input tokens per LLM call.
         avg_output_tokens: Average output tokens per LLM call.
         avg_reasoning_tokens: Average reasoning tokens per LLM call.
