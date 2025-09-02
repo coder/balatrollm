@@ -9,7 +9,7 @@ from typing import Any
 from openai import AsyncOpenAI
 from openai.types.chat import ChatCompletion
 
-from balatrobot import BalatroClient
+from balatrobot import BalatroClient, BalatroError
 from balatrobot.enums import State
 
 from .config import Config
@@ -92,6 +92,14 @@ class LLMBot:
         self.tools = self.strategy_manager.load_tools()
         self.data_collector: RunStatsCollector
 
+        # The last response is not a valid tool call (e.g. simple LLM text response)
+        # We need to keep track that in order to notify the LLM for the next request.
+        self.last_response_is_invalid: str | None = None
+
+        # The last tool call is a valid tool call but an BotError occurred
+        # (e.g. play hand with 6 cards)
+        self.last_tool_called_failed: str | None = None
+
     def __enter__(self):
         self.balatro_client.connect()
         return self
@@ -135,7 +143,11 @@ class LLMBot:
             [
                 self.strategy_manager.render_strategy(),
                 self.strategy_manager.render_gamestate(state_name, game_state),
-                self.strategy_manager.render_memory(self.responses),
+                self.strategy_manager.render_memory(
+                    self.responses,
+                    self.last_response_is_invalid,
+                    self.last_tool_called_failed,
+                ),
             ]
         )
         messages = [{"role": "user", "content": user_content}]
@@ -220,9 +232,15 @@ class LLMBot:
             raise ValueError("No response choices returned from LLM")
 
         message = response.choices[0].message
+
+        # Check if response has tool calls. If not, just return the current game state
+        # The data_collector will count the number of invalid tool call responses
         if not hasattr(message, "tool_calls") or not message.tool_calls:
-            logger.warning(f"No tool calls in LLM response: {message}")
-            raise ValueError("No tool calls in LLM response")
+            msg = f"No tool calls in LLM response: {message}"
+            self.last_response_is_invalid = msg
+            logger.warning(msg)
+            result = self.balatro_client.send_message("get_game_state", {})
+            return result
 
         # Extract function details from first tool call
         tool_call = message.tool_calls[0]
@@ -231,23 +249,39 @@ class LLMBot:
         function_args_str = getattr(function_obj, "arguments", None)
 
         if not function_name or not function_args_str:
-            raise ValueError("Invalid tool call: missing name or arguments")
+            msg = "Invalid tool call: missing name or arguments"
+            self.last_response_is_invalid = msg
+            logger.warning("Invalid tool call: missing name or arguments")
+            result = self.balatro_client.send_message("get_game_state", {})
+            return result
 
         # Parse JSON arguments
         try:
             arguments = json.loads(function_args_str)
         except json.JSONDecodeError as e:
-            raise ValueError(f"Invalid JSON in tool call arguments: {e}") from e
+            msg = f"Invalid JSON in tool call arguments: {e}"
+            self.last_response_is_invalid = msg
+            logging.warning(msg)
+            result = self.balatro_client.send_message("get_game_state", {})
+            return result
+
+        self.last_response_is_invalid = None
 
         # Execute tool call
         logger.info(f"Executing tool call: {function_name} with arguments: {arguments}")
-        result = self.balatro_client.send_message(function_name, arguments)
 
-        if not isinstance(result, dict):
-            logger.warning(
-                f"Unexpected result type from balatro_client: {type(result)}"
-            )
+        try:
+            result = self.balatro_client.send_message(function_name, arguments)
 
+        except BalatroError as e:
+            msg = f"Error executing tool call: {e}"
+            self.last_tool_called_failed = msg
+            self.data_collector.failed_calls.append(str(e))
+            logger.warning(f"Error executing tool call: {e}")
+            result = self.balatro_client.send_message("get_game_state", {})
+            return result
+
+        self.last_tool_called_failed = None
         return result
 
     async def _init_game(self, base_dir: Path = Path.cwd()) -> dict[str, Any]:
