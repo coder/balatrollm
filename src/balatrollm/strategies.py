@@ -80,17 +80,28 @@ class StrategyManager:
             game_state=game_state,
         )
 
-    def render_memory(self, responses: list[Any]) -> str:
+    def render_memory(
+        self,
+        responses: list[Any],
+        last_response_is_invalid: str | None = None,
+        last_tool_called_failed: str | None = None,
+    ) -> str:
         """Render the memory template.
 
         Args:
             responses: List of previous LLM responses for context.
+            last_response_is_invalid: Error message if last response was invalid.
+            last_tool_called_failed: Error message if last tool call failed.
 
         Returns:
             Rendered memory/history content as a string.
         """
         template = self.jinja_env.get_template("MEMORY.md.jinja")
-        return template.render(responses=responses)
+        return template.render(
+            responses=responses,
+            last_response_is_invalid=last_response_is_invalid,
+            last_tool_called_failed=last_tool_called_failed,
+        )
 
     def load_tools(self) -> dict[str, Any]:
         """Load tools from the strategy-specific TOOLS.json file.
