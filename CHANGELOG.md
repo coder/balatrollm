@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.6.0](https://github.com/S1M0N38/balatrollm/compare/v0.5.0...v0.6.0) (2025-09-02)
+
+
+### Features
+
+* add last_response_is_invalid and last_tool_called_failed to LLMBot ([7ae6d4a](https://github.com/S1M0N38/balatrollm/commit/7ae6d4aed596929e02165e703546a0ec719aa6d8))
+* make use of error messages in memory ([1c8bc14](https://github.com/S1M0N38/balatrollm/commit/1c8bc14c3292df19d810948c0e14cf1d9b63978e))
+* update data collection to include invalid responses ([18e7341](https://github.com/S1M0N38/balatrollm/commit/18e73412459af15e7cb3caea1eb0f49f7869240b))
+* update default MEMORY strategy with previous errors ([c02a9b0](https://github.com/S1M0N38/balatrollm/commit/c02a9b0d59c398af206de7cbaac64a5f2a6cdf0f))
+
+
+### Bug Fixes
+
+* comment BotError to BalatroError ([4b42402](https://github.com/S1M0N38/balatrollm/commit/4b4240299c97a355d8c839896f0c8b6d5b157cf2))
+* remove reasoning effort from qwen-3-32b config ([17265db](https://github.com/S1M0N38/balatrollm/commit/17265dbd3cc873768526e307a8694f52bf3708d3))
+* typos in data_collection.py ([17e0542](https://github.com/S1M0N38/balatrollm/commit/17e054256f9f397f54d860a7c4694c0e1d4860b4))
+* use logger instead of logging in bot.py ([d69ba00](https://github.com/S1M0N38/balatrollm/commit/d69ba00865c9d6cd3679376e36e05895dc58ca9d))
+
 ## [0.5.0](https://github.com/S1M0N38/balatrollm/compare/v0.4.0...v0.5.0) (2025-09-01)
 
 
