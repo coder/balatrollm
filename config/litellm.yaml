@@ -11,9 +11,6 @@ model_list:
   - model_name: qwen/qwen3-235b-a22b-2507
     litellm_params:
       model: openrouter/qwen/qwen3-235b-a22b-2507
-  - model_name: x-ai/grok-code-fast-1
-    litellm_params:
-      model: openrouter/x-ai/grok-code-fast-1
   - model_name: google/gemini-2.5-flash
     litellm_params:
       model: openrouter/google/gemini-2.5-flash
