@@ -178,11 +178,14 @@ class LLMBot:
         for attempt in range(max_retries):
             try:
                 request_data = {
+                    "extra_headers": {
+                        "HTTP-Referer": "https://github.com/S1M0N38/balatrollm",
+                        "X-Title": "BalatroLLM",
+                    },
                     "model": self.config.model,
                     "messages": messages,
                     "tools": tools,
                     "tool_choice": "auto",
-                    "extra_body": {"allowed_openai_params": ["reasoning_effort"]},
                 }
                 request_id = self.data_collector.write_request(request_data)
 
