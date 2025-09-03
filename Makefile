@@ -14,6 +14,7 @@ UV := uv
 RUFF := ruff
 TYPECHECK := basedpyright
 RUNS ?= 5
+INSTANCES ?= 1
 
 help: ## Show this help message
 	@echo "$(BLUE)BalatroLLM Development Makefile$(RESET)"
@@ -76,15 +77,20 @@ clean: ## Clean build artifacts and caches
 	@echo "$(GREEN)✓ Cleanup completed$(RESET)"
 
 # Game targets
-setup: ## Kill previous instances and start LiteLLM server + Balatro
+setup: ## Kill previous instances and start LiteLLM server + Balatro (INSTANCES=1)
 	@echo "$(YELLOW)Stopping all previous instances...$(RESET)"
 	@pkill -f litellm 2>/dev/null || true
 	@./balatro.sh --kill 2>/dev/null || true
 	@echo "$(YELLOW)Starting LiteLLM proxy server...$(RESET)"
 	@litellm --config config/litellm.yaml &
 	@sleep 3
-	@echo "$(YELLOW)Starting Balatro...$(RESET)"
-	@./balatro.sh
+	@echo "$(YELLOW)Starting Balatro with $(INSTANCES) instance(s)...$(RESET)"
+	@ports=""; \
+	for i in $$(seq 0 $$(($(INSTANCES) - 1))); do \
+		port=$$((12346 + i)); \
+		ports="$$ports -p $$port"; \
+	done; \
+	./balatro.sh $$ports
 
 teardown: ## Stop LiteLLM server and Balatro processes
 	@echo "$(YELLOW)Stopping LiteLLM proxy server...$(RESET)"
@@ -93,18 +99,20 @@ teardown: ## Stop LiteLLM server and Balatro processes
 	@./balatro.sh --kill 2>/dev/null || true
 	@echo "$(GREEN)✓ Services stopped$(RESET)"
 
-balatrobench: ## Run benchmark for all models and generate analysis (RUNS=5)
-	@echo "$(YELLOW)Starting benchmark runs for all models ($(RUNS) runs each)...$(RESET)"
-	@echo "$(YELLOW)Running openai/gpt-oss-120b...$(RESET)"
-	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model openai/gpt-oss-120b || true
-	@echo "$(YELLOW)Running openai/gpt-oss-20b...$(RESET)"
-	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model openai/gpt-oss-20b || true
-	@echo "$(YELLOW)Running qwen/qwen3-235b-a22b-thinking-2507...$(RESET)"
-	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model qwen/qwen3-235b-a22b-thinking-2507 || true
-	@echo "$(YELLOW)Running qwen/qwen3-235b-a22b-2507...$(RESET)"
-	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model qwen/qwen3-235b-a22b-2507 || true
-	@echo "$(YELLOW)Running google/gemini-2.5-flash...$(RESET)"
-	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model google/gemini-2.5-flash || true
-	@echo "$(YELLOW)Generating benchmark analysis...$(RESET)"
-	@balatrollm benchmark --runs-dir balatrobench/runs --output-dir balatrobench/benchmarks
-	@echo "$(GREEN)✓ Benchmark completed$(RESET)"
+balatrobench: ## Run benchmark for all models and generate analysis (RUNS=5, INSTANCES=4)
+	@$(eval BENCH_INSTANCES := $(if $(filter 1,$(INSTANCES)),4,$(INSTANCES)))
+	@echo "$(YELLOW)Starting benchmark runs for all models ($(RUNS) runs each with $(BENCH_INSTANCES) instances)...$(RESET)"
+	@ports=""; \
+	for i in $$(seq 0 $$(($(BENCH_INSTANCES) - 1))); do \
+		port=$$((12346 + i)); \
+		ports="$$ports -p $$port"; \
+	done; \
+	echo "$(YELLOW)Running openai/gpt-oss-120b...$(RESET)"; \
+	balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model openai/gpt-oss-120b $$ports || true; \
+	echo "$(YELLOW)Running openai/gpt-oss-20b...$(RESET)"; \
+	balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model openai/gpt-oss-20b $$ports || true; \
+	echo "$(YELLOW)Running qwen/qwen3-235b-a22b-thinking-2507...$(RESET)"; \
+	balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model qwen/qwen3-235b-a22b-thinking-2507 $$ports || true; \
+	echo "$(YELLOW)Generating benchmark analysis...$(RESET)"; \
+	balatrollm benchmark --runs-dir balatrobench/runs --output-dir balatrobench/benchmarks; \
+	echo "$(GREEN)✓ Benchmark completed$(RESET)"
