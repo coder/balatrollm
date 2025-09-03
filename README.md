@@ -45,7 +45,7 @@ uv sync
 
 # 3. Configure environment
 cp .envrc.example .envrc
-# edit .envrc with your API keys
+# edit .envrc with your OpenRouter API key
 
 # 4. Activate environment
 source .envrc
@@ -53,18 +53,17 @@ source .envrc
 
 #### Environment Variables
 
-**Provider API Keys** (required by LiteLLM or direct provider access)
+**OpenRouter API Key** (provides access to all LLM providers)
 
 ```bash
-export CEREBRAS_API_KEY="your-cerebras-key"
-export GROQ_API_KEY="your-groq-key"
-export OPENAI_API_KEY="your-openai-key"          # Optional
-export ANTHROPIC_API_KEY="your-anthropic-key"    # Optional
+export OPENROUTER_API_KEY="your-openrouter-api-key"
 ```
+
+Get your API key from: https://openrouter.ai/keys
 
 The CLI uses sensible defaults for all other configuration:
 
-- Default model: `cerebras/gpt-oss-120b`
+- Default model: `openai/gpt-oss-20b`
 - Default base URL: `http://localhost:4000`
 - Default API key: `sk-balatrollm-proxy-key`
 - Default strategy: `default`
@@ -103,7 +102,7 @@ positional arguments:
 
 options:
   -h, --help           show this help message and exit
-  --model MODEL        Model name to use from LiteLLM proxy (default: cerebras/gpt-oss-120b)
+  --model MODEL        Model name to use from LiteLLM proxy (default: openai/gpt-oss-20b)
   --list-models        List available models from the proxy and exit
   --strategy STRATEGY  Name of the strategy to use (default: default)
   --base-url BASE_URL  LiteLLM base URL (default: http://localhost:4000)

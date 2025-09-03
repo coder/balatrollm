@@ -13,6 +13,7 @@ BalatroLLM is an LLM-powered bot that plays Balatro (a roguelike poker deck-buil
 ```bash
 uv sync --all-extras --group dev
 cp .envrc.example .envrc
+# edit .envrc with your OpenRouter API key
 source .envrc
 ```
 
@@ -35,7 +36,7 @@ positional arguments:
 
 options:
   -h, --help           show this help message and exit
-  --model MODEL        Model name to use from LiteLLM proxy (default: cerebras/gpt-oss-120b)
+  --model MODEL        Model name to use from LiteLLM proxy (default: openai/gpt-oss-20b)
   --list-models        List available models from the proxy and exit
   --strategy STRATEGY  Name of the strategy to use (default: default)
   --base-url BASE_URL  LiteLLM base URL (default: http://localhost:4000)
@@ -131,15 +132,16 @@ Each strategy contains:
 3. Handle game states: BLIND_SELECT, SELECTING_HAND, SHOP, ROUND_EVAL, GAME_OVER
 4. Collect comprehensive statistics and generate run reports
 
-**Available Models** (`config/litellm.yaml`):
+**Available Models** (via OpenRouter):
 
-- **Cerebras**: cerebras/gpt-oss-120b (default), cerebras/gpt-oss-20b, cerebras/qwen-3-235b-a22b-thinking-2507
-- **Groq**: groq/qwen/qwen3-32b
-- **Local**: lmstudio/deepseek-r1-0528-qwen3-8b
+- **OpenAI**: openai/gpt-oss-20b (default), openai/gpt-oss-120b
+- **Qwen**: qwen/qwen3-235b-a22b-thinking-2507, qwen/qwen3-235b-a22b-2507
+- **X-AI**: x-ai/grok-code-fast-1
+- **Google**: google/gemini-2.5-flash
 
-**Provider API Keys** (required by LiteLLM or direct provider access):
+**API Key** (required by LiteLLM):
 
-- `CEREBRAS_API_KEY`, `GROQ_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`
+- `OPENROUTER_API_KEY` (provides access to all providers)
 
 ## Code Quality
 

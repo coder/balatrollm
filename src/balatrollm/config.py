@@ -15,7 +15,7 @@ class Config:
     model settings, game parameters, and metadata.
 
     Attributes:
-        model: LLM model identifier (e.g., 'cerebras/gpt-oss-120b').
+        model: LLM model identifier (e.g., 'openai/gpt-oss-20b').
         strategy: Strategy name to use for game decisions (default: 'default').
         deck: Balatro deck type to use (default: 'Red Deck').
         stake: Difficulty stake level (default: 1).
@@ -48,7 +48,7 @@ class Config:
             Config instance with all default parameter values.
         """
         return cls(
-            model="cerebras/gpt-oss-120b",
+            model="openai/gpt-oss-20b",
             strategy="default",
             deck="Red Deck",
             stake=1,
