@@ -129,8 +129,8 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     # Default command (play game) - no subcommand needed, just use main parser
     parser.add_argument(
         "--model",
-        default="cerebras/gpt-oss-120b",
-        help="Model name to use from LiteLLM proxy (default: cerebras/gpt-oss-120b)",
+        default="openai/gpt-oss-20b",
+        help="Model name to use from LiteLLM proxy (default: openai/gpt-oss-20b)",
     )
     parser.add_argument(
         "--list-models",

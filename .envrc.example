@@ -13,24 +13,11 @@ export GIT_LFS_SKIP_SMUDGE=1
 
 # BALATROLLM CONFIGURATION
 # The CLI uses sensible defaults - no configuration needed!
-# - Default model: cerebras/gpt-oss-120b
+# - Default model: openai/gpt-oss-20b
 # - Default base URL: http://localhost:4000
 # - Default API key: sk-balatrollm-proxy-key
 # - Default strategy: default
 
-# PROVIDER API KEYS (used by LiteLLM or direct provider access)
-# You need to set the API keys for the providers you want to use
-
-# CEREBRAS
-export CEREBRAS_API_KEY="your-cerebras-api-key"
-
-# GROQ
-export GROQ_API_KEY="your-groq-api-key"
-
-# OPENAI
-export OPENAI_API_KEY="your-openai-api-key"
-
-# ANTHROPIC
-export ANTHROPIC_API_KEY="your-anthropic-api-key"
-
-# OTHER PROVIDERS ...
+# OPENROUTER API KEY (provides access to all LLM providers)
+# Get your API key from: https://openrouter.ai/keys
+export OPENROUTER_API_KEY="your-openrouter-api-key"
