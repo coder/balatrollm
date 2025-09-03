@@ -291,7 +291,7 @@ class BenchmarkAnalyzer:
             avg_rerolls=avg("rerolls"),
             avg_money_spent=avg("money_spent"),
             avg_successful_calls=avg("successful_calls"),
-            avg_error_calls=avg_len("error_calls"),
+            avg_error_calls=avg_len("invalid_responses"),
             avg_failed_calls=avg_len("failed_calls"),
             avg_total_input_tokens=avg("total_input_tokens"),
             avg_total_output_tokens=avg("total_output_tokens"),
