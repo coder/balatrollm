@@ -74,6 +74,8 @@ class LLMBot:
         responses: List of LLM responses for memory and debugging.
         tools: Game state-specific tool definitions loaded from strategy.
         data_collector: Collector for structured run data and statistics.
+        consecutive_failed_calls: Counter for consecutive failed/error calls.
+        max_consecutive_failed_calls: Threshold for stopping the run (3 consecutive failed calls).
     """
 
     def __init__(self, config: Config, base_url: str, api_key: str, port: int = 12346):
@@ -100,6 +102,10 @@ class LLMBot:
         # The last tool call is a valid tool call but a BalatroError occurred
         # (e.g. play hand with 6 cards)
         self.last_tool_called_failed: str | None = None
+
+        # Counter for consecutive failed/error calls. Prenvent infinite loop.
+        self.consecutive_failed_calls: int = 0
+        self.max_consecutive_failed_calls: int = 3
 
     def __enter__(self):
         self.balatro_client.connect()
@@ -243,6 +249,14 @@ class LLMBot:
             msg = f"No tool calls in LLM response: {message}"
             self.last_response_is_invalid = msg
             logger.warning(msg)
+            self.consecutive_failed_calls += 1
+            if self.consecutive_failed_calls >= self.max_consecutive_failed_calls:
+                logger.error(
+                    f"Stopping run due to {self.consecutive_failed_calls} consecutive failed calls"
+                )
+                raise RuntimeError(
+                    f"Too many consecutive failed calls ({self.consecutive_failed_calls})"
+                )
             result = self.balatro_client.send_message("get_game_state", {})
             return result
 
@@ -256,6 +270,14 @@ class LLMBot:
             msg = "Invalid tool call: missing name or arguments"
             self.last_response_is_invalid = msg
             logger.warning("Invalid tool call: missing name or arguments")
+            self.consecutive_failed_calls += 1
+            if self.consecutive_failed_calls >= self.max_consecutive_failed_calls:
+                logger.error(
+                    f"Stopping run due to {self.consecutive_failed_calls} consecutive failed calls"
+                )
+                raise RuntimeError(
+                    f"Too many consecutive failed calls ({self.consecutive_failed_calls})"
+                )
             result = self.balatro_client.send_message("get_game_state", {})
             return result
 
@@ -266,9 +288,19 @@ class LLMBot:
             msg = f"Invalid JSON in tool call arguments: {e}"
             self.last_response_is_invalid = msg
             logger.warning(msg)
+            self.consecutive_failed_calls += 1
+            if self.consecutive_failed_calls >= self.max_consecutive_failed_calls:
+                logger.error(
+                    f"Stopping run due to {self.consecutive_failed_calls} consecutive failed calls"
+                )
+                raise RuntimeError(
+                    f"Too many consecutive failed calls ({self.consecutive_failed_calls})"
+                )
             result = self.balatro_client.send_message("get_game_state", {})
             return result
 
+        # Reset consecutive failed calls counter on successful parsing
+        self.consecutive_failed_calls = 0
         self.last_response_is_invalid = None
 
         # Execute tool call
@@ -282,9 +314,18 @@ class LLMBot:
             self.last_tool_called_failed = msg
             self.data_collector.failed_calls.append(str(e))
             logger.warning(f"Error executing tool call: {e}")
+            self.consecutive_failed_calls += 1
+            if self.consecutive_failed_calls >= self.max_consecutive_failed_calls:
+                logger.error(
+                    f"Stopping run due to {self.consecutive_failed_calls} consecutive failed calls"
+                )
+                raise RuntimeError(
+                    f"Too many consecutive failed calls ({self.consecutive_failed_calls})"
+                )
             result = self.balatro_client.send_message("get_game_state", {})
             return result
 
+        self.consecutive_failed_calls = 0
         self.last_tool_called_failed = None
         return result
 
@@ -373,6 +414,12 @@ class LLMBot:
         except KeyboardInterrupt:
             logger.info("Game interrupted by user")
 
+        except RuntimeError as e:
+            if "consecutive failed calls" in str(e):
+                logger.error(f"Game stopped due to consecutive failed calls: {e}")
+            else:
+                logger.error(f"Game loop failed: {e}")
+                raise
         except Exception as e:
             logger.error(f"Game loop failed: {e}")
             raise
