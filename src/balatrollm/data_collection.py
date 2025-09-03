@@ -83,6 +83,16 @@ class RunStats:
         total_reasoning_tokens: Total reasoning tokens across all calls.
         total_tokens: Total tokens across all calls.
         total_response_time_ms: Total response time in milliseconds.
+        total_cost: Total cost across all LLM calls.
+        avg_cost_per_call: Average cost per successful LLM call.
+        total_upstream_inference_cost: Total upstream inference cost.
+        total_upstream_prompt_cost: Total upstream prompt cost.
+        total_upstream_completion_cost: Total upstream completion cost.
+        providers_used: List of unique providers used during the run.
+        reasoning_calls: Number of calls that included reasoning content.
+        avg_reasoning_content_length: Average length of reasoning content.
+        total_reasoning_content_length: Total length of all reasoning content.
+        request_ids: List of request IDs for tracing and debugging.
     """
 
     # Game Performance
@@ -113,6 +123,24 @@ class RunStats:
     total_reasoning_tokens: int = 0
     total_tokens: int = 0
     total_response_time_ms: float = 0.0
+
+    # Cost Tracking
+    total_cost: float = 0.0
+    avg_cost_per_call: float = 0.0
+    total_upstream_inference_cost: float = 0.0
+    total_upstream_prompt_cost: float = 0.0
+    total_upstream_completion_cost: float = 0.0
+
+    # Provider Tracking
+    providers_used: list[str] = field(default_factory=list)
+
+    # Reasoning Analysis
+    reasoning_calls: int = 0
+    avg_reasoning_content_length: float = 0.0
+    total_reasoning_content_length: int = 0
+
+    # Request Tracking
+    request_ids: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -361,6 +389,12 @@ class RunStatsCollector:
             output_tokens = []
             reasoning_tokens = []
             total_tokens = []
+            costs = []
+            upstream_inference_costs = []
+            upstream_prompt_costs = []
+            upstream_completion_costs = []
+            reasoning_content_lengths = []
+            providers = []
 
             with open(responses_path, "r") as f:
                 for line in f:
@@ -374,14 +408,68 @@ class RunStatsCollector:
                         message = body.get("choices", [{}])[0].get("message", {})
                         usage = body.get("usage", {})
 
+                        # Token tracking
                         if "prompt_tokens" in usage:
                             input_tokens.append(usage["prompt_tokens"])
                         if "completion_tokens" in usage:
                             output_tokens.append(usage["completion_tokens"])
                         if "reasoning_tokens" in usage:
                             reasoning_tokens.append(usage["reasoning_tokens"])
+                        elif usage.get("completion_tokens_details", {}).get(
+                            "reasoning_tokens"
+                        ):
+                            reasoning_tokens.append(
+                                usage["completion_tokens_details"]["reasoning_tokens"]
+                            )
                         if "total_tokens" in usage:
                             total_tokens.append(usage["total_tokens"])
+
+                        # Cost tracking
+                        if "cost" in usage and usage["cost"] is not None:
+                            costs.append(usage["cost"])
+                        cost_details = usage.get("cost_details", {})
+                        if (
+                            "upstream_inference_cost" in cost_details
+                            and cost_details["upstream_inference_cost"] is not None
+                        ):
+                            upstream_inference_costs.append(
+                                cost_details["upstream_inference_cost"]
+                            )
+                        if (
+                            "upstream_inference_prompt_cost" in cost_details
+                            and cost_details["upstream_inference_prompt_cost"]
+                            is not None
+                        ):
+                            upstream_prompt_costs.append(
+                                cost_details["upstream_inference_prompt_cost"]
+                            )
+                        if (
+                            "upstream_inference_completions_cost" in cost_details
+                            and cost_details["upstream_inference_completions_cost"]
+                            is not None
+                        ):
+                            upstream_completion_costs.append(
+                                cost_details["upstream_inference_completions_cost"]
+                            )
+
+                        # Provider tracking
+                        if "provider" in body:
+                            provider = body["provider"]
+                            providers.append(provider)
+                            if provider not in stats.providers_used:
+                                stats.providers_used.append(provider)
+
+                        # Request ID tracking
+                        request_id = response.get("response", {}).get("request_id")
+                        if request_id:
+                            stats.request_ids.append(request_id)
+
+                        # Reasoning content analysis
+                        reasoning_content = message.get("reasoning_content", "")
+                        if reasoning_content:
+                            stats.reasoning_calls += 1
+                            reasoning_content_lengths.append(len(reasoning_content))
+
                         if message.get("tool_calls") is None:
                             stats.invalid_responses += 1
 
@@ -405,6 +493,21 @@ class RunStatsCollector:
             )
             stats.avg_total_tokens = (
                 sum(total_tokens) / len(total_tokens) if total_tokens else 0.0
+            )
+
+            # Calculate cost totals and averages
+            stats.total_cost = sum(costs)
+            stats.avg_cost_per_call = sum(costs) / len(costs) if costs else 0.0
+            stats.total_upstream_inference_cost = sum(upstream_inference_costs)
+            stats.total_upstream_prompt_cost = sum(upstream_prompt_costs)
+            stats.total_upstream_completion_cost = sum(upstream_completion_costs)
+
+            # Calculate reasoning content averages
+            stats.total_reasoning_content_length = sum(reasoning_content_lengths)
+            stats.avg_reasoning_content_length = (
+                sum(reasoning_content_lengths) / len(reasoning_content_lengths)
+                if reasoning_content_lengths
+                else 0.0
             )
 
         return stats
