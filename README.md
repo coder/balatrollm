@@ -90,26 +90,31 @@ balatrollm --help
 ```
 
 ```
-usage: balatrollm [-h] [--model MODEL] [--list-models] [--strategy STRATEGY] [--base-url BASE_URL]
-                  [--api-key API_KEY] [--config CONFIG] [--runs-dir RUNS_DIR] [--runs RUNS]
+usage: balatrollm [-h] [-m MODEL] [-l] [-s STRATEGY] [-u BASE_URL] [-k API_KEY] [-c CONFIG]
+                  [-d RUNS_DIR] [-r RUNS] [-p PORT]
                   {benchmark} ...
 
 LLM-powered Balatro bot using LiteLLM proxy
 
 positional arguments:
-  {benchmark}          Available commands
-    benchmark          Analyze runs and generate leaderboards
+  {benchmark}           Available commands
+    benchmark           Analyze runs and generate leaderboards
 
 options:
-  -h, --help           show this help message and exit
-  --model MODEL        Model name to use from LiteLLM proxy (default: openai/gpt-oss-20b)
-  --list-models        List available models from the proxy and exit
-  --strategy STRATEGY  Name of the strategy to use (default: default)
-  --base-url BASE_URL  LiteLLM base URL (default: http://localhost:4000)
-  --api-key API_KEY    LiteLLM proxy API key (default: sk-balatrollm-proxy-key)
-  --config CONFIG      Load configuration from a previous run's config.json file
-  --runs-dir RUNS_DIR  Base directory for storing run data (default: current directory)
-  --runs RUNS          Number of times to run the bot with the same configuration (default: 1)
+  -h, --help            show this help message and exit
+  -m, --model MODEL     Model name to use from LiteLLM proxy (default: openai/gpt-oss-20b)
+  -l, --list-models     List available models from the proxy and exit
+  -s, --strategy STRATEGY
+                        Name of the strategy to use (default: default)
+  -u, --base-url BASE_URL
+                        LiteLLM base URL (default: http://localhost:4000)
+  -k, --api-key API_KEY
+                        LiteLLM proxy API key (default: sk-balatrollm-proxy-key)
+  -c, --config CONFIG   Load configuration from a previous run's config.json file
+  -d, --runs-dir RUNS_DIR
+                        Base directory for storing run data (default: current directory)
+  -r, --runs RUNS       Number of times to run the bot with the same configuration (default: 1)
+  -p, --port PORT       Port for BalatroBot client connection (can specify multiple, default: 12346)
 ```
 
 #### `Makefile` - Development Workflow
