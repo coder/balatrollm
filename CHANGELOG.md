@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.7.0](https://github.com/S1M0N38/balatrollm/compare/v0.6.0...v0.7.0) (2025-09-03)
+
+
+### Features
+
+* add configurable port for balatrobot client ([3a5cb23](https://github.com/S1M0N38/balatrollm/commit/3a5cb23cc8ff62c324a258540bf9584f192e0d5f))
+* add extra_headers to requests for App identification ([65436cb](https://github.com/S1M0N38/balatrollm/commit/65436cb2ba2e7abca1a0db523b91caec7e7711dd))
+* add extra_headers to requests for App identification ([2ed4a1e](https://github.com/S1M0N38/balatrollm/commit/2ed4a1e5b9a538d15b4b5ff50ff7ed45f493c1d5))
+* add fields provided by OpenRouter to stats.json ([af97295](https://github.com/S1M0N38/balatrollm/commit/af97295327c9afea8338feb0a279bc5ebe00b321))
+* add fields provided by OpenRouter to stats.json ([f4cd7fb](https://github.com/S1M0N38/balatrollm/commit/f4cd7fb9aaebe6dbc05b490bbdd05736afd20571))
+* make balatro instance configurable in Makefile ([1f7ad4b](https://github.com/S1M0N38/balatrollm/commit/1f7ad4b6fe1736b6644ec3fe60c99d47b7d7bee3))
+* parallelize runs over multiple ports ([75286fa](https://github.com/S1M0N38/balatrollm/commit/75286faac2c448601711360ae05683e430cb4d20))
+* parallelize runs with multiple ports ([7169a24](https://github.com/S1M0N38/balatrollm/commit/7169a2493e119dd30ba1802a4e6b4864bce1cdc6))
+* stop game on 3 consecutive failed/error calls ([3e25508](https://github.com/S1M0N38/balatrollm/commit/3e2550895d41c358ecf95345a8413faea7e7ee05))
+* update benchmark with new openrouter fields ([0c4c8a5](https://github.com/S1M0N38/balatrollm/commit/0c4c8a5eec5718dd5fa08b76526c29c5f11f444d))
+* update default model to openai/gpt-oss-20b ([c6b7cdc](https://github.com/S1M0N38/balatrollm/commit/c6b7cdca043ee8d7874c4f109fc6bbc0531f713e))
+* update default model to openai/gpt-oss-20b ([70bffc7](https://github.com/S1M0N38/balatrollm/commit/70bffc778a4e34db4059d38ef507dff459cd2d72))
+* use openrouter in litellm config ([6a42fe0](https://github.com/S1M0N38/balatrollm/commit/6a42fe0331477eea2f10dc5da2f497974caa1c21))
+* use openrouter in litellm config ([85e9d22](https://github.com/S1M0N38/balatrollm/commit/85e9d22e25d4daff4ca26a901f4c6bff50986ca6))
+
+
+### Bug Fixes
+
+* update balatrobench command to new models ([de5222d](https://github.com/S1M0N38/balatrollm/commit/de5222dab820be4d740fe10bdf82eb8a65edda1b))
+* update balatrobench command to new models ([5042746](https://github.com/S1M0N38/balatrollm/commit/50427462b61ec57e6d86cf4adafbd11f19789b65))
+* use invalid_responses instead of error_calls ([9a09569](https://github.com/S1M0N38/balatrollm/commit/9a095691dffd850d8b3c5ef72d402748a5c0550e))
+
+
+### Documentation
+
+* update help for balatrollm ([6b4a515](https://github.com/S1M0N38/balatrollm/commit/6b4a5155f5feba19dc7682fe1516afb85f804d86))
+
 ## [0.6.0](https://github.com/S1M0N38/balatrollm/compare/v0.5.0...v0.6.0) (2025-09-02)
 
 
