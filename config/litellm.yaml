@@ -1,63 +1,35 @@
 model_list:
-  # Cerebras
-  - model_name: cerebras/gpt-oss-120b
+  - model_name: openai/gpt-oss-120b
     litellm_params:
-      model: cerebras/gpt-oss-120b
-      api_key: os.environ/CEREBRAS_API_KEY
-      api_base: https://api.cerebras.ai/v1
-      reasoning_effort: "medium"
-  - model_name: cerebras/qwen-3-32b
+      model: openrouter/openai/gpt-oss-120b
+  - model_name: openai/gpt-oss-20b
     litellm_params:
-      model: cerebras/qwen-3-32b
-      api_key: os.environ/CEREBRAS_API_KEY
-      api_base: https://api.cerebras.ai/v1
-  - model_name: cerebras/qwen-3-235b-a22b-thinking-2507
+      model: openrouter/openai/gpt-oss-20b
+  - model_name: qwen/qwen3-235b-a22b-thinking-2507
     litellm_params:
-      model: cerebras/qwen-3-235b-a22b-thinking-2507
-      api_key: os.environ/CEREBRAS_API_KEY
-      api_base: https://api.cerebras.ai/v1
-  - model_name: cerebras/qwen-3-235b-a22b-instruct-2507
+      model: openrouter/qwen/qwen3-235b-a22b-thinking-2507
+  - model_name: qwen/qwen3-235b-a22b-2507
     litellm_params:
-      model: cerebras/qwen-3-235b-a22b-instruct-2507
-      api_key: os.environ/CEREBRAS_API_KEY
-      api_base: https://api.cerebras.ai/v1
-  # Groq
-  - model_name: groq/openai/gpt-oss-120b
+      model: openrouter/qwen/qwen3-235b-a22b-2507
+  - model_name: x-ai/grok-code-fast-1
     litellm_params:
-      model: groq/openai/gpt-oss-120b
-      api_key: os.environ/GROQ_API_KEY
-      api_base: https://api.groq.com/openai/v1
-  - model_name: groq/openai/gpt-oss-20b
+      model: openrouter/x-ai/grok-code-fast-1
+  - model_name: google/gemini-2.5-flash
     litellm_params:
-      model: groq/openai/gpt-oss-20b
-      api_key: os.environ/GROQ_API_KEY
-      api_base: https://api.groq.com/openai/v1
-  - model_name: groq/qwen/qwen3-32b
+      model: openrouter/google/gemini-2.5-flash
+  - model_name: google/gemini-2.5-flash
     litellm_params:
-      model: groq/qwen/qwen3-32b
-      api_key: os.environ/GROQ_API_KEY
-      api_base: https://api.groq.com/openai/v1
-  - model_name: groq/deepseek-r1-distill-llama-70b
-    litellm_params:
-      model: groq/deepseek-r1-distill-llama-70b
-      api_key: os.environ/GROQ_API_KEY
-      api_base: https://api.groq.com/openai/v1
-  - model_name: groq/llama-3.3-70b-versatile
-    litellm_params:
-      model: groq/llama-3.3-70b-versatile
-      api_key: os.environ/GROQ_API_KEY
-      api_base: https://api.groq.com/openai/v1
-  - model_name: groq/llama-3.1-8b-instant
-    litellm_params:
-      model: groq/llama-3.1-8b-instant
-      api_key: os.environ/GROQ_API_KEY
-      api_base: https://api.groq.com/openai/v1
-  # LM Studio Local - Local development and testing
-  - model_name: lmstudio/deepseek-r1-0528-qwen3-8b
-    litellm_params:
-      model: openai/deepseek-r1-0528-qwen3-8b
-      api_key: dummy-key
-      api_base: http://localhost:1234/v1
+      model: openrouter/google/gemini-2.5-flash
+router_settings:
+  default_litellm_params:
+    api_key: os.environ/OPENROUTER_API_KEY
+    reasoning:
+      effort: "medium"
+    usage:
+      include: True
+    provider:
+      sort: "price"
+    seed: 0
 general_settings:
   master_key: sk-balatrollm-proxy-key
   set_verbose: true
