@@ -95,14 +95,16 @@ teardown: ## Stop LiteLLM server and Balatro processes
 
 balatrobench: ## Run benchmark for all models and generate analysis (RUNS=5)
 	@echo "$(YELLOW)Starting benchmark runs for all models ($(RUNS) runs each)...$(RESET)"
-	@echo "$(YELLOW)Running cerebras/gpt-oss-120b...$(RESET)"
-	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model cerebras/gpt-oss-120b || true
-	@echo "$(YELLOW)Running cerebras/qwen-3-235b-a22b-thinking-2507...$(RESET)"
-	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model cerebras/qwen-3-235b-a22b-thinking-2507 || true
-	@echo "$(YELLOW)Running cerebras/qwen-3-235b-a22b-instruct-2507...$(RESET)"
-	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model cerebras/qwen-3-235b-a22b-instruct-2507 || true
-	@echo "$(YELLOW)Running cerebras/qwen-3-32b...$(RESET)"
-	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model cerebras/qwen-3-32b || true
+	@echo "$(YELLOW)Running openai/gpt-oss-120b...$(RESET)"
+	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model openai/gpt-oss-120b || true
+	@echo "$(YELLOW)Running openai/gpt-oss-20b...$(RESET)"
+	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model openai/gpt-oss-20b || true
+	@echo "$(YELLOW)Running qwen/qwen3-235b-a22b-thinking-2507...$(RESET)"
+	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model qwen/qwen3-235b-a22b-thinking-2507 || true
+	@echo "$(YELLOW)Running qwen/qwen3-235b-a22b-2507...$(RESET)"
+	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model qwen/qwen3-235b-a22b-2507 || true
+	@echo "$(YELLOW)Running google/gemini-2.5-flash...$(RESET)"
+	@balatrollm --runs-dir ./balatrobench --runs $(RUNS) --model google/gemini-2.5-flash || true
 	@echo "$(YELLOW)Generating benchmark analysis...$(RESET)"
 	@balatrollm benchmark --runs-dir balatrobench/runs --output-dir balatrobench/benchmarks
 	@echo "$(GREEN)✓ Benchmark completed$(RESET)"
