@@ -27,13 +27,28 @@ class AveragedStats:
         avg_rerolls: Average number of shop rerolls per run.
         avg_money_spent: Average money spent per run.
         avg_successful_calls: Average successful LLM calls per run.
-        avg_error_calls: Average number of error calls per run.
+        avg_invalid_responses: Average number of invalid responses per run.
         avg_failed_calls: Average number of failed calls per run.
+        avg_avg_input_tokens: Average of per-call input token averages.
+        avg_avg_output_tokens: Average of per-call output token averages.
+        avg_avg_reasoning_tokens: Average of per-call reasoning token averages.
+        avg_avg_total_tokens: Average of per-call total token averages.
+        avg_avg_response_time_ms: Average of per-call response time averages.
         avg_total_input_tokens: Average total input tokens per run.
         avg_total_output_tokens: Average total output tokens per run.
         avg_total_reasoning_tokens: Average total reasoning tokens per run.
         avg_total_tokens: Average total tokens per run.
         avg_total_response_time_ms: Average total response time per run.
+        avg_total_cost: Average total cost per run.
+        avg_avg_cost_per_call: Average of per-call cost averages.
+        avg_total_upstream_inference_cost: Average total upstream inference cost per run.
+        avg_total_upstream_prompt_cost: Average total upstream prompt cost per run.
+        avg_total_upstream_completion_cost: Average total upstream completion cost per run.
+        avg_providers_used_count: Average number of unique providers used per run.
+        avg_reasoning_calls: Average number of reasoning calls per run.
+        avg_avg_reasoning_content_length: Average of per-call reasoning content length averages.
+        avg_total_reasoning_content_length: Average total reasoning content length per run.
+        avg_request_ids_count: Average number of request IDs per run.
     """
 
     avg_final_round: float
@@ -46,14 +61,36 @@ class AveragedStats:
     avg_money_spent: float
 
     avg_successful_calls: float
-    avg_error_calls: float
+    avg_invalid_responses: float
     avg_failed_calls: float
 
+    # Per-call averages (averages of the per-call averages)
+    avg_avg_input_tokens: float
+    avg_avg_output_tokens: float
+    avg_avg_reasoning_tokens: float
+    avg_avg_total_tokens: float
+    avg_avg_response_time_ms: float
+
+    # Total averages (averages of the totals)
     avg_total_input_tokens: float
     avg_total_output_tokens: float
     avg_total_reasoning_tokens: float
     avg_total_tokens: float
     avg_total_response_time_ms: float
+
+    # Cost metrics
+    avg_total_cost: float
+    avg_avg_cost_per_call: float
+    avg_total_upstream_inference_cost: float
+    avg_total_upstream_prompt_cost: float
+    avg_total_upstream_completion_cost: float
+
+    # Provider and reasoning metrics
+    avg_providers_used_count: float
+    avg_reasoning_calls: float
+    avg_avg_reasoning_content_length: float
+    avg_total_reasoning_content_length: float
+    avg_request_ids_count: float
 
 
 @dataclass
@@ -291,13 +328,32 @@ class BenchmarkAnalyzer:
             avg_rerolls=avg("rerolls"),
             avg_money_spent=avg("money_spent"),
             avg_successful_calls=avg("successful_calls"),
-            avg_error_calls=avg_len("invalid_responses"),
+            avg_invalid_responses=avg("invalid_responses"),
             avg_failed_calls=avg_len("failed_calls"),
+            # Per-call averages
+            avg_avg_input_tokens=avg("avg_input_tokens"),
+            avg_avg_output_tokens=avg("avg_output_tokens"),
+            avg_avg_reasoning_tokens=avg("avg_reasoning_tokens"),
+            avg_avg_total_tokens=avg("avg_total_tokens"),
+            avg_avg_response_time_ms=avg("avg_response_time_ms"),
+            # Total averages
             avg_total_input_tokens=avg("total_input_tokens"),
             avg_total_output_tokens=avg("total_output_tokens"),
             avg_total_reasoning_tokens=avg("total_reasoning_tokens"),
             avg_total_tokens=avg("total_tokens"),
             avg_total_response_time_ms=avg("total_response_time_ms"),
+            # Cost metrics
+            avg_total_cost=avg("total_cost"),
+            avg_avg_cost_per_call=avg("avg_cost_per_call"),
+            avg_total_upstream_inference_cost=avg("total_upstream_inference_cost"),
+            avg_total_upstream_prompt_cost=avg("total_upstream_prompt_cost"),
+            avg_total_upstream_completion_cost=avg("total_upstream_completion_cost"),
+            # Provider and reasoning metrics
+            avg_providers_used_count=avg_len("providers_used"),
+            avg_reasoning_calls=avg("reasoning_calls"),
+            avg_avg_reasoning_content_length=avg("avg_reasoning_content_length"),
+            avg_total_reasoning_content_length=avg("total_reasoning_content_length"),
+            avg_request_ids_count=avg_len("request_ids"),
         )
 
     def generate_leaderboard(self, output_dir: Path = Path("benchmarks")) -> None:
