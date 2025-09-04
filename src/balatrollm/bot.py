@@ -12,7 +12,7 @@ from openai.types.chat import ChatCompletion
 from balatrobot import BalatroClient, BalatroError
 from balatrobot.enums import State
 
-from .config import Config
+from .config import Config, load_model_config
 from .data_collection import RunStatsCollector, generate_run_directory
 from .strategies import StrategyManager
 
@@ -83,11 +83,13 @@ class LLMBot:
 
         Args:
             config: Bot configuration containing model and strategy settings.
-            base_url: Base URL for the LiteLLM proxy server.
-            api_key: API key for LiteLLM proxy authentication.
+            base_url: Base URL for OpenAI compatible API.
+            api_key: API key for authentication.
             port: Port for BalatroBot client connection.
         """
         self.config = config
+        self.model_config = load_model_config(config.model)
+
         self.llm_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
         self.balatro_client = BalatroClient(port=port)
         self.strategy_manager = StrategyManager(config.strategy)
@@ -183,16 +185,17 @@ class LLMBot:
 
         for attempt in range(max_retries):
             try:
+                # Build request data from model config
                 request_data = {
-                    "extra_headers": {
-                        "HTTP-Referer": "https://github.com/S1M0N38/balatrollm",
-                        "X-Title": "BalatroLLM",
-                    },
                     "model": self.config.model,
                     "messages": messages,
                     "tools": tools,
-                    "tool_choice": "auto",
                 }
+
+                # Add model-specific parameters from config
+                for key, value in self.model_config.items():
+                    request_data[key] = value
+
                 request_id = self.data_collector.write_request(request_data)
 
                 response = await self.llm_client.chat.completions.create(**request_data)
