@@ -3,8 +3,63 @@
 import json
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from typing import Any
+
+import yaml
 
 from . import __version__
+
+
+def load_model_config(
+    model: str, config_path: Path = Path("config/models.yaml")
+) -> dict[str, Any]:
+    """Load model-specific configuration from models.yaml.
+
+    Merges model-specific settings with global defaults to create final
+    parameters for OpenAI client requests.
+
+    Args:
+        model: Model identifier (e.g., 'openai/gpt-oss-20b')
+        config_path: Path to models.yaml file
+
+    Returns:
+        Dictionary containing merged configuration for the model
+
+    Raises:
+        FileNotFoundError: If config file doesn't exist
+        KeyError: If model not found in configuration
+    """
+    if not config_path.exists():
+        raise FileNotFoundError(f"Model config file not found: {config_path}")
+    with config_path.open() as f:
+        config = yaml.safe_load(f)
+
+    model_config = None
+    for model_entry in config.get("models", []):
+        if model_entry.get("model") == model:
+            model_config = model_entry.copy()
+            break
+    if model_config is None:
+        raise KeyError(f"Model '{model}' not found in {config_path}")
+
+    defaults = config.get("defaults", {})
+
+    # Start with defaults, then merge model config
+    # For nested dicts like extra_body, we need deep merging
+    final_config = defaults.copy()
+
+    for key, value in model_config.items():
+        if (
+            key in final_config
+            and isinstance(final_config[key], dict)
+            and isinstance(value, dict)
+        ):
+            # Deep merge for nested dicts
+            final_config[key] = {**final_config[key], **value}
+        else:
+            final_config[key] = value
+
+    return final_config
 
 
 @dataclass
