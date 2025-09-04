@@ -2,6 +2,7 @@
 
 import argparse
 import asyncio
+import os
 import sys
 from pathlib import Path
 
@@ -192,7 +193,7 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         Configured ArgumentParser instance with all commands and options.
     """
     parser = argparse.ArgumentParser(
-        description="LLM-powered Balatro bot using LiteLLM proxy",
+        description="LLM-powered Balatro bot",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
@@ -204,13 +205,13 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         "-m",
         "--model",
         default="openai/gpt-oss-20b",
-        help="Model name to use from LiteLLM proxy (default: openai/gpt-oss-20b)",
+        help="Model name to use from OpenRouter (default: openai/gpt-oss-20b)",
     )
     parser.add_argument(
         "-l",
         "--list-models",
         action="store_true",
-        help="List available models from the proxy and exit",
+        help="List available models from OpenRouter and exit",
     )
     parser.add_argument(
         "-s",
@@ -222,14 +223,14 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-u",
         "--base-url",
-        default="http://localhost:4000",
-        help="LiteLLM base URL (default: http://localhost:4000)",
+        default="https://openrouter.ai/api/v1",
+        help="OpenAI API base URL (default: https://openrouter.ai/api/v1)",
     )
     parser.add_argument(
         "-k",
         "--api-key",
-        default="sk-balatrollm-proxy-key",
-        help="LiteLLM proxy API key (default: sk-balatrollm-proxy-key)",
+        default=os.getenv("OPENROUTER_API_KEY"),
+        help="API key (default: OPENROUTER_API_KEY env var)",
     )
     parser.add_argument(
         "-c",
