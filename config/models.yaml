@@ -1,0 +1,24 @@
+models:
+  - model: openai/gpt-oss-120b
+    extra_body:
+      reasoning:
+        effort: medium
+  - model: openai/gpt-oss-20b
+    extra_body:
+      reasoning:
+        effort: medium
+  - model: qwen/qwen3-235b-a22b-thinking-2507
+  - model: qwen/qwen3-235b-a22b-2507
+  - model: google/gemini-2.5-flash
+defaults:
+  seed: 0
+  parallel_tool_calls: false
+  tool_choice: auto
+  extra_headers:
+    HTTP-Referer: https://github.com/S1M0N38/balatrollm
+    X-Title: BalatroLLM
+  extra_body:
+    provider:
+      sort: price
+    usage:
+      include: true
