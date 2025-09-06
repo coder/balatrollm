@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-BalatroLLM is an LLM-powered bot that plays Balatro (a roguelike poker deck-building game) using the BalatroBot client. The bot uses LiteLLM proxy to communicate with various LLM providers and makes strategic decisions based on game state analysis.
+BalatroLLM is an LLM-powered bot that plays Balatro (a roguelike poker deck-building game) using the BalatroBot client. The bot uses OpenAI-compatible APIs to communicate with various LLM providers and makes strategic decisions based on game state analysis.
 
 ## Development Commands
 
@@ -17,12 +17,6 @@ cp .envrc.example .envrc
 source .envrc
 ```
 
-### LiteLLM Proxy
-
-```bash
-litellm --config config/litellm.yaml
-```
-
 ### Running the Application
 
 ```
@@ -30,7 +24,7 @@ usage: balatrollm [-h] [-m MODEL] [-l] [-s STRATEGY] [-u BASE_URL] [-k API_KEY] 
                   [-d RUNS_DIR] [-r RUNS] [-p PORT]
                   {benchmark} ...
 
-LLM-powered Balatro bot using LiteLLM proxy
+LLM-powered Balatro bot
 
 positional arguments:
   {benchmark}           Available commands
@@ -38,14 +32,14 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -m, --model MODEL     Model name to use from LiteLLM proxy (default: openai/gpt-oss-20b)
-  -l, --list-models     List available models from the proxy and exit
+  -m, --model MODEL     Model name to use from OpenRouter (default: openai/gpt-oss-20b)
+  -l, --list-models     List available models from OpenRouter and exit
   -s, --strategy STRATEGY
                         Name of the strategy to use (default: default)
   -u, --base-url BASE_URL
-                        LiteLLM base URL (default: http://localhost:4000)
+                        OpenAI-compatible API base URL (default: https://openrouter.ai/api/v1)
   -k, --api-key API_KEY
-                        LiteLLM proxy API key (default: sk-balatrollm-proxy-key)
+                        API key (default: OPENROUTER_API_KEY env var)
   -c, --config CONFIG   Load configuration from a previous run's config.json file
   -d, --runs-dir RUNS_DIR
                         Base directory for storing run data (default: current directory)
@@ -71,8 +65,8 @@ Available targets:
   test-cov           Run tests with coverage report
   all                Run all code quality checks and tests
   clean              Clean build artifacts and caches
-  setup              Kill previous instances and start LiteLLM server + Balatro
-  teardown           Stop LiteLLM server and Balatro processes
+  setup              Kill previous instances and start Balatro
+  teardown           Stop Balatro processes
   balatrobench       Run benchmark for all models and generate analysis
 ```
 
@@ -130,7 +124,7 @@ Each strategy contains:
 - `MEMORY.md.jinja`: Response history tracking
 - `TOOLS.json`: Strategy-specific function definitions
 
-**Key Dependencies**: balatrobot, litellm, openai, jinja2, httpx
+**Key Dependencies**: balatrobot, openai, jinja2, httpx
 
 **Game Flow**:
 
@@ -146,7 +140,7 @@ Each strategy contains:
 - **X-AI**: x-ai/grok-code-fast-1
 - **Google**: google/gemini-2.5-flash
 
-**API Key** (required by LiteLLM):
+**API Key**:
 
 - `OPENROUTER_API_KEY` (provides access to all providers)
 
@@ -188,21 +182,20 @@ tests/test_llm.py                  # Test suite
 
 ## Context7 Library IDs
 
-**Core**: `/s1m0n38/balatrobot`, `/pallets/jinja`, `/openai/openai-python`, `/berriai/litellm`, `/encode/httpx`
+**Core**: `/s1m0n38/balatrobot`, `/pallets/jinja`, `/openai/openai-python`, `/encode/httpx`
 **Dev**: `/detachhead/basedpyright`, `/pytest-dev/pytest`, `/pytest-dev/pytest-asyncio`, `/astral-sh/ruff`, `/astral-sh/uv`
 
 ## Results Tracking
 
 **Run Data Structure:**
 
-- `runs/[version]/[strategy]/[provider]/[model-name]/[timestamp]_[deck]_[seed]/`
-- JSONL format for performance analysis across providers, models, and strategies
-- Provider/model parsing: `groq/qwen/qwen3-32b` → `groq/qwen--qwen3-32b` (filesystem safe)
-- Strategy-first organization enables easy comparison across providers/models within strategies
+- `runs/[version]/[strategy]/[vendor]/[model-name]/[timestamp]_[deck]_[seed]/`
+- JSONL format for performance analysis across vendors, models, and strategies
+- Strategy-first organization enables easy comparison across vendors/models within strategies
 
 **Benchmark Results Structure:**
 
-- `benchmarks/[version]/[strategy]/[provider]/[model-name].json` - Detailed model analysis
+- `benchmarks/[version]/[strategy]/[vendor]/[model-name].json` - Detailed model analysis
 - `benchmarks/[version]/[strategy]/leaderboard.json` - Strategy-specific leaderboard
 - Hierarchical structure matches runs organization for consistency
 

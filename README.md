@@ -64,8 +64,8 @@ Get your API key from: https://openrouter.ai/keys
 The CLI uses sensible defaults for all other configuration:
 
 - Default model: `openai/gpt-oss-20b`
-- Default base URL: `http://localhost:4000`
-- Default API key: `sk-balatrollm-proxy-key`
+- Default base URL: `https://openrouter.ai/api/v1`
+- Default API key: `OPENROUTER_API_KEY` environment variable
 - Default strategy: `default`
 
 ### Usage
@@ -73,13 +73,10 @@ The CLI uses sensible defaults for all other configuration:
 #### Quick Start
 
 ```bash
-# 1. Start LiteLLM proxy (in separate terminal)
-litellm --config config/litellm.yaml
-
-# 2. Start Balatro with BalatroBot mod (in separate terminal)
+# 1. Start Balatro with BalatroBot mod (in separate terminal)
 ./balatro.sh
 
-# 3. Run the bot with default settings
+# 2. Run the bot with default settings
 balatrollm
 ```
 
@@ -94,7 +91,7 @@ usage: balatrollm [-h] [-m MODEL] [-l] [-s STRATEGY] [-u BASE_URL] [-k API_KEY] 
                   [-d RUNS_DIR] [-r RUNS] [-p PORT]
                   {benchmark} ...
 
-LLM-powered Balatro bot using LiteLLM proxy
+LLM-powered Balatro bot
 
 positional arguments:
   {benchmark}           Available commands
@@ -102,14 +99,14 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -m, --model MODEL     Model name to use from LiteLLM proxy (default: openai/gpt-oss-20b)
-  -l, --list-models     List available models from the proxy and exit
+  -m, --model MODEL     Model name to use from OpenAI-compatible API (default: openai/gpt-oss-20b)
+  -l, --list-models     List available models from OpenAI-compatible API and exit
   -s, --strategy STRATEGY
                         Name of the strategy to use (default: default)
   -u, --base-url BASE_URL
-                        LiteLLM base URL (default: http://localhost:4000)
+                        OpenAI-compatible API base URL (default: https://openrouter.ai/api/v1)
   -k, --api-key API_KEY
-                        LiteLLM proxy API key (default: sk-balatrollm-proxy-key)
+                        API key (default: OPENROUTER_API_KEY env var)
   -c, --config CONFIG   Load configuration from a previous run's config.json file
   -d, --runs-dir RUNS_DIR
                         Base directory for storing run data (default: current directory)
@@ -139,8 +136,8 @@ Available targets:
   test-cov           Run tests with coverage report
   all                Run all code quality checks and tests
   clean              Clean build artifacts and caches
-  setup              Kill previous instances and start LiteLLM server + Balatro
-  teardown           Stop LiteLLM server and Balatro processes
+  setup              Kill previous instances and start Balatro
+  teardown           Stop Balatro processes
   balatrobench       Run benchmark for all models and generate analysis
 ```
 

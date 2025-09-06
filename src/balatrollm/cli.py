@@ -6,7 +6,7 @@ import os
 import sys
 from pathlib import Path
 
-from .benchmark import run_benchmark_analysis
+from .benchmark import BenchmarkAnalyzer
 from .bot import LLMBot, setup_logging
 from .config import Config
 
@@ -121,8 +121,8 @@ async def _port_worker(
     Args:
         work_queue: Queue containing run numbers to process.
         config: Bot configuration.
-        base_url: LiteLLM base URL.
-        api_key: LiteLLM API key.
+        base_url: OpenAI-compatible API base URL.
+        api_key: API key.
         port: Port number for this worker.
         runs_dir: Directory for storing run data.
         total_runs: Total number of runs (for progress display).
@@ -174,7 +174,7 @@ def cmd_benchmark(args) -> None:
         Exception: If benchmark analysis fails for any other reason.
     """
     try:
-        run_benchmark_analysis(args.runs_dir, args.output_dir)
+        BenchmarkAnalyzer(args.runs_dir, args.output_dir).analyze_all_runs()
     except FileNotFoundError as e:
         print(f"Error: {e}")
         sys.exit(1)
@@ -205,13 +205,13 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         "-m",
         "--model",
         default="openai/gpt-oss-20b",
-        help="Model name to use from OpenRouter (default: openai/gpt-oss-20b)",
+        help="Model name to use from OpenAI-compatible API (default: openai/gpt-oss-20b)",
     )
     parser.add_argument(
         "-l",
         "--list-models",
         action="store_true",
-        help="List available models from OpenRouter and exit",
+        help="List available models from OpenAI-compatible API and exit",
     )
     parser.add_argument(
         "-s",
@@ -224,7 +224,7 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         "-u",
         "--base-url",
         default="https://openrouter.ai/api/v1",
-        help="OpenAI API base URL (default: https://openrouter.ai/api/v1)",
+        help="OpenAI-compatible API base URL (default: https://openrouter.ai/api/v1)",
     )
     parser.add_argument(
         "-k",
