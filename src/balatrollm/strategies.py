@@ -83,8 +83,8 @@ class StrategyManager:
     def render_memory(
         self,
         responses: list[Any],
-        last_response_is_invalid: str | None = None,
-        last_tool_called_failed: str | None = None,
+        last_error_call_msg: str | None = None,
+        last_failed_call_msg: str | None = None,
     ) -> str:
         """Render the memory template.
 
@@ -99,8 +99,8 @@ class StrategyManager:
         template = self.jinja_env.get_template("MEMORY.md.jinja")
         return template.render(
             responses=responses,
-            last_response_is_invalid=last_response_is_invalid,
-            last_tool_called_failed=last_tool_called_failed,
+            last_error_call_msg=last_error_call_msg,
+            last_failed_call_msg=last_failed_call_msg,
         )
 
     def load_tools(self) -> dict[str, Any]:

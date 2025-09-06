@@ -1,13 +1,13 @@
 # Memory & Previous Actions
 
 ## Previous Action Status
-{% if last_response_is_invalid %}
-**Your last response was invalid**: {{ last_response_is_invalid }}
+{% if last_error_call_msg %}
+**Your last response was invalid**: {{ last_error_call_msg }}
 Please ensure your next response includes a proper tool call with valid function name and JSON arguments.
 {% endif %}
 
-{% if last_tool_called_failed %}
-**Your last tool call failed**: {{ last_tool_called_failed }}
+{% if last_failed_call_msg %}
+**Your last tool call failed**: {{ last_failed_call_msg }}
 The tool call was formatted correctly but execution failed. Please try a different approach or adjust your parameters.
 {% endif %}
 
