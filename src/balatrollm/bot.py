@@ -3,17 +3,25 @@
 import asyncio
 import json
 import logging
+import time
 from pathlib import Path
 from typing import Any
 
-from openai import AsyncOpenAI
+from openai import (
+    APIConnectionError,
+    APIStatusError,
+    APITimeoutError,
+    AsyncOpenAI,
+    ContentFilterFinishReasonError,
+    LengthFinishReasonError,
+)
 from openai.types.chat import ChatCompletion
 
 from balatrobot import BalatroClient, BalatroError
 from balatrobot.enums import State
 
 from .config import Config, load_model_config
-from .data_collection import RunStatsCollector, generate_run_directory
+from .data_collection import ChatCompletionError, ChatCompletionResponse, StatsCollector
 from .strategies import StrategyManager
 
 logger = logging.getLogger(__name__)
@@ -54,10 +62,16 @@ def setup_logging(log_file: Path | None = None) -> None:
         # Ensure parent directory exists
         log_file.parent.mkdir(parents=True, exist_ok=True)
 
-        file_handler = logging.FileHandler(log_file, mode="w")  # 'w' to overwrite
+        file_handler = logging.FileHandler(log_file, mode="w")
         file_handler.setLevel(level)
         file_handler.setFormatter(formatter)
         root_logger.addHandler(file_handler)
+
+
+class LLMBotError(Exception):
+    """Base class for exceptions raised by the LLMBot class."""
+
+    pass
 
 
 class LLMBot:
@@ -95,19 +109,19 @@ class LLMBot:
         self.strategy_manager = StrategyManager(config.strategy)
         self.responses: list[ChatCompletion] = []
         self.tools = self.strategy_manager.load_tools()
-        self.data_collector: RunStatsCollector
+        self.data_collector: StatsCollector
 
         # The last response is not a valid tool call (e.g. simple LLM text response)
         # We need to keep track that in order to notify the LLM for the next request.
-        self.last_response_is_invalid: str | None = None
+        self.last_error_call_msg: str | None = None
 
         # The last tool call is a valid tool call but a BalatroError occurred
         # (e.g. play hand with 6 cards)
-        self.last_tool_called_failed: str | None = None
+        self.last_failed_call_msg: str | None = None
 
         # Counter for consecutive failed/error calls. Prenvent infinite loop.
-        self.consecutive_failed_calls: int = 0
-        self.max_consecutive_failed_calls: int = 3
+        self.error_or_failed_calls: int = 0
+        self.max_error_or_failed_calls: int = 3
 
     def __enter__(self):
         self.balatro_client.connect()
@@ -117,10 +131,10 @@ class LLMBot:
         self.balatro_client.disconnect()
 
     async def list_available_models(self) -> list[str]:
-        """Get list of available models from the LiteLLM proxy.
+        """Get list of available models from the API.
 
         Returns:
-            List of model IDs available from the proxy.
+            List of model IDs available from the API.
             Returns empty list if request fails.
         """
         try:
@@ -154,8 +168,8 @@ class LLMBot:
                 self.strategy_manager.render_gamestate(state_name, game_state),
                 self.strategy_manager.render_memory(
                     self.responses,
-                    self.last_response_is_invalid,
-                    self.last_tool_called_failed,
+                    self.last_error_call_msg,
+                    self.last_failed_call_msg,
                 ),
             ]
         )
@@ -185,151 +199,159 @@ class LLMBot:
 
         for attempt in range(max_retries):
             try:
-                # Build request data from model config
                 request_data = {
                     "model": self.config.model,
                     "messages": messages,
                     "tools": tools,
                 }
-
-                # Add model-specific parameters from config
                 for key, value in self.model_config.items():
                     request_data[key] = value
 
-                request_id = self.data_collector.write_request(request_data)
-
+                custom_id = self.data_collector.write_request(request_data)
+                request_id = str(time.time_ns() // 1_000_000)
                 response = await self.llm_client.chat.completions.create(**request_data)
-
                 self.responses.append(response)
-                if self.data_collector and request_id:
-                    self.data_collector.write_response(request_id, response)
+                self.data_collector.write_response(
+                    id=str(time.time_ns() // 1_000_000),
+                    custom_id=custom_id,
+                    response=ChatCompletionResponse(
+                        request_id=request_id,
+                        status_code=200,
+                        body=response.to_dict(),
+                    ),
+                )
                 return response
 
-            except Exception as e:
-                if attempt == max_retries - 1:
-                    logger.error(
-                        f"LLM decision failed after {max_retries} attempts: {e}"
-                    )
-                    if self.data_collector and request_id:
-                        self.data_collector.write_response(
-                            request_id, error=e, status_code=500
-                        )
-                    raise
-
-                logger.warning(
-                    f"LLM attempt {attempt + 1} failed, retrying in {retry_delay}s: {e}"
+            except APITimeoutError as e:
+                logger.error(e)
+                self.data_collector.write_response(
+                    id=str(time.time_ns() // 1_000_000),
+                    custom_id=custom_id,
+                    error=ChatCompletionError(
+                        code="timeout",
+                        message=str(e),
+                    ),
                 )
-                await asyncio.sleep(retry_delay)
-                retry_delay *= 2
+
+            except APIConnectionError as e:
+                logger.error(e)
+                self.data_collector.write_response(
+                    id=str(time.time_ns() // 1_000_000),
+                    custom_id=custom_id,
+                    error=ChatCompletionError(
+                        code="connection",
+                        message=str(e),
+                    ),
+                )
+
+            except APIStatusError as e:
+                logger.error(e)
+                self.data_collector.write_response(
+                    id=str(time.time_ns() // 1_000_000),
+                    custom_id=custom_id,
+                    response=ChatCompletionResponse(
+                        request_id=request_id,
+                        status_code=e.status_code,
+                        body={},
+                    ),
+                )
+
+            except LengthFinishReasonError as e:
+                logger.error(e)
+                self.data_collector.write_response(
+                    id=str(time.time_ns() // 1_000_000),
+                    custom_id=custom_id,
+                    response=ChatCompletionResponse(
+                        request_id=request_id,
+                        status_code=200,
+                        body=e.completion.to_dict(),
+                    ),
+                    error=ChatCompletionError(
+                        code="length",
+                        message=str(e),
+                    ),
+                )
+
+            except ContentFilterFinishReasonError as e:
+                logger.error(e)
+                self.data_collector.write_response(
+                    id=str(time.time_ns() // 1_000_000),
+                    custom_id=custom_id,
+                    error=ChatCompletionError(
+                        code="content_filter",
+                        message=str(e),
+                    ),
+                )
+
+            logger.warning(
+                f"Retrying in {retry_delay} seconds [{attempt + 1}/{max_retries}]"
+            )
+            await asyncio.sleep(retry_delay)
+            retry_delay *= 2
 
         # This should never be reached due to raise in the exception handler
         raise RuntimeError("All retry attempts exhausted without raising exception")
 
+    def _error_call(self, msg):
+        logger.warning(msg)
+        self.last_error_call_msg = msg
+        self.error_or_failed_calls += 1
+        self.data_collector.call_stats.error += 1
+        self.data_collector.call_stats.total += 1
+        if self.error_or_failed_calls >= self.max_error_or_failed_calls:
+            raise LLMBotError("Too many consecutive error/failed calls")
+        return self.balatro_client.send_message("get_game_state", {})
+
+    def _failed_call(self, msg):
+        logger.warning(msg)
+        self.last_failed_call_msg = msg
+        self.error_or_failed_calls += 1
+        self.data_collector.call_stats.failed += 1
+        self.data_collector.call_stats.total += 1
+        if self.error_or_failed_calls >= self.max_error_or_failed_calls:
+            raise LLMBotError("Too many consecutive error/failed calls")
+        return self.balatro_client.send_message("get_game_state", {})
+
     def process_and_execute_tool_call(self, response: ChatCompletion) -> dict[str, Any]:
-        """Extract tool call from LLM response and execute it.
-
-        Parses the first tool call from the LLM response and executes it
-        via the BalatroClient.
-
-        Args:
-            response: ChatCompletion response containing tool calls.
-
-        Returns:
-            Dictionary containing the result from executing the tool call.
-
-        Raises:
-            ValueError: If response has no tool calls or invalid format.
-            json.JSONDecodeError: If tool call arguments are invalid JSON.
-        """
-        if not response.choices:
-            raise ValueError("No response choices returned from LLM")
-
         message = response.choices[0].message
 
-        # Check if response has tool calls. If not, just return the current game state
-        # The data_collector will count the number of invalid tool call responses
-        if not hasattr(message, "tool_calls") or not message.tool_calls:
-            msg = f"No tool calls in LLM response: {message}"
-            self.last_response_is_invalid = msg
-            logger.warning(msg)
-            self.consecutive_failed_calls += 1
-            if self.consecutive_failed_calls >= self.max_consecutive_failed_calls:
-                logger.error(
-                    f"Stopping run due to {self.consecutive_failed_calls} consecutive failed calls"
-                )
-                raise RuntimeError(
-                    f"Too many consecutive failed calls ({self.consecutive_failed_calls})"
-                )
-            result = self.balatro_client.send_message("get_game_state", {})
-            return result
+        # Check that the response is not an error call
 
-        # Extract function details from first tool call
+        if not hasattr(message, "tool_calls") or not message.tool_calls:
+            return self._error_call(f"No tool calls in LLM response: {message}")
+
         tool_call = message.tool_calls[0]
         function_obj = getattr(tool_call, "function", tool_call)
-        function_name = getattr(function_obj, "name", None)
-        function_args_str = getattr(function_obj, "arguments", None)
 
-        if not function_name or not function_args_str:
-            msg = "Invalid tool call: missing name or arguments"
-            self.last_response_is_invalid = msg
-            logger.warning("Invalid tool call: missing name or arguments")
-            self.consecutive_failed_calls += 1
-            if self.consecutive_failed_calls >= self.max_consecutive_failed_calls:
-                logger.error(
-                    f"Stopping run due to {self.consecutive_failed_calls} consecutive failed calls"
-                )
-                raise RuntimeError(
-                    f"Too many consecutive failed calls ({self.consecutive_failed_calls})"
-                )
-            result = self.balatro_client.send_message("get_game_state", {})
-            return result
+        fn_name = getattr(function_obj, "name", None)
+        if not fn_name:
+            return self._error_call("Invalid tool call: missing name")
 
-        # Parse JSON arguments
+        fn_args_str = getattr(function_obj, "arguments", None)
+        if not fn_args_str:
+            return self._error_call("Invalid tool call: missing arguments")
+
         try:
-            arguments = json.loads(function_args_str)
+            fn_args = json.loads(fn_args_str)
         except json.JSONDecodeError as e:
-            msg = f"Invalid JSON in tool call arguments: {e}"
-            self.last_response_is_invalid = msg
-            logger.warning(msg)
-            self.consecutive_failed_calls += 1
-            if self.consecutive_failed_calls >= self.max_consecutive_failed_calls:
-                logger.error(
-                    f"Stopping run due to {self.consecutive_failed_calls} consecutive failed calls"
-                )
-                raise RuntimeError(
-                    f"Too many consecutive failed calls ({self.consecutive_failed_calls})"
-                )
-            result = self.balatro_client.send_message("get_game_state", {})
-            return result
+            return self._error_call(f"Invalid JSON in tool call arguments: {e}")
 
-        # Reset consecutive failed calls counter on successful parsing
-        self.consecutive_failed_calls = 0
-        self.last_response_is_invalid = None
+        self.error_or_failed_calls = 0
+        self.last_error_call_msg = None
 
-        # Execute tool call
-        logger.info(f"Executing tool call: {function_name} with arguments: {arguments}")
+        # Check that the response is not a failed call
 
         try:
-            result = self.balatro_client.send_message(function_name, arguments)
-
+            logger.info(f"Executing tool call: {fn_name} with arguments: {fn_args}")
+            result = self.balatro_client.send_message(fn_name, fn_args)
         except BalatroError as e:
-            msg = f"Error executing tool call: {e}"
-            self.last_tool_called_failed = msg
-            self.data_collector.failed_calls.append(str(e))
-            logger.warning(f"Error executing tool call: {e}")
-            self.consecutive_failed_calls += 1
-            if self.consecutive_failed_calls >= self.max_consecutive_failed_calls:
-                logger.error(
-                    f"Stopping run due to {self.consecutive_failed_calls} consecutive failed calls"
-                )
-                raise RuntimeError(
-                    f"Too many consecutive failed calls ({self.consecutive_failed_calls})"
-                )
-            result = self.balatro_client.send_message("get_game_state", {})
-            return result
+            return self._failed_call(f"Error executing tool call: {e}")
 
-        self.consecutive_failed_calls = 0
-        self.last_tool_called_failed = None
+        self.last_failed_call_msg = None
+        self.error_or_failed_calls = 0
+        self.data_collector.call_stats.successful += 1
+        self.data_collector.call_stats.total += 1
+
         return result
 
     async def _init_game(self, base_dir: Path = Path.cwd()) -> dict[str, Any]:
@@ -344,16 +366,12 @@ class LLMBot:
         Returns:
             Initial game state dictionary from starting the run.
         """
-
-        # Generate run directory
-        run_dir = generate_run_directory(self.config, base_dir=base_dir)
-        logger.info(f"Run data will be saved to: {run_dir}")
-
-        self.config.to_config_file(run_dir / "config.json")
-        self.data_collector = RunStatsCollector(run_dir=run_dir, config=self.config)
+        self.data_collector = StatsCollector(self.config, base_dir)
+        self.config.to_config_file(self.data_collector.run_dir / "config.json")
+        logger.info(f"Run data will be saved to: {self.data_collector.run_dir}")
 
         # Set up logging to write to run.log file
-        log_path = run_dir / "run.log"
+        log_path = self.data_collector.run_dir / "run.log"
         setup_logging(log_file=log_path)
         logger.info(f"Game log will be saved to: {log_path}")
 
@@ -362,7 +380,7 @@ class LLMBot:
             "stake": self.config.stake,
             "seed": self.config.seed,
             "challenge": self.config.challenge,
-            "log_path": run_dir / "gamestates.jsonl",
+            "log_path": self.data_collector.run_dir / "gamestates.jsonl",
         }
 
         return self.balatro_client.send_message("start_run", start_run_args)
@@ -417,12 +435,10 @@ class LLMBot:
         except KeyboardInterrupt:
             logger.info("Game interrupted by user")
 
-        except RuntimeError as e:
-            if "consecutive failed calls" in str(e):
-                logger.error(f"Game stopped due to consecutive failed calls: {e}")
-            else:
-                logger.error(f"Game loop failed: {e}")
-                raise
+        except LLMBotError as e:
+            logger.error(f"Game stopped: {e}")
+            raise
+
         except Exception as e:
             logger.error(f"Game loop failed: {e}")
             raise
