@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.8.0](https://github.com/S1M0N38/balatrollm/compare/v0.7.0...v0.8.0) (2025-09-06)
+
+
+### Features
+
+* add model-specific config loading ([15d71d9](https://github.com/S1M0N38/balatrollm/commit/15d71d9926ee91b110f6e1515bb80ec8278eb7d7))
+* **bot:** improve error handling and LLM integration ([310799c](https://github.com/S1M0N38/balatrollm/commit/310799c5cd5761b571c8a39ad72579ff74922668))
+* move to openrouter ([6a0f4fa](https://github.com/S1M0N38/balatrollm/commit/6a0f4fad2408bf3296a209a0cb1aaa4f90591318))
+* remove litellm dependency ([28fb425](https://github.com/S1M0N38/balatrollm/commit/28fb425b7f0b9ebe748248b13fab1fef31fb76df))
+* replace litellm config with models.yaml ([446d981](https://github.com/S1M0N38/balatrollm/commit/446d981fe6465b7668dce878b5851348ba14a644))
+* use model config for model parameters ([3576fd5](https://github.com/S1M0N38/balatrollm/commit/3576fd522738e64c7cf83f45c471463f0548723a))
+
+
+### Documentation
+
+* add strategy submission guidelines ([03cc82d](https://github.com/S1M0N38/balatrollm/commit/03cc82dae171b64ec3621bf109a309c353b8e01d))
+* update CLI and documentation for direct OpenRouter integration ([00a061d](https://github.com/S1M0N38/balatrollm/commit/00a061d793f4f70a00186b9f95c33974e50ba3d6))
+
 ## [0.7.0](https://github.com/S1M0N38/balatrollm/compare/v0.6.0...v0.7.0) (2025-09-03)
 
 
