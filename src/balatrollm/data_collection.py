@@ -1,177 +1,156 @@
-"""Data collection and run directory management for BalatroLLM."""
-
 import json
+import re
+import statistics
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from openai.types.chat import ChatCompletion
-
 from balatrollm.config import Config
 
 
-def generate_run_directory(config: Config, base_dir: Path) -> Path:
-    """Generate structured directory path for the run.
+@dataclass
+class AggregatedStats:
+    input_tokens: int | float
+    output_tokens: int | float
+    input_cost: float
+    output_cost: float
+    total_cost: float
+    time_ms: float
 
-    Creates a hierarchical directory structure organized by version,
-    strategy, provider, model, and run timestamp.
-
-    Args:
-        config: Bot configuration containing model, strategy, and run parameters.
-        base_dir: Base directory for organizing run data.
-
-    Returns:
-        Path to the generated run directory.
-    """
-    base_dir = base_dir / "runs"
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-    provider, model_name = config.model.split(sep="/", maxsplit=1)
-    model_name = model_name.replace("/", "--")
-
-    # Clean names for filesystem safety
-    deck_clean = config.deck.replace(" ", "").replace("-", "")
-    challenge_clean = (
-        config.challenge.replace(" ", "").replace("-", "") if config.challenge else ""
-    )
-
-    # Build run directory name
-    parts = [timestamp, deck_clean, f"s{config.stake}"]
-    if challenge_clean:
-        parts.append(challenge_clean)
-    parts.append(config.seed)
-    run_dir_name = "_".join(parts)
-
-    return (
-        base_dir
-        / f"v{config.version}"
-        / config.strategy
-        / provider
-        / model_name
-        / run_dir_name
-    )
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "AggregatedStats":
+        return cls(**data)
 
 
 @dataclass
-class RunStats:
-    """Statistics collected from a single game run.
+class CallStats:
+    successful: int = 0  # tool call was executed successfully
+    error: int = 0  # no a valid tool call
+    failed: int = 0  # valid tool call but a BalatroError occurred
+    total: int = 0  # total number of calls
 
-    Tracks game performance, strategy metrics, and LLM performance
-    for comprehensive run analysis.
-
-    Attributes:
-        run_won: Whether the game run was won.
-        completed: Whether the run completed (won or game over).
-        ante_reached: Highest ante level reached.
-        final_round: Final round number achieved.
-        jokers_bought: List of joker names purchased during the run.
-        jokers_sold: List of joker names sold during the run.
-        consumables_used: List of consumable names used during the run.
-        rerolls: Number of shop rerolls performed.
-        money_spent: Total money spent during the run.
-        hands_played: Dictionary mapping hand types to play counts.
-        successful_calls: Number of successful LLM API calls.
-        failed_calls: List of failed tool calls from LLM calls.
-        avg_input_tokens: Average input tokens per LLM call.
-        avg_output_tokens: Average output tokens per LLM call.
-        avg_reasoning_tokens: Average reasoning tokens per LLM call.
-        avg_total_tokens: Average total tokens per LLM call.
-        avg_response_time_ms: Average response time in milliseconds.
-        total_input_tokens: Total input tokens across all calls.
-        total_output_tokens: Total output tokens across all calls.
-        total_reasoning_tokens: Total reasoning tokens across all calls.
-        total_tokens: Total tokens across all calls.
-        total_response_time_ms: Total response time in milliseconds.
-        total_cost: Total cost across all LLM calls.
-        avg_cost_per_call: Average cost per successful LLM call.
-        total_upstream_inference_cost: Total upstream inference cost.
-        total_upstream_prompt_cost: Total upstream prompt cost.
-        total_upstream_completion_cost: Total upstream completion cost.
-        providers_used: List of unique providers used during the run.
-        reasoning_calls: Number of calls that included reasoning content.
-        avg_reasoning_content_length: Average length of reasoning content.
-        total_reasoning_content_length: Total length of all reasoning content.
-        request_ids: List of request IDs for tracing and debugging.
-    """
-
-    # Game Performance
-    run_won: bool = False
-    completed: bool = False
-    ante_reached: int = 0
-    final_round: int = 0
-
-    # Strategy Metrics
-    jokers_bought: list[str] = field(default_factory=list)
-    jokers_sold: list[str] = field(default_factory=list)
-    consumables_used: list[str] = field(default_factory=list)
-    rerolls: int = 0
-    money_spent: int = 0
-    hands_played: dict[str, int] = field(default_factory=dict)
-
-    # LLM Performance
-    successful_calls: int = 0
-    invalid_responses: int = 0
-    failed_calls: list[str] = field(default_factory=list)
-    avg_input_tokens: float = 0.0
-    avg_output_tokens: float = 0.0
-    avg_reasoning_tokens: float = 0.0
-    avg_total_tokens: float = 0.0
-    avg_response_time_ms: float = 0.0
-    total_input_tokens: int = 0
-    total_output_tokens: int = 0
-    total_reasoning_tokens: int = 0
-    total_tokens: int = 0
-    total_response_time_ms: float = 0.0
-
-    # Cost Tracking
-    total_cost: float = 0.0
-    avg_cost_per_call: float = 0.0
-    total_upstream_inference_cost: float = 0.0
-    total_upstream_prompt_cost: float = 0.0
-    total_upstream_completion_cost: float = 0.0
-
-    # Provider Tracking
-    providers_used: list[str] = field(default_factory=list)
-
-    # Reasoning Analysis
-    reasoning_calls: int = 0
-    avg_reasoning_content_length: float = 0.0
-    total_reasoning_content_length: int = 0
-
-    # Request Tracking
-    request_ids: list[str] = field(default_factory=list)
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "CallStats":
+        return cls(**data)
 
 
 @dataclass
-class RunStatsCollector:
-    """Collects run data in structured directory format.
+class Stats:
+    won: bool
+    completed: bool
+    ante_reached: int
+    final_round: int
+    providers: list[str]
+    calls: CallStats
+    total: AggregatedStats
+    average: AggregatedStats
+    std_dev: AggregatedStats
 
-    Manages structured logging of game execution data, LLM requests/responses,
-    and final statistics calculation.
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "Stats":
+        calls = CallStats.from_dict(data["calls"])
+        total = AggregatedStats.from_dict(data["total"])
+        average = AggregatedStats.from_dict(data["average"])
+        std_dev = AggregatedStats.from_dict(data["std_dev"])
 
-    Attributes:
-        run_dir: Directory path for storing this run's data.
-        config: Bot configuration for this run.
-        request_count: Counter for LLM request numbering.
-    """
+        return cls(
+            won=data["won"],
+            completed=data["completed"],
+            ante_reached=data["ante_reached"],
+            final_round=data["final_round"],
+            providers=data["providers"],
+            calls=calls,
+            total=total,
+            average=average,
+            std_dev=std_dev,
+        )
 
-    run_dir: Path
-    config: Config
-    request_count: int = 0
-    failed_calls: list[str] = field(default_factory=list)
 
-    def __post_init__(self):
-        """Create directory structure and write config."""
-        self.run_dir.mkdir(parents=True, exist_ok=True)
+@dataclass
+class ChatCompletionRequestInput:
+    custom_id: str  # unique identifier for the request/response pair
+    method: str = "POST"
+    url: str = "/v1/chat/completions"
+    body: dict[str, Any] = field(default_factory=dict)
 
-    def write_config(self) -> None:
-        """Write the run configuration.
 
-        Saves the bot configuration to config.json in the run directory.
-        """
-        with open(self.run_dir / "config.json", "w") as f:
-            json.dump(asdict(self.config), f, indent=2)
+@dataclass
+class ChatCompletionResponse:
+    request_id: str  # unix timestamp in ms for the request
+    status_code: int
+    body: dict[str, Any]
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "ChatCompletionResponse":
+        return cls(**data)
+
+
+@dataclass
+class ChatCompletionError:
+    code: str
+    message: str
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "ChatCompletionError":
+        return cls(**data)
+
+
+@dataclass
+class ChatCompletionRequestOutput:
+    id: str  # unix timestamp in ms for the response
+    custom_id: str  # unique identifier for the request/response pair
+    response: ChatCompletionResponse | None = None
+    error: ChatCompletionError | None = None
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "ChatCompletionRequestOutput":
+        response = None
+        if data.get("response"):
+            response = ChatCompletionResponse.from_dict(data["response"])
+
+        error = None
+        if data.get("error"):
+            error = ChatCompletionError.from_dict(data["error"])
+
+        return cls(
+            id=data["id"],
+            custom_id=data["custom_id"],
+            response=response,
+            error=error,
+        )
+
+
+class StatsCollector:
+    def __init__(self, config: Config, base_dir: Path, run_dir: Path | None = None):
+        self.config = config
+        self.run_dir = run_dir or self._generate_run_dir(base_dir)
+        self.call_stats = CallStats()
+        self._request_count = 0
+
+    def _generate_run_dir(self, base_dir: Path) -> Path:
+        assert re.match(r"^[a-z0-9-]+/[a-z0-9:-]+$", self.config.model), (
+            f"Invalid vendor/model format: {self.config.model}"
+        )
+        vendor, model = self.config.model.split("/", 1)
+        dir_name = "_".join(
+            [
+                datetime.now().strftime("%Y%m%d_%H%M%S"),
+                self.config.deck.replace(" ", ""),
+                f"s{self.config.stake}",
+                self.config.challenge.replace(" ", "") if self.config.challenge else "",
+                self.config.seed,
+            ]
+        )
+        return (
+            base_dir
+            / "runs"
+            / f"v{self.config.version}"
+            / self.config.strategy
+            / vendor
+            / model
+            / dir_name
+        )
 
     def write_stats(self) -> None:
         """Calculate and write final run statistics.
@@ -183,331 +162,118 @@ class RunStatsCollector:
         with open(self.run_dir / "stats.json", "w") as f:
             json.dump(asdict(stats), f, indent=2)
 
-    def write_request(self, request_data: dict[str, Any]) -> str:
-        """Write an LLM request to requests.jsonl in OpenAI batch format.
-
-        Args:
-            request_data: Dictionary containing the LLM request parameters.
-
-        Returns:
-            Unique request ID for matching with responses.
-        """
-        self.request_count += 1
-        request_id = f"req_{self.request_count:03d}"
-
-        batch_entry = {
-            "custom_id": request_id,
-            "method": "POST",
-            "url": "/v1/chat/completions",
-            "body": request_data,
-        }
-
+    def write_request(self, body: dict[str, Any]) -> str:
+        self._request_count += 1
+        custom_id = f"request-{self._request_count:05}"
+        req = ChatCompletionRequestInput(
+            custom_id=custom_id,
+            body=body,
+        )
         with open(self.run_dir / "requests.jsonl", "a") as f:
-            f.write(json.dumps(batch_entry) + "\n")
-        return request_id
+            f.write(json.dumps(asdict(req)) + "\n")
+        return custom_id
 
     def write_response(
         self,
-        request_id: str,
-        response: ChatCompletion | None = None,
-        error: Exception | None = None,
-        status_code: int = 200,
+        id: str,
+        custom_id: str,
+        response: ChatCompletionResponse | None = None,
+        error: ChatCompletionError | None = None,
     ) -> None:
-        """Write an LLM response to responses.jsonl in OpenAI batch format.
-
-        Args:
-            request_id: Unique ID matching the original request.
-            response: Successful ChatCompletion response (mutually exclusive with error).
-            error: Exception that occurred during request (mutually exclusive with response).
-            status_code: HTTP status code for error responses (default: 200).
-
-        Raises:
-            ValueError: If neither response nor error is provided.
-        """
-        if response:
-            batch_response = {
-                "id": request_id,
-                "custom_id": request_id,
-                "response": {
-                    "status_code": 200,
-                    "request_id": response.id,
-                    "body": response.model_dump(),
-                },
-                "error": None,
-            }
-        elif error:
-            batch_response = {
-                "id": request_id,
-                "custom_id": request_id,
-                "response": {
-                    "status_code": status_code,
-                    "request_id": request_id,
-                    "body": {},
-                },
-                "error": {"code": type(error).__name__, "message": str(error)},
-            }
-        else:
-            raise ValueError("Either response or error must be provided")
-
+        res = ChatCompletionRequestOutput(
+            id=id,
+            custom_id=custom_id,
+            response=response,
+            error=error,
+        )
         with open(self.run_dir / "responses.jsonl", "a") as f:
-            f.write(json.dumps(batch_response) + "\n")
+            f.write(json.dumps(asdict(res)) + "\n")
 
-    def calculate_stats(self) -> RunStats:
-        """Calculate comprehensive run statistics from logged data.
+    def calculate_stats(self) -> Stats:
+        with open(self.run_dir / "gamestates.jsonl", "r") as f:
+            gamestates = [json.loads(line) for line in f]
 
-        Analyzes gamestates.jsonl and responses.jsonl to compute game performance,
-        strategy metrics, and LLM performance statistics.
+        with open(self.run_dir / "responses.jsonl", "r") as f:
+            responses = [
+                ChatCompletionRequestOutput.from_dict(json.loads(line)) for line in f
+            ]
 
-        Returns:
-            RunStats instance containing all calculated statistics.
-        """
-        stats = RunStats()
-
-        # Load game states
-        gamestates_path = self.run_dir / "gamestates.jsonl"
-        if not gamestates_path.exists():
-            return stats
-
-        game_states = []
-        with open(gamestates_path, "r") as f:
-            for line in f:
-                game_states.append(json.loads(line))
-
-        if not game_states:
-            return stats
-
-        # Extract final state data
-        final_state = game_states[-1].get("game_state_after", {})
-
-        # Game Performance
-        stats.run_won = final_state["game"].get(
-            "won", False
-        )  # TODO: check if "won" is the right key
-        stats.completed = (
-            stats.run_won or final_state["state"] == 4
-        )  # 4 is GAME_OVER game state
-        stats.final_round = final_state["game"]["round"]
-        stats.ante_reached = (
-            max(1, (stats.final_round // 3) + 1) if stats.final_round > 0 else 1
+        stats = dict(
+            providers=[],
+            input_tokens=[],
+            output_tokens=[],
+            input_cost=[],
+            output_cost=[],
+            total_cost=[],
+            time_ms=[],
         )
-        stats.failed_calls = self.failed_calls
 
-        # Strategy Metrics
-        for state in game_states:
-            function_name = state.get("function", {}).get("name")
-            args = state.get("function", {}).get("arguments", {})
-
-            if function_name == "shop" and args.get("action") == "buy_joker":
-                shop_jokers = state.get("game_state_before", {}).get("shop_jokers", {})
-                joker_index = args.get("joker_index", 0)
-                if "cards" in shop_jokers and joker_index < len(shop_jokers["cards"]):
-                    joker_name = shop_jokers["cards"][joker_index].get(
-                        "label", "Unknown"
-                    )
-                    stats.jokers_bought.append(joker_name)
-
-            elif function_name == "sell_joker":
-                jokers_before = state.get("game_state_before", {}).get("jokers", {})
-                joker_index = args.get("joker_index", 0)
-                if "cards" in jokers_before and joker_index < len(
-                    jokers_before["cards"]
-                ):
-                    joker_name = jokers_before["cards"][joker_index].get(
-                        "label", "Unknown"
-                    )
-                    stats.jokers_sold.append(joker_name)
-
-            elif function_name == "use_consumable":
-                consumables_before = state.get("game_state_before", {}).get(
-                    "consumables", {}
+        for res in responses:
+            if res.response is not None and res.response.status_code == 200:
+                stats["providers"].append(res.response.body["provider"])
+                stats["input_tokens"].append(
+                    res.response.body["usage"]["prompt_tokens"]
                 )
-                consumable_index = args.get("consumable_index", 0)
-                if "cards" in consumables_before and consumable_index < len(
-                    consumables_before["cards"]
-                ):
-                    consumable_name = consumables_before["cards"][consumable_index].get(
-                        "label", "Unknown"
-                    )
-                    stats.consumables_used.append(consumable_name)
+                stats["output_tokens"].append(
+                    res.response.body["usage"]["completion_tokens"]
+                )
+                stats["input_cost"].append(
+                    res.response.body["usage"]["cost_details"][
+                        "upstream_inference_prompt_cost"
+                    ]
+                )
+                stats["output_cost"].append(
+                    res.response.body["usage"]["cost_details"][
+                        "upstream_inference_completions_cost"
+                    ]
+                )
+                stats["total_cost"].append(res.response.body["usage"]["cost"])
+                stats["time_ms"].append(int(res.id) - int(res.response.request_id))
 
-            elif function_name == "shop" and args.get("action") == "reroll":
-                stats.rerolls += 1
+        # Call Stats are tracked during the by the LLMBot class
+        call_stats = self.call_stats
 
-            elif (
-                function_name == "play_hand_or_discard"
-                and args.get("action") == "play_hand"
-            ):
-                reasoning = args.get("reasoning", "")
-                hand_types = [
-                    "Pair",
-                    "Two Pair",
-                    "Three of a Kind",
-                    "Straight",
-                    "Flush",
-                    "Full House",
-                    "Four of a Kind",
-                    "Straight Flush",
-                    "Royal Flush",
-                ]
-                for hand_type in hand_types:
-                    if hand_type.lower() in reasoning.lower():
-                        stats.hands_played[hand_type] = (
-                            stats.hands_played.get(hand_type, 0) + 1
-                        )
-                        break
-                else:
-                    stats.hands_played["High Card"] = (
-                        stats.hands_played.get("High Card", 0) + 1
-                    )
-
-        # Calculate money spent
-        prev_money = None
-        for state in game_states:
-            current_money = (
-                state.get("game_state_after", {}).get("game", {}).get("dollars", 0)
-            )
-            if prev_money is not None and current_money < prev_money:
-                stats.money_spent += prev_money - current_money
-            prev_money = current_money
-
-        # Calculate response times
-        response_times = []
-        for state in game_states:
-            before = state.get("timestamp_ms_before", 0)
-            after = state.get("timestamp_ms_after", 0)
-            if after > before:
-                response_times.append(after - before)
-        stats.total_response_time_ms = sum(response_times)
-        stats.avg_response_time_ms = (
-            sum(response_times) / len(response_times) if response_times else 0.0
+        # Total Stats
+        total = AggregatedStats(
+            input_tokens=sum(stats["input_tokens"]),
+            output_tokens=sum(stats["output_tokens"]),
+            input_cost=sum(stats["input_cost"]),
+            output_cost=sum(stats["output_cost"]),
+            total_cost=sum(stats["total_cost"]),
+            time_ms=sum(stats["time_ms"]),
         )
 
-        # LLM Performance
-        responses_path = self.run_dir / "responses.jsonl"
-        if responses_path.exists():
-            input_tokens = []
-            output_tokens = []
-            reasoning_tokens = []
-            total_tokens = []
-            costs = []
-            upstream_inference_costs = []
-            upstream_prompt_costs = []
-            upstream_completion_costs = []
-            reasoning_content_lengths = []
-            providers = []
+        # Average Stats
+        average = AggregatedStats(
+            input_tokens=sum(stats["input_tokens"]) / len(stats["input_tokens"]),
+            output_tokens=sum(stats["output_tokens"]) / len(stats["output_tokens"]),
+            input_cost=sum(stats["input_cost"]) / len(stats["input_cost"]),
+            output_cost=sum(stats["output_cost"]) / len(stats["output_cost"]),
+            total_cost=sum(stats["total_cost"]) / len(stats["total_cost"]),
+            time_ms=sum(stats["time_ms"]) / len(stats["time_ms"]),
+        )
 
-            with open(responses_path, "r") as f:
-                for line in f:
-                    response = json.loads(line)
-                    if (
-                        response.get("error") is None
-                        and response.get("response", {}).get("status_code") == 200
-                    ):
-                        stats.successful_calls += 1
-                        body = response.get("response", {}).get("body", {})
-                        message = body.get("choices", [{}])[0].get("message", {})
-                        usage = body.get("usage", {})
+        # Std Dev Stats
+        std_dev = AggregatedStats(
+            input_tokens=statistics.stdev(stats["input_tokens"]),
+            output_tokens=statistics.stdev(stats["output_tokens"]),
+            input_cost=statistics.stdev(stats["input_cost"]),
+            output_cost=statistics.stdev(stats["output_cost"]),
+            total_cost=statistics.stdev(stats["total_cost"]),
+            time_ms=statistics.stdev(stats["time_ms"]),
+        )
 
-                        # Token tracking
-                        if "prompt_tokens" in usage:
-                            input_tokens.append(usage["prompt_tokens"])
-                        if "completion_tokens" in usage:
-                            output_tokens.append(usage["completion_tokens"])
-                        if "reasoning_tokens" in usage:
-                            reasoning_tokens.append(usage["reasoning_tokens"])
-                        elif usage.get("completion_tokens_details", {}).get(
-                            "reasoning_tokens"
-                        ):
-                            reasoning_tokens.append(
-                                usage["completion_tokens_details"]["reasoning_tokens"]
-                            )
-                        if "total_tokens" in usage:
-                            total_tokens.append(usage["total_tokens"])
+        state = gamestates[-1]["game_state_after"]
 
-                        # Cost tracking
-                        if "cost" in usage and usage["cost"] is not None:
-                            costs.append(usage["cost"])
-                        cost_details = usage.get("cost_details", {})
-                        if (
-                            "upstream_inference_cost" in cost_details
-                            and cost_details["upstream_inference_cost"] is not None
-                        ):
-                            upstream_inference_costs.append(
-                                cost_details["upstream_inference_cost"]
-                            )
-                        if (
-                            "upstream_inference_prompt_cost" in cost_details
-                            and cost_details["upstream_inference_prompt_cost"]
-                            is not None
-                        ):
-                            upstream_prompt_costs.append(
-                                cost_details["upstream_inference_prompt_cost"]
-                            )
-                        if (
-                            "upstream_inference_completions_cost" in cost_details
-                            and cost_details["upstream_inference_completions_cost"]
-                            is not None
-                        ):
-                            upstream_completion_costs.append(
-                                cost_details["upstream_inference_completions_cost"]
-                            )
-
-                        # Provider tracking
-                        if "provider" in body:
-                            provider = body["provider"]
-                            providers.append(provider)
-                            if provider not in stats.providers_used:
-                                stats.providers_used.append(provider)
-
-                        # Request ID tracking
-                        request_id = response.get("response", {}).get("request_id")
-                        if request_id:
-                            stats.request_ids.append(request_id)
-
-                        # Reasoning content analysis
-                        reasoning_content = message.get("reasoning_content", "")
-                        if reasoning_content:
-                            stats.reasoning_calls += 1
-                            reasoning_content_lengths.append(len(reasoning_content))
-
-                        if message.get("tool_calls") is None:
-                            stats.invalid_responses += 1
-
-            # Calculate totals
-            stats.total_input_tokens = sum(input_tokens)
-            stats.total_output_tokens = sum(output_tokens)
-            stats.total_reasoning_tokens = sum(reasoning_tokens)
-            stats.total_tokens = sum(total_tokens)
-
-            # Calculate averages
-            stats.avg_input_tokens = (
-                sum(input_tokens) / len(input_tokens) if input_tokens else 0.0
-            )
-            stats.avg_output_tokens = (
-                sum(output_tokens) / len(output_tokens) if output_tokens else 0.0
-            )
-            stats.avg_reasoning_tokens = (
-                sum(reasoning_tokens) / len(reasoning_tokens)
-                if reasoning_tokens
-                else 0.0
-            )
-            stats.avg_total_tokens = (
-                sum(total_tokens) / len(total_tokens) if total_tokens else 0.0
-            )
-
-            # Calculate cost totals and averages
-            stats.total_cost = sum(costs)
-            stats.avg_cost_per_call = sum(costs) / len(costs) if costs else 0.0
-            stats.total_upstream_inference_cost = sum(upstream_inference_costs)
-            stats.total_upstream_prompt_cost = sum(upstream_prompt_costs)
-            stats.total_upstream_completion_cost = sum(upstream_completion_costs)
-
-            # Calculate reasoning content averages
-            stats.total_reasoning_content_length = sum(reasoning_content_lengths)
-            stats.avg_reasoning_content_length = (
-                sum(reasoning_content_lengths) / len(reasoning_content_lengths)
-                if reasoning_content_lengths
-                else 0.0
-            )
-
-        return stats
+        # Base Stats
+        return Stats(
+            won=state["game"]["won"],
+            completed=state["game"]["round"] == 4,  # 4 is GAME_OVER gamestate
+            ante_reached=max(1, (state["game"]["round"] // 3) + 1),
+            final_round=state["game"]["round"],
+            providers=stats["providers"],
+            calls=call_stats,
+            total=total,
+            average=average,
+            std_dev=std_dev,
+        )
