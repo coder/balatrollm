@@ -77,13 +77,9 @@ clean: ## Clean build artifacts and caches
 	@echo "$(GREEN)✓ Cleanup completed$(RESET)"
 
 # Game targets
-setup: ## Kill previous instances and start LiteLLM server + Balatro (INSTANCES=1)
+setup: ## Kill previous instances and start Balatro (INSTANCES=1)
 	@echo "$(YELLOW)Stopping all previous instances...$(RESET)"
-	@pkill -f litellm 2>/dev/null || true
 	@./balatro.sh --kill 2>/dev/null || true
-	@echo "$(YELLOW)Starting LiteLLM proxy server...$(RESET)"
-	@litellm --config config/litellm.yaml &
-	@sleep 3
 	@echo "$(YELLOW)Starting Balatro with $(INSTANCES) instance(s)...$(RESET)"
 	@ports=""; \
 	for i in $$(seq 0 $$(($(INSTANCES) - 1))); do \
@@ -92,9 +88,7 @@ setup: ## Kill previous instances and start LiteLLM server + Balatro (INSTANCES=
 	done; \
 	./balatro.sh $$ports
 
-teardown: ## Stop LiteLLM server and Balatro processes
-	@echo "$(YELLOW)Stopping LiteLLM proxy server...$(RESET)"
-	@pkill -f litellm 2>/dev/null || true
+teardown: ## Stop Balatro processes
 	@echo "$(YELLOW)Stopping Balatro...$(RESET)"
 	@./balatro.sh --kill 2>/dev/null || true
 	@echo "$(GREEN)✓ Services stopped$(RESET)"
