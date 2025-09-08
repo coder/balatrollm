@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.8.1](https://github.com/S1M0N38/balatrollm/compare/v0.8.0...v0.8.1) (2025-09-08)
+
+
+### Bug Fixes
+
+* add pyyaml missing dependency ([dbd91cd](https://github.com/S1M0N38/balatrollm/commit/dbd91cdd8581e9ad6ba98d057a38d815fc733492))
+* update completed gamestate ([#13](https://github.com/S1M0N38/balatrollm/issues/13)) ([a2463b6](https://github.com/S1M0N38/balatrollm/commit/a2463b67d60a2156dc7165d686769726ae391195))
+
+
+### Documentation
+
+* remove release process form CONTRIBUTING.md ([3763cec](https://github.com/S1M0N38/balatrollm/commit/3763cecc33b6949b056865f2d6a1647a86839048))
+
 ## [0.8.0](https://github.com/S1M0N38/balatrollm/compare/v0.7.0...v0.8.0) (2025-09-06)
 
 
