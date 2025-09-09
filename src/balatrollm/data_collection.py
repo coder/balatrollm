@@ -135,7 +135,7 @@ class StatsCollector:
         vendor, model = self.config.model.split("/", 1)
         dir_name = "_".join(
             [
-                datetime.now().strftime("%Y%m%d_%H%M%S"),
+                datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3],
                 self.config.deck.replace(" ", ""),
                 f"s{self.config.stake}",
                 self.config.challenge.replace(" ", "") if self.config.challenge else "",
