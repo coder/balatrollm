@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.2](https://github.com/S1M0N38/balatrollm/compare/v0.8.1...v0.8.2) (2025-09-09)
+
+
+### Bug Fixes
+
+* add milliseconds to timestamp ([8b271a8](https://github.com/S1M0N38/balatrollm/commit/8b271a87a6d669535b3b760461b48f9260f53a22))
+
 ## [0.8.1](https://github.com/S1M0N38/balatrollm/compare/v0.8.0...v0.8.1) (2025-09-08)
 
 
