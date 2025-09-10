@@ -9,7 +9,10 @@ models:
         effort: medium
   - model: qwen/qwen3-235b-a22b-thinking-2507
   - model: qwen/qwen3-235b-a22b-2507
-  - model: google/gemini-2.5-flash
+  - model: google/gemini-2.5-pro
+    extra_body:
+      reasoning:
+        effort: medium
   - model: anthropic/claude-sonnet-4
     extra_body:
       reasoning:
