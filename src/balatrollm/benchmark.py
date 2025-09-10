@@ -139,14 +139,25 @@ class BenchmarkAnalyzer:
         )
 
         def tot_std_dev(attr: str) -> float:
-            var = 0
-            mean = getattr(average, attr)
+            # total number of calls across all stats
+            N = calls.total
+            if N <= 1:
+                return 0.0
+
+            overall_mean = getattr(average, attr)
+
+            numerator = 0.0
             for stat in stats:
-                std_i = getattr(stat.std_dev, attr)
-                mean_i = getattr(stat.average, attr)
+                s_i = getattr(stat.std_dev, attr)  # group's sample std
+                mean_i = getattr(stat.average, attr)  # group's mean
                 n_i = stat.calls.total
-                var += (n_i * (std_i**2 + (mean_i - mean) ** 2)) / (calls.total - 1)
-            return (1 / calls.total) * var**0.5
+
+                # within-group contribution: (n_i - 1) * s_i^2
+                # between-group contribution: n_i * (mean_i - overall_mean)^2
+                numerator += (n_i - 1) * (s_i**2) + n_i * ((mean_i - overall_mean) ** 2)
+
+            pooled_var = numerator / (N - 1)
+            return pooled_var**0.5
 
         std_dev = ModelAggregatedStats(
             tot_std_dev("input_tokens"),
