@@ -129,7 +129,7 @@ class StatsCollector:
         self._request_count = 0
 
     def _generate_run_dir(self, base_dir: Path) -> Path:
-        assert re.match(r"^[a-z0-9-]+/[a-z0-9:-]+$", self.config.model), (
+        assert re.match(r"^[a-z0-9.-]+/[a-z0-9:.-]+$", self.config.model), (
             f"Invalid vendor/model format: {self.config.model}"
         )
         vendor, model = self.config.model.split("/", 1)
