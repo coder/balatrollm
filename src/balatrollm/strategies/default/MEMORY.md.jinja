@@ -1,22 +1,16 @@
 # Memory & Previous Actions
 
-## Previous Action Status
-{% if last_error_call_msg %}
-**Your last response was invalid**: {{ last_error_call_msg }}
-Please ensure your next response includes a proper tool call with valid function name and JSON arguments.
-{% endif %}
-
-{% if last_failed_call_msg %}
-**Your last tool call failed**: {{ last_failed_call_msg }}
-The tool call was formatted correctly but execution failed. Please try a different approach or adjust your parameters.
-{% endif %}
-
 {% if responses %}
 ## Recent Decision History
-{% for response in responses[-5:] -%}
+
+Here is a list of your recent decisions (from the most recent to the oldest):
+{% set response_count = responses|length %}
+{% set max_responses = 10 if response_count > 10 else response_count %}
+{% for i in range(max_responses) -%}
+{%- set response = responses[-(max_responses - i)] -%}
 {%- if response.choices and response.choices[0].message.tool_calls -%}
 {%- set tool_call = response.choices[0].message.tool_calls[0] -%}
-**{{ loop.index }}.** {{ tool_call.function }}
+**{{ i + 1 }}.** {{ tool_call.function }}
 {% endif -%}
 {% endfor %}
 {% endif %}
@@ -34,4 +28,14 @@ This is the beginning of the game. Focus on:
 - Making decisions that set up long-term synergies
 - Building a foundation for scaling in later rounds
 - Considering the overall arc of your run strategy
+{% endif %}
+
+{% if last_error_call_msg %}
+**NOTE**: **Your last response was invalid**: {{ last_error_call_msg }}
+Please ensure your next response includes a proper tool call with valid function name and JSON arguments.
+{% endif %}
+
+{% if last_failed_call_msg %}
+**NOTE**: **Your last tool call failed**: {{ last_failed_call_msg }}
+The tool call was formatted correctly but execution failed. Please try a different approach or adjust your parameters.
 {% endif %}
