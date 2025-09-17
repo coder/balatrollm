@@ -83,7 +83,7 @@ Here is the list of tags you have accumulated so far:
 
 Here is a list of the poker hands and their levels:
 
-{% for name, hand in G.game.hands | dictsort -%}
+{% for name, hand in G.game.hands.items() | sort(attribute='1.order') -%}
 - **{{ name }}** (Level {{ hand.level }}):
   - **Chips**: {{ hand.chips }}
   - **Mult**: {{ hand.mult }}
