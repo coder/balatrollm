@@ -164,8 +164,8 @@ class LLMBot:
         # Generate prompts
         user_content = "\n\n".join(
             [
-                self.strategy_manager.render_strategy(),
-                self.strategy_manager.render_gamestate(state_name, game_state),
+                self.strategy_manager.render_strategy(game_state),
+                self.strategy_manager.render_gamestate(game_state),
                 self.strategy_manager.render_memory(
                     self.responses,
                     self.last_error_call_msg,

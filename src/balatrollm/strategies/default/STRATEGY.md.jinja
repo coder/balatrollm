@@ -1,105 +1,700 @@
-# Balatro Strategy Guide
-
 You are an expert Balatro player. Analyze the game state and make strategic decisions to progress through the game.
 
-## WHAT IS BALATRO?
+# Balatro Guide
 
-Balatro is a roguelike poker deck-building game where you defeat "blinds" by playing poker hands to score chips. Your goal is to survive as many rounds as possible by building powerful card combinations and strategic synergies.
+Balatro is a roguelike deck-building game where you play poker hands to score points and defeat blinds (score targets). You collect Jokers that modify scoring rules, enhance cards with special abilities, and strategically build synergies to reach exponentially higher scores.
 
-## CORE MECHANICS
+The game alternates between a four main game phases:
 
-### Scoring System
-- **Formula**: `Chips × Multiplier = Final Score`
-- **Key Insight**: Balanced growth in both chips and multipliers is crucial for high scores
+1. **Blind Select Phase**: You decide to play or skip the next round (aka blind). If you play and win the blind, you earn money and have access to the shop Phase. If you skip, you won't earn money rewarded for winning a blind, you won't have access to the shop and you will be send to the next Blind Select Phase. However you will gain a Tag, a special item that activate its effect in the next blind played. You can accumulate Tags for consecutive skips (effects of accumulated tags will all activate in the next blind played).
 
-### Game Structure
-- **Ante**: A set of 3 blinds (Small → Big → Boss)
-- **Limited Resources**: Hands and discards per round
-- **Progression**: Each ante increases difficulty and score requirements
+2. **Playing Phase**: You start with a initial hand of 8 cards. You play a limited number of pokers-like hands (hands left) which scores points according to the scoring system. Scores for the played hands sum together into the current score in order to reach the score target for the round. Under normal circumstances, you can play up to 5 cards at once. You have also access to a limited number of discards (discard left) where you can discard, under normal circumstances, up to 5 cards. In the case of a discard, you will draw from the deck the same amount of cards you have discarded and those cards are added to your current hand. By strategically discard useless cards, you will have a chance to draw new cards that help you creating high scoring hands. If you successfully reach the target score, you will proceed to the Round Eval Phase otherwise it's Game Over.
 
-## STRATEGIC PRIORITIES
+3. **Round Eval Phase**: In this phase you collect the rewards money for winning the previous round. The money rewarded is proportional to the number of hands left at the end of the round (1$ each). You can receive also interest money ($1 per $5, max 5$). Then you enter the Shop Phase.
 
-### 1. MONEY MANAGEMENT - CRITICAL
+4. **Shop Phase**: You can buy jokers, consumables, packs, cards, and vouchers to modify the scoring system. The objective in this phase is to strategically use (or not use) the shop action to strategically invest (or save) money to upgrade the scoring system for the following rounds. After you have perform all the action you want to perform in the shop, you can proceed to the next Blind Select Phase (next round).
 
-**ACCUMULATE MONEY - DON'T ALWAYS BUY**
-- **Interest System**: Earn $1 per $5 held (max $5 per round)
-- **Target**: Aim for $25+ to maximize interest income
-- **Strategy**: Build a financial foundation before expensive purchases
+## Initial Setup
 
-**SELLING ECONOMICS - MAJOR STRATEGIC FACTOR**
-- **Sell Value**: Items sell for approximately **HALF** their original cost
-- **Strategic Implication**: Buying and selling frequently loses money rapidly
-- **Rule**: Only buy what you really need, avoid experimental purchases
-- **Planning**: Think carefully before buying - selling back is expensive
+When starting a new run, players begin with $4, a standard 52-card deck (13 ranks across 4 suits), 5 empty Joker slots, and 2 consumable slots. Each round provides 4 hands and 3 discards as the baseline to defeat blinds. Players draw 8 cards at the start of each round. The economic system rewards $1 per unspent hand after defeating a blind, plus $1 interest per $5 saved (maximum $5 interest at $25+). The first Ante requires 300 chips for the Small Blind, 450 for the Big Blind, and 600 for the Boss Blind.
 
-### 2. JOKER STRATEGY
+## Blinds and Antes
 
-**Core Mechanic**: Jokers modify scoring and create synergies
-- **Positioning Matters**: Place +chips jokers before ×mult jokers
-- **Synergies**: Multiple jokers working together > individual powerful jokers
-- **Quality over Quantity**: Better to have fewer, focused jokers than many random ones
+Blinds are the main obstacle that the player must overcome during a run in Balatro. For each selected Blind, the player has to meet or surpass the required score to beat it, otherwise they will lose their run. Defeating the Blind may earn some reward money as well.
 
-### 3. HAND TYPES & SCALING
+An Ante is made up of three Blinds in succession: a Small Blind, a Big Blind, and a random Boss Blind. Special Boss Blinds called Showdown Blinds only appear on the final level of a run, at Ante 8. The player can choose to take on a Small or Big Blind, or to skip one or both and claim one or more Tags instead; Boss Blinds must always be played.
 
-**Basic Hand Ranking** (weakest to strongest):
-1. High Card → 2. Pair → 3. Two Pair → 4. Three of a Kind → 5. Straight → 6. Flush → 7. Full House → 8. Four of a Kind → 9. Straight Flush → 10. Royal Flush
+You start at Ante 1 and go up an Ante level for every Boss Blind defeated. By completing Ante 8 and finishing the Showdown Blind, the run is considered "won".
 
-**Planet Cards**: Upgrade hand types permanently (+chips and +mult)
-- Use on your PRIMARY hand type that you're building around
-- Don't waste on hands you rarely play
+### Small Blind and Big Blind
 
-### 4. BOSS BLINDS - PLAN AHEAD
+Small and Big Blinds have no other effects and can be skipped to receive a Tag.
 
-Boss blinds have special effects that can destroy unprepared strategies:
-- **Debuffing**: Some make certain cards worthless (face cards, suits, etc.)
-- **Restrictions**: Limit how you can play (one hand type, reduced hands, etc.)
-- **Preparation**: Look ahead and adapt your strategy for upcoming bosses
+### Boss Blinds
 
-## DECISION FRAMEWORK
+Boss Blinds are the last blind of an Ante. Boss Blinds have certain special effects that add difficulty to the round, for example:
 
-### BLIND_SELECT Phase
-- **DEFAULT**: Always select the blind - this is how you progress and earn money
-- **ONLY SKIP**: When blind is truly impossible or you desperately need a specific tag
-- **Money Focus**: Playing blinds gives money and progression
+- Debuffing some category of cards. The debuffed cards, appearing with a red cross, can still make Poker Hands but won't be scored.
 
-### SHOP Phase
-**FINANCIAL DISCIPLINE IS KEY**
-- **Don't Buy Everything**: Resist the urge to purchase unless it clearly improves your strategy
-- **Maintain Cash Flow**: Keep money for interest and future opportunities
-- **Strategic Purchases Only**: Buy jokers that synergize with your existing build
-- **Reroll Economics**: First reroll costs $5, increases by $1 each time
+- Causing some cards to be drawn face-down, making them entirely hidden before being played. A hand played including face-down cards will have its type displayed as "???"; scoring and other effects will still perform as normal.
 
-**Purchase Priority**:
-1. Jokers that synergize with your current strategy
-2. Planet cards for your main hand type
-3. Vouchers for permanent upgrades
-4. Tarot cards for deck improvement
+- Restricting the size or type of poker hand that can be played. Hands that don't meet the restriction can still be played, but will not be scored or activate other effects, acting like a discard.
 
-### SELECTING_HAND Phase
-- **Play Strong Hands**: Use pairs or better when available
-- **Discard Wisely**: Use discards to improve weak hands
-- **Resource Conservation**: Don't waste all discards early
+Boss Blinds are randomly selected.
 
-## COMMON MISTAKES TO AVOID
+Showdown Blinds are a special type of Boss Blind, that appear at the end of the game (Ante 8) and are identical to regular Boss Blinds.
 
-### Economic Mistakes
-1. **Overspending**: Buying everything available depletes your resources
-2. **Poor Sell Timing**: Selling items loses significant value (50% loss)
-3. **Ignoring Interest**: Not maintaining $25+ for passive income
-4. **Impulse Buying**: Purchasing without clear strategic purpose
+Here is the list of all Boss Blinds and Showdown Boss Blinds:
 
-### Strategic Mistakes
-1. **Lack of Focus**: Trying to do everything instead of specializing
-2. **Wrong Joker Order**: Multiplicative before additive reduces effectiveness
-3. **Boss Blind Ignorance**: Not preparing for upcoming challenges
-4. **Resource Waste**: Using all hands/discards without purpose
+**Boss Blinds:**
 
-## KEY STRATEGIC PRINCIPLES
+- **The Hook**: Discards 2 random cards held in hand after every played hand
+- **The Ox**: Playing your most played hand this run sets money to $0
+- **The House**: First hand is drawn face down
+- **The Wall**: Extra large blind
+- **The Wheel**: 1 in 7 cards get drawn face down during the round
+- **The Arm**: Decrease level of played poker hand by 1 (hand levels can go as low as Level 1, and are reduced before scoring)
+- **The Club**: All Club cards are debuffed
+- **The Fish**: Cards drawn face down after each hand played
+- **The Psychic**: Must play 5 cards (not all cards need to score)
+- **The Goad**: All Spade cards are debuffed
+- **The Water**: Start with 0 discards
+- **The Window**: All Diamond cards are debuffed
+- **The Manacle**: -1 Hand Size
+- **The Eye**: No repeat hand types this round (every hand played this round must be of a different type and not previously played this round)
+- **The Mouth**: Only one hand type can be played this round
+- **The Plant**: All face cards are debuffed
+- **The Serpent**: After Play or Discard, always draw 3 cards (ignores hand size)
+- **The Pillar**: Cards played previously this Ante (during Small and Big Blinds) are debuffed
+- **The Needle**: Play only 1 hand
+- **The Head**: All Heart cards are debuffed
+- **The Tooth**: Lose $1 per card played
+- **The Flint**: Base Chips and Mult for played poker hands are halved for the entire round
+- **The Mark**: All face cards are drawn face down
 
-1. **MONEY FIRST**: Build financial stability before expensive strategies
-2. **FOCUSED BUILDS**: Specialize in specific hand types and synergies
-3. **PLAN AHEAD**: Consider boss blinds and scaling requirements
-4. **BUY STRATEGICALLY**: Only purchase items that clearly improve your build
-5. **PRESERVE VALUE**: Avoid unnecessary buying/selling cycles
+**Showdown Boss Blinds:**
 
-Remember: **Selling items costs you roughly half their value**. Be strategic about purchases and avoid the costly buy-sell cycle that drains your resources.
+- **Amber Acorn**: Flips and shuffles all Joker cards
+- **Verdant Leaf**: All cards debuffed until 1 Joker sold
+- **Violet Vessel**: Very large blind
+- **Crimson Heart**: One random Joker disabled every hand (changes every hand)
+- **Cerulean Bell**: Forces 1 card to always be selected
+
+### Antes
+
+An Ante is made up of three Blinds. A run will always begin at Ante 1.
+
+## Tags
+
+Tags are rewards you can receive for skipping a Small Blind or Big Blind. Depending on the type of tag, it may trigger immediately or it may not trigger until a certain gamestate or condition is met (for example, the next time you visit the Shop). There are 24 different Tags available. The player can keep stacking multiple Tags until they're used. Here is the list of the tags that can appear during the run
+
+- **Uncommon**: The next shop will have a free Uncommon Joker
+- **Rare**: The next shop will have a free Rare Joker
+- **Negative**: The next base edition Joker you find in a Shop becomes Negative (+1 joker slot) and free
+- **Foil**: The next base edition Joker you find in a Shop becomes Foil (+50 Chips) and free
+- **Holographic**: The next base edition Joker you find in a Shop becomes Holographic (+10 Mult) and free
+- **Polychrome**: The next base edition Joker you find in a Shop becomes Polychrome (X1.5 Mult) and free
+- **Investment**: Gain $25 after defeating the next Boss Blind
+- **Voucher**: Adds a Voucher to the next Shop
+- **Boss**: Re-rolls the next Boss Blind
+- **Standard**: Immediately open a free Mega Standard Pack
+- **Charm**: Immediately open a free Mega Arcana Pack
+- **Meteor**: Immediately open a free Mega Celestial Pack
+- **Buffoon**: Immediately open a free Mega Buffoon Pack
+- **Handy**: Gain $1 for each hand played this run
+- **Garbage**: Gain $1 for each unused discard this run
+- **Ethereal**: Immediately open a free Spectral Pack
+- **Coupon**: In the next shop, initial Jokers, Consumables Cards and Booster Packs are free ($0)
+- **Double**: Gives a copy of the next Tag selected (excluding Double Tags)
+- **Juggle**: +3 Hand Size for the next round only
+- **D6**: In the next Shop, Rerolls start at $0
+- **Top-up**: Create up to 2 Common Jokers (if you have space)
+- **Speed**: Gives $5 for each Blind you've skipped this run
+- **Orbital**: Upgrades a specified random Poker Hand by three levels
+- **Economy**: Doubles your money (adds a maximum of $40)
+
+## Deck Composition
+
+You begin each run with a standard 52-card deck (13 ranks across 4 suits). However, your deck is not static - it evolves throughout the run. You can modify your deck by purchasing individual playing cards directly from the Shop (when available through certain Vouchers), or through various Consumable effects. Tarot cards can change suits and ranks of existing cards, while Spectral cards can add enhanced cards or create copies.
+
+Strategic deck manipulation - thinning out weak cards, adding enhanced cards, or building toward specific hand types - is crucial for success in higher Antes where score requirements grow exponentially.
+
+## Cards representation
+
+In the following sections we are making use of the following card representation: `<suit>_<rank>`.
+
+- `<suit>` : S (Spades), H (Hearts), D (Diamonds), C (Clubs)
+- `<rank>`: A (Ace), 2-9 (Number cards), T (Ten), J (Jack), Q (Queen), K (King)
+
+For example:
+
+- S_A (Ace of Spades)
+- S_2 (Two of Spades)
+- H_K (King of Hearts)
+- D_T (Ten of Diamonds)
+
+## Scoring System
+
+When you play a hand the following formula is used to calculate your score:
+
+Score = (Base Chips + Cards Value + Chip Additions) × (Base Multiplier + Mult Additions) × Mult Multipliers
+
+- **Base Chips** are the base chips associated with the hand type.
+- **Cards Value** is the sum of the ranks of the cards that are used in the hand type. Ace is worth 11 and face cards are worth 10.
+- **Chip Additions** originates from jokers and cards enhancements.
+- **Base Multiplier** is the base multiplier associated with the hand type.
+- **Mult Additions** originates from jokers and enhanced cards.
+- **Mult Multipliers** originates from jokers and enhanced cards.
+
+## Order of Operations
+
+When playing a hand, effects activate in a specific sequence: Boss Blind effects first, then Jokers and card effects trigger as cards are scored from left to right. When multiple Jokers trigger from the same condition, they always activate from left to right based on their position in your Joker slots. This sequence matters for strategy - placing additive effects (+Mult, +Chips) to the left of multiplicative effects (×Mult) maximizes your score, since additions happen before multiplications.
+
+### Poker Hands
+
+Poker Hands are sets of one to five cards that can be played in Balatro to obtain Chips and Mult for scoring. Each hand also has a level that affects its potency. In general, the more difficult it is to play a certain Poker Hand, the higher its base score will be. For example, a Pair will score for much less than a Four of a Kind.
+
+At the beginning of a run, all Hands start at Level 1, and are generally upgraded through Planet Cards.
+
+Generally, only the cards relevant to the hand are scored. All others are not scored so there is not concept of a kicker like in poker. For example, if an Ace is played as a High Card with 4 other cards, only the High Card base amount and the Ace's values are used for the hand's score. The other cards (up to 4) are just discarded and have no effect. However, sometimes it can be beneficial to play extra cards as an extra discard while still having the main hand score.
+
+There are 10 hand types (weakest to strongest).
+
+- **Straight Flush**:
+
+  - Description: Five cards in a row (consecutive ranks) with all cards sharing the same suit.
+  - Base Chips: 100
+  - Base Multiplier: 8
+  - Example: `S_Q, S_J, S_T, S_9, S_8`: Those are five cards with consecutive ranks (8, 9, 10, Jack, Queen) and all cards share the same suit (Spades). This hand scores ((10 + 10 + 10 + 9 + 8) + 100) × (8) = 1176
+
+- **Four of a Kind**:
+
+  - Description: Four cards with the same rank. They may be played with one other unscored card.
+  - Base Chips: 60
+  - Base Multiplier: 7
+  - Example: `S_J, H_J, C_J, D_J, C_3`: S_J (Jack of Spades), H_J (Jack of Hearts), C_J (Jack of Clubs), D_J (Jack of Diamonds) create a four of a kind. This hand scores ((10 + 10 + 10 + 10) + 60) × (7) = 700
+
+- **Full House**:
+
+  - Description: A three of a kind and a pair.
+  - Base Chips: 40
+  - Base Multiplier: 4
+  - Example: `H_K, C_K, D_K, S_2, D_2`: H_K (King of Hearts), C_K (King of Clubs), D_K (King of Diamonds) create a three of a kind. S_2 (Two of Spades) and D_2 (Two of Diamonds) create a pair. This hand scores ((10 + 10 + 10 + 2 + 2) + 40) × (4) = 296
+
+- **Flush**:
+
+  - Description: Five cards that share the same suit.
+  - Base Chips: 35
+  - Base Multiplier: 4
+  - Example: `H_A, H_K, H_T, H_5, H_4`: Those are five cards with the same suit (Hearts). This hand scores ((11 + 10 + 10 + 5 + 4)) + 35) × (4) = 300
+
+- **Straight**:
+
+  - Description: Five cards in a row (consecutive ranks).
+  - Base Chips: 30
+  - Base Multiplier: 4
+  - Example: `D_J, C_T, C_9, S_8, H_7`: Those are five cards with consecutive ranks (7, 8, 9, 10, Jack). This hand scores ((10 + 10 + 9 + 8 + 7)) + 30) × (4) = 296
+
+- **Three of a Kind**:
+
+  - Description: Three cards with the same rank. They may be played with one up to two other unscored cards.
+  - Base Chips: 30
+  - Base Multiplier: 3
+  - Example: `S_T, C_T, D_T, H_6, D_5`: S_T (Ten of Spades), C_T (Ten of Clubs), D_T (Ten of Diamonds) create a three of a kind. This hand scores ((10 + 10 + 10) + 30) × (3) = 180
+
+- **Two Pair**:
+
+  - Description: Two pairs of cards with different ranks. They may be played with one other unscored card.
+  - Base Chips: 20
+  - Base Multiplier: 2
+  - Example: `H_A, D_A, C_Q, H_4, C_4`: H_A (Ace of Hearts) and D_A (Ace of Diamonds) create a pair. H_4 (Four of Hearts) and C_4 (Four of Clubs) create another pair. This hand scores ((11 + 11 + 4 + 4)) + 20) × (2) = 100
+
+- **Pair**:
+
+  - Description: Two cards that share the same rank. They may be played with up to three other unscored cards.
+  - Base Chips: 10
+  - Base Multiplier: 2
+  - Example: `S_K, S_9, D_9, H_6, D_3`: S_9 (Nine of Spades) and D_9 (Nine of Diamonds) create a pair. This hand scores ((9 + 9)) + 10) × (2) = 56
+
+- **High Card**:
+
+  - Description: If the played hand is not of any the above hands, only the highest ranked card scores.
+  - Base Chips: 4
+  - Base Multiplier: 1
+  - Example: `S_A, D_Q, D_9, C_4, D_3`: S_A (Ace of Spades) is the highest rank card so it's the only one that will be used to compute the score. This hand scores (11 + 5) × (1) = 16
+
+NOTE: The Base Chips and Base Multiplier for the described hand types refers to level 1 hand types. The Planet Cards (a type of consumable cards) let you increase the level of the different hand types. Moreover the score calculations in the examples does not take into account the Chip Additions, Mult Additions and Mult Multipliers. Those terms originate from the jokers and enhanced cards and play central roles in a good balatro strategy.
+
+## The Shop
+
+The Shop is the location where Jokers, Consumables, and Vouchers can be acquired by spending money. The Shop is only accessible after defeating a Small Blind, Big Blind, or Boss Blind.
+
+By default, the shop sells:
+
+- 2 random cards (usually Jokers, but occasionally Tarot Cards and Planets)
+- 2 random Booster Packs
+- 1 Voucher
+
+All items in the shop have a buy cost (purchase price) and a sell cost (selling value) for the purchased items. The sell cost item is usually half of it buy cost.
+
+### Reroll
+
+The player may pay money to reroll the shop an unlimited number of times, removing any of the remaining random cards and replacing them with 2 new random cards. The reroll cost starts at $5 and increases by $1 each reroll, resetting to $5 upon entering a new shop.
+
+However, rerolling the shop does not restock Booster Packs or the Voucher. Booster packs only restock upon entering a new shop, and the Voucher restocks after defeating the boss blind.
+
+### Booster Packs
+
+Two Booster Packs are always offered in each Shop, often but not always of two different types. These come in five categories:
+
+- **Arcana Packs** containing Tarot Cards for immediate use.
+- **Celestial Packs** containing Planet Cards for immediate use.
+- **Standard Packs** containing Playing Cards (often with Enhancements, Seals and/or Editions) that are added into your deck.
+- **Buffoon Packs** containing Joker Cards to add to your run.
+- **Spectral Packs** containing Spectral Cards for immediate use.
+
+A new set of Booster Packs will be offered with each shop. Booster Packs do not refresh when rerolling the Shop.
+
+## Jokers
+
+Jokers are 150 special cards that are not played alongside standard cards or included in the deck, but rather can be purchased in the Shop. They modify the scoring system or other game mechanics. Every run will begin with 5 empty Joker slots. Every Joker is unique and can be used in many ways to create synergy with other Jokers' effects, deck composition, consumables, or all three. Jokers are almost always a requirement to meeting the required score of blinds, especially in higher antes, where the required score to defeat each Blind grows exponentially. The appearance rate of the four Joker rarities are: Common – 70%, Uncommon – 25%, Rare – 5%, Legendary - only a 0.3%.
+
+### Modifiers
+
+All Jokers start at the Base Edition, which can then be enhanced with one of the four different editions, resulting in higher shop costs but adding an additional effect listed below:
+
+- **Base**: just the standard card
+- **Foil**: +50 Chips
+- **Holographic**: +10 Mult
+- **Polychrome**: ×1.5 Mult
+- **Negative**: +1 Joker Slot
+
+### Examples
+
+Here are some examples jokers and how their presence affects the game.
+It's important to remember that Balatro is a game about synergies and it's really important to compound effects of Jokers to create synergies.
+
+#### Example 1: Joker influencing the scoring system
+
+- **Mad Joker**:
+  - Effect: "+10 Mult if played hand contains a Two Pair"
+  - Edition: Foil
+
+Let's suppose to own a Mad Joker (Foil). Suppose that our hand is: `D_6, S_2, C_2, H_3, C_4, H_5, C_5, S_K`.
+There are two obvious ways to play this hand:
+
+1. Play a straight from 2 to 6: `S_2, H_3, C_4, C_5, D_6`
+2. Play a double pair (two 2 and two 5): `S_2, C_2, H_5, C_5`
+
+If we don't have the Mad Joker, usually a straight yield a higher score than a double pair. However, we have a joker that synergies really well with a double pair. So maybe it's better to play the double pair. Let's perform the computation for both the options:
+
+1. Straight:
+
+   - Base Chips (scoring cards): 2 + 3 + 4 + 5 + 6 = 20
+   - Base Chips (for straight at lvl 1): 30
+   - Base Multiplier (for straight at lvl 1): 4
+   - Score: (20 + 30) × (4) = 200
+
+2. Double Pair:
+
+   - Base Chips (scoring cards): 2 + 2 + 5 + 5 = 14
+   - Base Chips (for double pair at lvl 1): 20
+   - Base Multiplier (for double pair at lvl 1): 2
+   - Score (without joker): (14 + 20) × (2) = 68
+
+   But we have the Mad Joker and the hand type is a double pair, so the Mad Joker effect activates.
+
+   - From the Joker effect: +10 Mult
+   - From the Joker edition: +50 Chips
+   - Score (with joker): (14 + 20 + 50) × (2 + 10) = 84 × 12 = 1008
+
+Now we can compare the two options. Normally, playing the straight is better than the double pair (200 > 68). However the presence of the of the Mad Joker drastically turn decision around: now the score yield by the double pair is 1008 due to the joker effect while the score for the straight is still 200 because the straight does not activate the joker effect.
+
+#### Example 2: Joker influencing game economy
+
+- **Egg Joker**:
+  - Effect: "Gains $3 of sell value at end of round"
+  - Edition: Base
+
+This joker does not modify the scoring system and just occupy a Joker slot. However, at the end of every round gains $3 of sell value. It's easy to foresee that after many round this joker could worth a lot of money a can be a extremely good investment early rounds. We can decide to sell it when we need money or if we need to free a joker slot.
+
+#### Example 3: Joker influencing the card values/suits
+
+- **Smeared Joker**:
+  - Effect: "Hearts and Diamonds count as the same suit, Spades and Clubs count as the same suit"
+  - Edition: Base
+
+This joker change dramatically the way to play the game. If Hearts and Diamonds are considered to be the same suit (and the same for Spades and Clubs), it's far simpler to play flushes because you have a deck effectively contains only to type of suits: "red" and "black".
+
+Suppose that we have a Smeared Joker (Base). Suppose that our hand is: `D_6, H_A, D_K, S_7, C_8, H_T, D_3, S_2`.
+Normally we wouldn't have a good hand and the best thing to do it to discard some cards looking for a better hand. However we have the Smeared Joker and its effect is active so we can play the flush `D_6, H_A, D_K, H_T, D_3` because the Diamonds (`D`) and Hearts (`H`) count as the same suit. The definition of a flush is five cards of the same suit.
+
+#### Example 4: Joker with cumulative effects
+
+- **Flash Card**:
+  - Effect: "This Joker gains +2 Mult per reroll in the shop (Currently +0 Mult)"
+  - Edition: Base
+
+The Flash Card Joker is an example of a Joker that has a cumulative effect. When first bought, it add +0 Mult in the score calculation so initially has no effect. However it permanently increase the Mult addition in it's effect by 2 every time the reroll action is performed in the shop. The reroll cost money but we can think that spending the money in the reroll (maybe because we really want to reroll cards in the shop, maybe because the reroll it's cheap/free) and to have a better Flash card. After the first reroll the new joker effect will be: "This Joker gains +2 Mult per reroll in the shop (Currently +2 Mult)". After another reroll (maybe in following shop phase) the effect will be "This Joker gains +2 Mult per reroll in the shop (Currently +4 Mult)" and so on.
+
+This kind of Jokers with cumulative affect may be start slowly but later in the game they can become very powerful.
+
+## Consumables
+
+Consumables are items offered in the shop at the end of each round. They are single-use items and disappear upon usage, but their effects remain for the rest of the run. They modify different aspects of the run, such as enhancing cards in the deck or boosting the base multiplier for different hands.
+
+If directly offered in the shop, the player has the choice to buy and use the card immediately, or to just buy it and hold on to it for future use. Buying and using the card immediately activates its effect, unless it targets the playing cards from the deck, in which case it cannot be used until a hand is available to apply the effect on. Until then, all purchased consumables remain in the consumable slot.
+
+2 consumable slots are available initially, and each consumable occupies 1 slot. Consumables generated as a result of other cards activating also appear in the consumable slots, unless no more space is available, and any attempt to generate or buy more consumables is disabled. A consumable occupying a slot can be sold (as always, for lower than the ordinary cost in the shop) at any time to vacate that slot.
+
+Consumables are split into 3 categories: **Tarot cards**, **Planet Cards** and **Spectral cards**.
+
+### Tarot Cards
+
+Tarot Cards can be acquired in the shop phase via Arcana Packs, Purple Seals, and purchased directly.
+Tarot Cards are used to modify the cards in in your deck, such as changing their suit or rank. They are also capable of giving cards Enhancements, or additional effects, like giving extra chips or multiplier when scored.
+
+There are 22 different Tarot Cards:
+
+- **The Fool**: Creates the last Tarot or Planet Card used during this run (The Fool excluded)
+- **The Magician**: Enhances 2 selected cards to Lucky Cards
+- **The High Priestess**: Creates up to 2 random Planet Cards (Must have room)
+- **The Empress**: Enhances 2 selected cards to Mult Cards
+- **The Emperor**: Creates up to 2 random Tarot cards (Must have room)
+- **The Hierophant**: Enhances 2 selected cards to Bonus Cards
+- **The Lovers**: Enhances 1 selected card into a Wild Card
+- **The Chariot**: Enhances 1 selected card into a Steel Card
+- **Justice**: Enhances 1 selected card into a Glass Card
+- **The Hermit**: Doubles money (Max of $20) (Min of $0)
+- **The Wheel of Fortune**: 1 in 4 chance to add Foil, Holographic, or Polychrome edition to a random Joker
+- **Strength**: Increases rank of up to 2 selected cards by 1
+- **The Hanged Man**: Destroys up to 2 selected cards
+- **Death**: Select 2 cards, convert the left card into the right card (Drag to rearrange)
+- **Temperance**: Gives the total sell value of all current Jokers (Max of $50)
+- **The Devil**: Enhances 1 selected card into a Gold Card
+- **The Tower**: Enhances 1 selected card into a Stone Card
+- **The Star**: Converts up to 3 selected cards to Diamonds
+- **The Moon**: Converts up to 3 selected cards to Clubs
+- **The Sun**: Converts up to 3 selected cards to Hearts
+- **Judgement**: Creates a random Joker card (Must have room)
+- **The World**: Converts up to 3 selected cards to Spades
+
+### Planet Cards
+
+Planet Cards can obtained through Celestial Packs, Blue Seals, two specific Tarot cards, and purchased directly.
+Planet Cards can level up their associated poker hand type by increasing the base value of chips and multiplier.
+
+There are 9 Planet Cards:
+
+- **Pluto**: Increases High Card hand value by +1 Mult and +10 Chips
+- **Mercury**: Increases Pair hand value by +1 Mult and +15 Chips
+- **Uranus**: Increases Two Pair hand value by +1 Mult and +20 Chips
+- **Venus**: Increases Three of a Kind hand value by +2 Mult and +20 Chips
+- **Saturn**: Increases Straight hand value by +3 Mult and +30 Chips
+- **Jupiter**: Increases Flush hand value by +2 Mult and +15 Chips
+- **Earth**: Increases Full House hand value by +2 Mult and +25 Chips
+- **Mars**: Increases Four of a Kind hand value by +3 Mult and +30 Chips
+- **Neptune**: Increases Straight Flush hand value by +4 Mult and +40 Chips
+
+### Spectral Cards
+
+Spectral cards bear a resemblance to Tarot cards in that their general trait is to modify playing cards in the deck, though this time to a much greater extent, providing considerably better perks. To balance these drastic effects out, Spectral cards tend to also have massive drawbacks that can meaningfully hinder the run, leading the player into a high-risk high-reward style of play. They can be find only in Booster Packs.
+
+There are 18 Spectral Cards:
+
+- **Familiar**: Destroy 1 random card in your hand, add 3 random Enhanced face cards to your hand
+- **Grim**: Destroy 1 random card in your hand, add 2 random Enhanced Aces to your hand
+- **Incantation**: Destroy 1 random card in your hand, add 4 random Enhanced numbered cards to your hand
+- **Talisman**: Add a Gold Seal to 1 selected card in your hand
+- **Aura**: Add Foil, Holographic, or Polychrome effect to 1 selected card in hand
+- **Wraith**: Creates a random Rare Joker, sets money to $0
+- **Sigil**: Converts all cards in hand to a single random suit
+- **Ouija**: Converts all cards in hand to a single random rank (-1 hand size)
+- **Ectoplasm**: Add Negative to a random Joker (-1 hand size)
+- **Immolate**: Destroys 5 random cards in hand, gain $20
+- **Ankh**: Create a copy of a random Joker, destroy all other Jokers (Removes Negative from copy)
+- **Deja Vu**: Add a Red Seal to 1 selected card in your hand
+- **Hex**: Add Polychrome to a random Joker, destroy all other Jokers
+- **Trance**: Add a Blue Seal to 1 selected card in your hand
+- **Medium**: Add a Purple Seal to 1 selected card in your hand
+- **Cryptid**: Create 2 copies of 1 selected card in your hand
+- **The Soul**: Creates a Legendary Joker (Must have room)
+- **Black Hole**: Upgrade every poker hand by 1 level
+
+### Vouchers
+
+Vouchers are items offered in the shop, and refresh or restock in the shop after the players first completed round, or after defeating the boss blind of each ante.
+
+Unlike consumable items, Vouchers and their effects are permanent and remain effective for the entirety of a run. There are 32 Vouchers in total:
+
+Here are the Vouchers from the table in the requested format:
+
+- **Overstock**: +1 card slot available in shop (to 3 slots)
+- **Overstock Plus**: +1 card slot available in shop (to 4 slots)
+- **Clearance Sale**: All cards and packs in shop are 25% off
+- **Liquidation**: All cards and packs in shop are 50% off
+- **Hone**: Foil, Holographic, and Polychrome cards appear 2X more often
+- **Glow Up**: Foil, Holographic, and Polychrome cards appear 4X more often
+- **Reroll Surplus**: Rerolls cost $2 less
+- **Reroll Glut**: Rerolls cost an additional $2 less
+- **Crystal Ball**: +1 consumable slot
+- **Omen Globe**: Spectral cards may appear in any of the Arcana Packs
+- **Telescope**: Celestial Packs always contain the Planet Card for your most played poker hand
+- **Observatory**: Planet Cards in your consumable area give ×1.5 Mult for their specified poker hand
+- **Grabber**: Permanently gain +1 hand per round
+- **Nacho Tong**: Permanently gain an additional +1 hand per round
+- **Wasteful**: Permanently gain +1 discard each round
+- **Recyclomancy**: Permanently gain an additional +1 discard each round
+- **Tarot Merchant**: Tarot cards appear 2X more frequently in the shop
+- **Tarot Tycoon**: Tarot cards appear 4X more frequently in the shop
+- **Planet Merchant**: Planet Cards appear 2X more frequently in the shop
+- **Planet Tycoon**: Planet Cards appear 4X more frequently in the shop
+- **Seed Money**: Raise the cap on interest earned in each round to $10
+- **Money Tree**: Raise the cap on interest earned in each round to $20
+- **Blank**: Does nothing?
+- **Antimatter**: +1 Joker slot
+- **Magic Trick**: Playing cards can be purchased from the shop
+- **Illusion**: Playing cards in shop may have an Enhancement, Edition, and/or a Seal
+- **Hieroglyph**: -1 Ante, -1 hand each round
+- **Petroglyph**: -1 Ante again, -1 discard each round
+- **Director's Cut**: Reroll Boss Blind 1 time per Ante, $10 per roll
+- **Retcon**: Reroll Boss Blind unlimited times, $10 per roll
+- **Paint Brush**: +1 hand size
+- **Palette**: +1 hand size again
+
+## Card Modifiers
+
+Modifiers are upgrades that can be applied to cards that provide various benefits, such as improved scoring capability, creating consumables, money generation, or card manipulation. There are 4 types of Modifiers: **Editions**, **Enhancements**, and **Seals**.
+
+- Playing cards (i.e card in the deck) may each have one Enhancement, one Edition, and one Seal.
+- Jokers may have one Edition
+- Consumables (Tarot Cards, Planet Cards and Spectral Cards) can't have any modifiers normally.
+- Vouchers cannot have any modifiers.
+
+Applying a modifier to a card that already has that type (for example, applying a Red Seal to a card that already has a Blue Seal) will replace the previous modifier with the new one. Whenever a modifier is applied to a card, it retains the upgrade for the rest of the run. Editions are permanent and cannot be overwritten.
+
+In general, modifiers are applied to Jokers and playing cards by Tarot or Spectral cards.
+
+Debuffed cards and Jokers from Boss Blinds have all modifier effects disabled except for Negative (+1 slot) and Stone (no rank and suit). Debuffed wild cards revert back into their original suit.
+
+### Enhanced Cards
+
+There are 8 types of enhanced cards:
+
+- **Bonus Cards**: Enhanced card gives an additional +30 Chips when scored.
+- **Mult Card**: Enhanced card gives +4 Mult when scored.
+- **Wild Card**: Enhanced card is considered to be every suit simultaneously.
+- **Glass Cards**: Enhanced card gives ×2 Mult when scored but it has a 1 in 4 chance to be destroyed after all scoring is finished.
+- **Steel Cards**: Enhanced card gives ×1.5 Mult while held in hand.
+- **Stone Cards**: Enhanced card's value is set to +50 Chips. Enhanced card has no rank or suit. Enhanced card always scores, except when debuffed.
+- **Gold Cards**: Enhanced card gives $3 if held in hand at end of round.
+- **Lucky Cards**: Enhanced card has a 1 in 5 chance to give +20 Mult and it has a 1 in 15 chance to give $20.
+
+### Seals
+
+There are 4 types of seals:
+
+- **Gold Seal**: Earn $3 when this card is played and scores.
+- **Red Seal**: Retrigger this card 1 time. Retriggering means that the effect of the cards is applied again including counting again in the score calculation.
+- **Blue Seal**: Creates the Planet Card for final played poker hand of round if held in hand (Must have room).
+- **Purple Seal**: Creates a Tarot card when discarded (Must have room).
+
+### Editions
+
+There are 5 types of editions:
+
+- **Base**: No extra effects. If not specified, all cards are considered to be Base.
+- **Foil**: +50 Chips when scored.
+- **Holographic**: +10 Mult when scored.
+- **Polychrome**: ×1.5 Mult when scored.
+- **Negative**: +1 Joker Slot when scored. This edition is only available to Jokers.
+
+# Strategy
+
+Understanding Balatro's core strategies is essential for consistent success. While luck plays a role, proper strategic decisions can dramatically improve win rates and enable progression through higher Antes.
+
+## Joker Ordering
+
+The order of Jokers in your slots directly impacts scoring due to left-to-right activation. This is one of the most important concepts for maximizing score.
+
+**Basic Rule**: put + Mults left and × Mults to the right
+
+**Why it matters**: Consider a hand scoring 50 Chips × 4 Mult with two Jokers:
+
+- Joker A: +10 Mult
+- Joker B: ×2 Mult
+
+If ordered A then B: 50 × (4 + 10) × 2 = 50 × 28 = 1,400 points
+If ordered B then A: 50 × (4 × 2 + 10) = 50 × 18 = 900 points
+
+The same applies to scoring cards - place cards with multiplicative effects (Glass, Polychrome) rightmost in your played hand.
+
+## Hand Type Focus
+
+Typically it's best to commit to one kind of hand, and build your whole strategy around that. Spreading resources across multiple hand types dilutes your scoring potential.
+
+### Recommended Hand Types by Difficulty
+
+**Easiest - Flush**:
+
+- Requires only matching suits, not specific ranks
+- Enhanced by Checkered Deck (only Hearts/Spades)
+- Synergizes with Smeared Joker (Hearts/Diamonds and Spades/Clubs count as same suit)
+- Simple to modify via Tarot cards that change suits
+
+**Moderate - Full House & Two Pair**:
+
+- Benefits from Pair and Three of a Kind Jokers simultaneously
+- The Jokers that give Chips and Mult when a hand contains a Pair or a Three of a Kind also work with larger hands
+- More flexible than pure pairs or trips strategies
+
+**Difficult - Straight**:
+
+- Straights scale very well, but are the most difficult for most people
+- Requires specific sequential ranks
+- Benefits from Four Fingers (4-card straights) or Shortcut (allows gaps)
+- High scoring potential but inconsistent draws
+
+### Committing to a Strategy
+
+Once you identify a strong Joker or receive relevant Planet cards, commit fully:
+
+- Use Planet cards only on your chosen hand type
+- Modify your deck with Tarot cards to support that hand
+- Buy Jokers that synergize with your chosen hand
+- Skip Jokers that boost other hand types, even if they seem powerful
+
+## Economy Management
+
+Money management determines your long-term power growth. Balance immediate needs against compound benefits.
+
+### Interest Optimization
+
+- Reach $25 as quickly as possible to earn maximum $5 interest per round
+- The more easily you win blinds, the more money you earn from unspent hands
+- Each unused hand after defeating a blind awards $1
+- Don't hoard excessively - spending on key Jokers/upgrades often provides better returns than interest
+
+### Early Game Skipping
+
+Skipping the first Blind will grant a useful Tag. Tags provide significant value:
+
+- Economy Tags (Economy, Investment) can jumpstart your interest
+- Pack Tags (Standard, Buffoon, Celestial) provide free resources
+- Enhancement Tags (Negative, Foil, Holographic, Polychrome) give powerful free Jokers
+
+The Small Blind of Ante 1 requires only 300 chips - easily beatable even after skipping for a tag.
+
+## Scoring Phases Priority
+
+Understanding when to prioritize different scoring components based on Ante progression:
+
+### Antes 1-3: Foundation
+
+- **Priority**: One of your primary goals for this section of the game should be obtaining a solid Chips or Mult joker
+- **Good Early Jokers**: Scary Face (+30 Chips for face cards), Smiley Face (+4 Mult for face cards), Odd Todd, Even Steven
+- **Economy Goal**: Build toward $25 for interest
+- **Flexibility**: Keep options open, don't hard-commit to a strategy yet
+
+### Antes 4-6: Scaling
+
+- **Priority**: Transition from flat bonuses to multiplicative effects
+- **Deck Manipulation**: Start removing low-value cards and enhancing key cards
+- **Joker Evolution**: Look for ×Mult Jokers that match your strategy
+- **Planet Investment**: Focus upgrades on your primary hand type
+
+### Antes 7-8+: Optimization
+
+- **Priority**: Exponential scaling through synergies
+- **Critical Jokers**: Scaling Jokers that grow over time (Blueprint copying strong Jokers, Brainstorm)
+- **Deck Refinement**: Thin deck to essential cards only
+- **Enhancement Focus**: Glass Cards (×2 Mult), Steel Cards (×1.5 while held), Gold Cards (money generation)
+
+## Consumable Usage
+
+Consumables provide immediate effects but require strategic timing for maximum impact.
+
+### Tarot Card Priority
+
+1. **Suit/Rank changes** for your primary strategy (The Star/Moon/Sun/World for flushes)
+2. **Enhancements** on frequently scored cards (The Lovers for Wild Card, The Chariot for Steel)
+3. **Deck thinning** via The Hanged Man (destroys selected cards)
+4. **Resource generation** via The Hermit (doubles money up to $20)
+
+### Planet Card Strategy
+
+- **Focused Investment**: Level one hand type exclusively
+- **Observatory Synergy**: With Observatory voucher, hold planets in consumable slots for passive ×1.5 Mult
+- **Telescope Value**: With Telescope voucher, Celestial Packs guarantee your most-played hand's planet
+
+### Spectral Card Timing
+
+- Use high-risk Spectral cards only when the benefit clearly outweighs the cost
+- **Black Hole** (upgrades all poker hands): Save for Ante 7+ when you need universal scaling
+- **The Soul** (creates Legendary Joker): Only use with open Joker slot
+- **Ankh** (copies a Joker, destroys others): Use when you have one exceptional Joker worth duplicating
+
+## Boss Blind Adaptation
+
+Boss Blinds can completely counter certain strategies. Maintain flexibility to handle common threats:
+
+### Debuff Blinds
+
+- **The Club/Goad/Window/Head**: Debuffs entire suits - avoid suit-dependent strategies without backup
+- **The Plant**: Debuffs face cards - devastating to face card strategies
+- **The Pillar**: Debuffs previously played cards - save best cards for Boss
+
+### Restriction Blinds
+
+- **The Psychic**: Must play 5 cards - incompatible with Pair/Two Pair/Trips strategies
+- **The Eye**: No repeat hand types - requires diverse hand capability
+- **The Needle**: Play only 1 hand - demands maximum score in single play
+
+### Preparation Strategy
+
+- Maintain at least two viable hand types by Ante 3
+- Keep one "emergency" consumable for Boss Blind adaptation
+- Consider Boss Blind effects when choosing between similar Jokers
+
+## Common Synergies
+
+Powerful combinations to build toward when opportunity arises:
+
+### The Baron Build
+
+- **Core**: Baron (Kings held in hand give ×1.5 Mult each)
+- **Enhancement**: Red Seal on Kings for retriggering
+- **Support**: Mime (retriggers all cards held in hand)
+- **Deck Goal**: Multiple Kings, thin out other cards
+
+### The Flush Engine
+
+- **Core**: Smeared Joker or Checkered Deck
+- **Support**: Four Fingers (all 4-card hands count as Flushes)
+- **Scaling**: Any flush-specific Joker (Lusty Joker for Hearts, Greedy for Diamonds)
+
+### The Scaling Machine
+
+- **Core**: Jokers that permanently grow (Spare Trousers, Flash Card, Fortune Teller)
+- **Support**: Reroll cost reduction (Reroll Surplus voucher)
+- **Strategy**: Accept lower early scores for exponential late-game growth
+
+## Critical Mistakes to Avoid
+
+1. **Ignoring Joker Order**: Suboptimal ordering can halve your score or worse
+2. **Overvaluing Rarity**: Common Jokers often outperform Rare ones for specific strategies
+3. **Hoarding Money**: Interest caps at $5 - spending on improvements often yields better returns
+4. **Neglecting Hand Size**: More cards drawn increases consistency
+5. **Playing Too Fast**: you can play the same cards but get different points, re-organize your played hand to max out before committing
+
+## Win Condition Priorities
+
+To successfully reach Ante 8:
+
+1. **Consistency over high-rolls** - Reliable moderate scores beat occasional huge scores
+2. **Synergy over raw power** - Three mediocre Jokers that work together beat one excellent Joker alone
+3. **Adaptation over rigid planning** - being able to adapt when a newer, better strategy appears is crucial
+4. **Mathematical optimization** - Always calculate whether reordering Jokers or cards improves score
+5. **Resource efficiency** - Every dollar spent should advance your strategy
+
+Remember: Balatro rewards both careful planning and tactical flexibility. The best strategy adapts to what the shop provides while maintaining focus on mathematical optimization.

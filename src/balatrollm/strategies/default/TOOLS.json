@@ -238,36 +238,21 @@
       }
     }
   ],
-  "SHOP": [
+  "ROUND_EVAL": [
     {
       "type": "function",
       "function": {
-        "name": "shop",
-        "description": "Perform an action in the shop",
+        "name": "cash_out",
+        "description": "Proceed from round completion to the shop",
         "parameters": {
           "type": "object",
           "properties": {
-            "action": {
-              "type": "string",
-              "enum": [
-                "next_round",
-                "reroll",
-                "buy_card",
-                "redeem_voucher"
-              ],
-              "description": "The shop action to perform"
-            },
-            "index": {
-              "type": "integer",
-              "description": "0-indexed position in the relevant shop area (required for buy_card and redeem_voucher)"
-            },
             "reasoning": {
               "type": "string",
-              "description": "Strategic reasoning for this shop action"
+              "description": "Brief reflection on the round performance"
             }
           },
           "required": [
-            "action",
             "reasoning"
           ]
         }
@@ -346,21 +331,36 @@
       }
     }
   ],
-  "ROUND_EVAL": [
+  "SHOP": [
     {
       "type": "function",
       "function": {
-        "name": "cash_out",
-        "description": "Proceed from round completion to the shop",
+        "name": "shop",
+        "description": "Perform an action in the shop",
         "parameters": {
           "type": "object",
           "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "next_round",
+                "reroll",
+                "buy_card",
+                "redeem_voucher"
+              ],
+              "description": "The shop action to perform"
+            },
+            "index": {
+              "type": "integer",
+              "description": "0-indexed position in the relevant shop area (required for buy_card and redeem_voucher)"
+            },
             "reasoning": {
               "type": "string",
-              "description": "Brief reflection on the round performance"
+              "description": "Strategic reasoning for this shop action"
             }
           },
           "required": [
+            "action",
             "reasoning"
           ]
         }
