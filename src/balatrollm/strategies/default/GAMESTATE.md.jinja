@@ -5,59 +5,57 @@
 - **Round**: {{ game_state.game.round }}
 - **Ante**: {{ 1 if (game_state.game.round == 0) else ((game_state.game.round - 1) // 3) + 1 }}/8
 - **Money**: ${{ game_state.game.dollars }}
-{% elif game_state.state == 1 -%}
+{%- elif game_state.state == 1 -%}
 - **Phase**: Playing Phase
 - **Round**: {{ game_state.game.round }}
 - **Ante**: {{ 1 if (game_state.game.round == 0) else ((game_state.game.round - 1) // 3) + 1 }}/8
 - **Money**: ${{ game_state.game.dollars }}
-- **Hands left**: {{ game_state.game.current_round.hands_left}} / {{ game_state.game.current_round.hands_left + game_state.game.current_round.hands_played}}
-- **Discards left**: {{ game_state.game.current_round.discards_left }} / {{ game_state.game.current_round.discards_left + game_state.game.current_round.discards_used }}
-{% elif game_state.state == 8 -%}
+- **Hands left**: {{ game_state.game.current_round.hands_left}}/{{ game_state.game.current_round.hands_left + game_state.game.current_round.hands_played}}
+- **Discards left**: {{ game_state.game.current_round.discards_left }}/{{ game_state.game.current_round.discards_left + game_state.game.current_round.discards_used }}
+{%- elif game_state.state == 8 -%}
 - **Phase**: Round Evaluation Phase
 - **Round**: {{ game_state.game.round }}
 - **Ante**: {{ 1 if (game_state.game.round == 0) else ((game_state.game.round - 1) // 3) + 1 }}/8
 - **Money**: ${{ game_state.game.dollars }}
-{% elif game_state.state == 5 -%}
+{%- elif game_state.state == 5 %}
 - **Phase**: Shop Phase
 - **Round**: {{ game_state.game.round }}
 - **Ante**: {{ 1 if (game_state.game.round == 0) else ((game_state.game.round - 1) // 3) + 1 }}/8
 - **Money**: ${{ game_state.game.dollars }}
-{% endif -%}
+{%- endif %}
 
 ## Jokers
 
-The current Jokers count is {{ game_state.jokers.config.card_count }} / {{ game_state.jokers.config.card_limit }}
-
+The current Jokers count is {{ game_state.jokers.config.card_count }}/{{ game_state.jokers.config.card_limit }}.
 {% for j in game_state.jokers.cards -%}
-{% if j.facing == "front" -%}
+{% if j.facing == "front" %}
 - {{ loop.index0 }}: {{ j.label }} ({{ constants.jokers[j.config.center_key] }})
   - **Sell value**: {{ j.sell_cost }}
-{% if j.edition %}
+{%- if j.edition %}
   - **{{ j.edition.type|title }} Edition**: {{ constants.editions[j.edition.key] }}
-{% endif -%}
-{% if j.debuff %}
+{%- endif %}
+{%- if j.debuff %}
   - **Debuff**: this card is debuffed and will not be counted in scoring
-{% endif -%}
-{% else %}
+{%- endif%}
+{%- else %}
 - {{ loop.index0 }}: the joker is face down
-{% endif -%}
-{% endfor -%}
+{%- endif %}
+{%- endfor %}
 
 ## Consumables
 
-The current Consumables count is {{ game_state.consumables.config.card_count }} / {{ game_state.consumables.config.card_limit }}
-
+The current Consumables count is {{ game_state.consumables.config.card_count }}/{{ game_state.consumables.config.card_limit }}.
 {% for c in game_state.consumables.cards -%}
-{% if c.facing == "front" -%}
+{% if c.facing == "front" %}
 - {{ loop.index0 }}: {{ c.label }} ({{ constants.consumables[c.config.center_key] }})
   - **Sell value**: {{ c.sell_cost }}
-{% if c.debuff %}
+{%- if c.debuff %}
   - **Debuff**: this card is debuffed and will not be counted in scoring
-{% endif -%}
-{% else %}
+{%- endif %}
+{%- else %}
 - {{ loop.index0 }}: the joker is face down
-{% endif -%}
-{% endfor -%}
+{%- endif %}
+{%- endfor %}
 
 {% if game_state.used_vouchers|length > 0 -%}
 ## Vouchers
@@ -116,32 +114,31 @@ Here is a list of the poker hands and their levels:
 ## Current Hand
 
 The current card count is {{ game_state.hand.config.card_count }} / {{ game_state.hand.config.card_limit }}
-You can play or discard up to {{ game_state.hand.config.card_limit }} cards.
-
-{% for c in game_state.hand.cards -%}
-{% if c.facing == "front" -%}
-{% if c.ability.name == "Stone Card" -%}
-- {{ loop.index0 }}: ??? of ???
-{% else %}
+You can play or discard up to {{ game_state.hand.config.highlighted_limit }} cards.
+{% for c in game_state.hand.cards %}
+{%- if c.facing == "front" %}
+{%- if c.ability.name == "Stone Card" %}
+- {{ loop.index0 }}: this is a stone card (no suit and no rank)
+{%- else %}
 - {{ loop.index0 }}: {{ c.config.card.value }} of {{ c.config.card.suit }} (`{{ c.config.card_key }}`)
-{% if c.edition %}
+{%- if c.edition %}
   - **{{ c.edition.type|title }} Edition**: {{ constants.editions[c.edition.key] }}
-{% endif -%}
-{% if c.ability.set == "Enhanced" %}
+{%- endif %}
+{%- if c.ability.set == "Enhanced" %}
   - **{{c.ability.name}}**: {{ constants.enhancements['m_' + c.ability.name.lower().replace(' card', '').replace(' ', '_')] }}
-{% endif -%}
-{% if c.seal %}
+{%- endif %}
+{%- if c.seal %}
   - **{{ c.seal }} seal**: {{ constants.seals[c.seal] }}
-{% endif -%}
-{% if c.debuff %}
+{%- endif %}
+{%- if c.debuff %}
   - **Debuff**: this card is debuffed and will not be counted in scoring
-{% endif -%}
-{% endif -%}
-{% else %}
+{%- endif %}
+{%- endif %}
+{%- else %}
 - {{ loop.index0 }}: the card is face down
-{% endif -%}
-{% endfor %}
-{% endif -%}
+{%- endif %}
+{%- endfor %}
+{%- endif %}
 
 {% if game_state.state == 5 -%}
 ## Shop
@@ -154,7 +151,7 @@ TODO
 
 You **MUST** use one of the following tools to perform the intended action:
 
-{% if game_state.state == 7 -%}
+{% if game_state.state == 7 %}
 - Select or skip the current blind
   - Function: `skip_or_select_blind`
   - Parameters:
@@ -184,7 +181,7 @@ You **MUST** use one of the following tools to perform the intended action:
     - `action`: (string) `next_round`, `reroll`, `buy_card`, or `redeem_voucher`
     - `index`: (integer) 0-indexed position in the relevant shop area (required for buy_card)
     - `reasoning`: (string) Strategic reasoning for this shop action
-{% endif %}
+{% endif -%}
 - Sell a Joker
   - Function: `sell_joker`
   - Parameters:
