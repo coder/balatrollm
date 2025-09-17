@@ -12,6 +12,8 @@
 - **Money**: ${{ G.game.dollars }}
 - **Hands left**: {{ G.game.current_round.hands_left}}/{{ G.game.current_round.hands_left + G.game.current_round.hands_played}}
 - **Discards left**: {{ G.game.current_round.discards_left }}/{{ G.game.current_round.discards_left + G.game.current_round.discards_used }}
+- **Current Score**: {{ G.game.chips }}
+- **Target Score**: {% if G.blinds.small.status == "Current" %}{{ G.blinds.small.score }}{% elif G.blinds.big.status == "Current" %}{{ G.blinds.big.score }}{% elif G.blinds.boss.status == "Current" %}{{ G.blinds.boss.score }}{% endif %}
 {%- elif G.state == 8 -%}
 - **Phase**: Round Evaluation Phase
 - **Round**: {{ G.game.round }}
@@ -204,13 +206,13 @@ Here are the vouchers that can be redeemed:
 {%- endif %}
 {%- endfor %}
 
-Here are the booster packs that can be opened:
+{#- Here are the booster packs that can be opened:
 
 {% for pack in G.shop_booster.cards -%}
 - {{ loop.index0 }}: {{ pack.label }}
   - **Cost**: ${{ pack.cost }}
   - **Sell value**: ${{ pack.sell_cost }}
-{% endfor %}
+{% endfor %} -#}
 {%- endif %}
 
 # Tools available
