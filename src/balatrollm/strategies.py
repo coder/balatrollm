@@ -353,7 +353,7 @@ class StrategyManager:
         self.jinja_env = Environment(loader=FileSystemLoader(self.strategy_path))
         self.jinja_env.filters["from_json"] = json.loads
 
-    def render_strategy(self, game_state: dict[str, Any] | None = None) -> str:
+    def render_strategy(self, game_state: dict[str, Any]) -> str:
         """Render the strategy template.
 
         Args:
@@ -363,10 +363,10 @@ class StrategyManager:
             Rendered strategy guidance content as a string.
         """
         template = self.jinja_env.get_template("STRATEGY.md.jinja")
-        context = {"constants": BALATRO_CONSTANTS}
-        if game_state:
-            context["game_state"] = game_state
-        return template.render(**context)
+        return template.render(
+            G=game_state,
+            constants=BALATRO_CONSTANTS,
+        )
 
     def render_gamestate(self, game_state: dict[str, Any]) -> str:
         """Render the game state template.
@@ -379,7 +379,7 @@ class StrategyManager:
         """
         template = self.jinja_env.get_template("GAMESTATE.md.jinja")
         return template.render(
-            game_state=game_state,
+            G=game_state,
             constants=BALATRO_CONSTANTS,
         )
 

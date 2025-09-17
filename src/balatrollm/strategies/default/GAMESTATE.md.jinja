@@ -1,33 +1,33 @@
 # Current Game State
 
-{% if game_state.state == 7 -%}
+{% if G.state == 7 -%}
 - **Phase**: Blind Select Phase
-- **Round**: {{ game_state.game.round }}
-- **Ante**: {{ 1 if (game_state.game.round == 0) else ((game_state.game.round - 1) // 3) + 1 }}/8
-- **Money**: ${{ game_state.game.dollars }}
-{%- elif game_state.state == 1 -%}
+- **Round**: {{ G.game.round }}
+- **Ante**: {{ 1 if (G.game.round == 0) else ((G.game.round - 1) // 3) + 1 }}/8
+- **Money**: ${{ G.game.dollars }}
+{%- elif G.state == 1 -%}
 - **Phase**: Playing Phase
-- **Round**: {{ game_state.game.round }}
-- **Ante**: {{ 1 if (game_state.game.round == 0) else ((game_state.game.round - 1) // 3) + 1 }}/8
-- **Money**: ${{ game_state.game.dollars }}
-- **Hands left**: {{ game_state.game.current_round.hands_left}}/{{ game_state.game.current_round.hands_left + game_state.game.current_round.hands_played}}
-- **Discards left**: {{ game_state.game.current_round.discards_left }}/{{ game_state.game.current_round.discards_left + game_state.game.current_round.discards_used }}
-{%- elif game_state.state == 8 -%}
+- **Round**: {{ G.game.round }}
+- **Ante**: {{ 1 if (G.game.round == 0) else ((G.game.round - 1) // 3) + 1 }}/8
+- **Money**: ${{ G.game.dollars }}
+- **Hands left**: {{ G.game.current_round.hands_left}}/{{ G.game.current_round.hands_left + G.game.current_round.hands_played}}
+- **Discards left**: {{ G.game.current_round.discards_left }}/{{ G.game.current_round.discards_left + G.game.current_round.discards_used }}
+{%- elif G.state == 8 -%}
 - **Phase**: Round Evaluation Phase
-- **Round**: {{ game_state.game.round }}
-- **Ante**: {{ 1 if (game_state.game.round == 0) else ((game_state.game.round - 1) // 3) + 1 }}/8
-- **Money**: ${{ game_state.game.dollars }}
-{%- elif game_state.state == 5 %}
+- **Round**: {{ G.game.round }}
+- **Ante**: {{ 1 if (G.game.round == 0) else ((G.game.round - 1) // 3) + 1 }}/8
+- **Money**: ${{ G.game.dollars }}
+{%- elif G.state == 5 %}
 - **Phase**: Shop Phase
-- **Round**: {{ game_state.game.round }}
-- **Ante**: {{ 1 if (game_state.game.round == 0) else ((game_state.game.round - 1) // 3) + 1 }}/8
-- **Money**: ${{ game_state.game.dollars }}
+- **Round**: {{ G.game.round }}
+- **Ante**: {{ 1 if (G.game.round == 0) else ((G.game.round - 1) // 3) + 1 }}/8
+- **Money**: ${{ G.game.dollars }}
 {%- endif %}
 
 ## Jokers
 
-The current Jokers count is {{ game_state.jokers.config.card_count }}/{{ game_state.jokers.config.card_limit }}.
-{% for j in game_state.jokers.cards -%}
+The current Jokers count is {{ G.jokers.config.card_count }}/{{ G.jokers.config.card_limit }}.
+{% for j in G.jokers.cards -%}
 {% if j.facing == "front" %}
 - {{ loop.index0 }}: {{ j.label }} ({{ constants.jokers[j.config.center_key] }})
   - **Sell value**: {{ j.sell_cost }}
@@ -44,8 +44,8 @@ The current Jokers count is {{ game_state.jokers.config.card_count }}/{{ game_st
 
 ## Consumables
 
-The current Consumables count is {{ game_state.consumables.config.card_count }}/{{ game_state.consumables.config.card_limit }}.
-{% for c in game_state.consumables.cards -%}
+The current Consumables count is {{ G.consumables.config.card_count }}/{{ G.consumables.config.card_limit }}.
+{% for c in G.consumables.cards -%}
 {% if c.facing == "front" %}
 - {{ loop.index0 }}: {{ c.label }} ({{ constants.consumables[c.config.center_key] }})
   - **Sell value**: {{ c.sell_cost }}
@@ -57,22 +57,22 @@ The current Consumables count is {{ game_state.consumables.config.card_count }}/
 {%- endif %}
 {%- endfor %}
 
-{% if game_state.used_vouchers|length > 0 -%}
+{% if G.used_vouchers|length > 0 -%}
 ## Vouchers
 
 Here is the list of vouchers redeemed during the run:
 
-{% for v in game_state.used_vouchers.keys() -%}
+{% for v in G.used_vouchers.keys() -%}
 - {{ constants.vouchers[v] }}
 {% endfor -%}
 {% endif -%}
 
-{% if game_state.tags|length > 0 -%}
+{% if G.tags|length > 0 -%}
 ## Tags
 
 Here is the list of tags you have accumulated so far:
 
-{% for t in game_state.tags -%}
+{% for t in G.tags -%}
 - {{ constants.tags[t] }}
 {% endfor -%}
 {% endif -%}
@@ -81,41 +81,41 @@ Here is the list of tags you have accumulated so far:
 
 Here is a list of the poker hands and their levels:
 
-{% for name, hand in game_state.game.hands | dictsort -%}
+{% for name, hand in G.game.hands | dictsort -%}
 - **{{ name }}** (Level {{ hand.level }}):
   - **Chips**: {{ hand.chips }} (Base: {{ hand.s_chips }})
   - **Mult**: {{ hand.mult }} (Base: {{ hand.s_mult }})
   - **Example**: `{% for c in hand.example %}{{ c[0] }}{% if not c[1] %} (not scored){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}`
 {% endfor -%}
 
-{% if game_state.state == 7 -%}
+{% if G.state == 7 -%}
 ## Blind Select Game State
 
 - **Small Blind**:
-  - **target score**: {{ game_state.blinds.small.score }}
-  - **status**: {{ game_state.blinds.small.status }}
-  - **tag name**: {{ game_state.blinds.small.tag_name }}
-  - **tag effect**: {{ game_state.blinds.small.tag_effect }}
+  - **target score**: {{ G.blinds.small.score }}
+  - **status**: {{ G.blinds.small.status }}
+  - **tag name**: {{ G.blinds.small.tag_name }}
+  - **tag effect**: {{ G.blinds.small.tag_effect }}
 
 - **Big Blind**:
-  - **target score**: {{ game_state.blinds.big.score }}
-  - **status**: {{ game_state.blinds.big.status }}
-  - **tag name**: {{ game_state.blinds.big.tag_name }}
-  - **tag effect**: {{ game_state.blinds.big.tag_effect }}
+  - **target score**: {{ G.blinds.big.score }}
+  - **status**: {{ G.blinds.big.status }}
+  - **tag name**: {{ G.blinds.big.tag_name }}
+  - **tag effect**: {{ G.blinds.big.tag_effect }}
 
 - **Boss Blind**:
-  - **target score**: {{ game_state.blinds.boss.score }}
-  - **status**: {{ game_state.blinds.boss.status }}
-  - **name**: {{ game_state.blinds.boss.name }}
-  - **effect**: {{ game_state.blinds.boss.effect }}
+  - **target score**: {{ G.blinds.boss.score }}
+  - **status**: {{ G.blinds.boss.status }}
+  - **name**: {{ G.blinds.boss.name }}
+  - **effect**: {{ G.blinds.boss.effect }}
 {% endif %}
 
-{% if game_state.state == 1 -%}
+{% if G.state == 1 -%}
 ## Current Hand
 
-The current card count is {{ game_state.hand.config.card_count }} / {{ game_state.hand.config.card_limit }}
-You can play or discard up to {{ game_state.hand.config.highlighted_limit }} cards.
-{% for c in game_state.hand.cards %}
+The current card count is {{ G.hand.config.card_count }} / {{ G.hand.config.card_limit }}
+You can play or discard up to {{ G.hand.config.highlighted_limit }} cards.
+{% for c in G.hand.cards %}
 {%- if c.facing == "front" %}
 {%- if c.ability.name == "Stone Card" %}
 - {{ loop.index0 }}: this is a stone card (no suit and no rank)
@@ -140,7 +140,7 @@ You can play or discard up to {{ game_state.hand.config.highlighted_limit }} car
 {%- endfor %}
 {%- endif %}
 
-{% if game_state.state == 5 -%}
+{% if G.state == 5 -%}
 ## Shop
 
 TODO
@@ -151,13 +151,13 @@ TODO
 
 You **MUST** use one of the following tools to perform the intended action:
 
-{% if game_state.state == 7 %}
+{% if G.state == 7 %}
 - Select or skip the current blind
   - Function: `skip_or_select_blind`
   - Parameters:
     - `action`: (string) `select` or `skip`
     - `reasoning`: (string) Strategic reasoning for selecting or skipping the blind
-{% elif game_state.state == 1 -%}
+{% elif G.state == 1 -%}
 - Play a Hand or Discard cards
   - Function: `play_hand_or_discard`
   - Parameters:
@@ -169,12 +169,12 @@ You **MUST** use one of the following tools to perform the intended action:
   - Parameters:
     - `cards`: (list) List of 0-indexed card positions in desired new order (must include all cards)
     - `reasoning`: (string) Reasoning for this specific arrangement
-{% elif game_state.state == 8 -%}
+{% elif G.state == 8 -%}
 - Cash out the reward money for the current round
   - Function: `cash_out`
   - Parameters:
     - `reasoning`: (string) Brief reflection on the round performance
-{% elif game_state.state == 5 -%}
+{% elif G.state == 5 -%}
 - Spend money in the shop
   - Function: `shop`
   - Parameters:
