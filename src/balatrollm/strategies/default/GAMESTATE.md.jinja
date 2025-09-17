@@ -67,15 +67,15 @@ Here is the list of vouchers redeemed during the run:
 {% endfor -%}
 {% endif -%}
 
-{% if G.tags|length > 0 -%}
+{% if G.game.tags|length > 0 -%}
 ## Tags
 
 Here is the list of tags you have accumulated so far:
 
-{% for t in G.tags -%}
-- {{ constants.tags[t] }}
-{% endfor -%}
-{% endif -%}
+{% for t in G.game.tags -%}
+- {{t.name}}: {{ constants.tags[t.key] }}
+{%- endfor %}
+{%- endif %}
 
 ## Poker Hands
 
@@ -86,29 +86,22 @@ Here is a list of the poker hands and their levels:
   - **Chips**: {{ hand.chips }} (Base: {{ hand.s_chips }})
   - **Mult**: {{ hand.mult }} (Base: {{ hand.s_mult }})
   - **Example**: `{% for c in hand.example %}{{ c[0] }}{% if not c[1] %} (not scored){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}`
-{% endfor -%}
+{% endfor %}
 
 {% if G.state == 7 -%}
 ## Blind Select Game State
 
-- **Small Blind**:
-  - **target score**: {{ G.blinds.small.score }}
-  - **status**: {{ G.blinds.small.status }}
-  - **tag name**: {{ G.blinds.small.tag_name }}
-  - **tag effect**: {{ G.blinds.small.tag_effect }}
-
-- **Big Blind**:
-  - **target score**: {{ G.blinds.big.score }}
-  - **status**: {{ G.blinds.big.status }}
-  - **tag name**: {{ G.blinds.big.tag_name }}
-  - **tag effect**: {{ G.blinds.big.tag_effect }}
-
-- **Boss Blind**:
-  - **target score**: {{ G.blinds.boss.score }}
-  - **status**: {{ G.blinds.boss.status }}
-  - **name**: {{ G.blinds.boss.name }}
-  - **effect**: {{ G.blinds.boss.effect }}
-{% endif %}
+- **Small Blind {{ G.blinds.small.score }} chips**{{ " (Current)" if G.blinds.small.status == "Select" }}
+- **Big Blind {{ G.blinds.big.score }} chips**{{ " (Current)" if G.blinds.big.status == "Select" }}
+- **Blind Boss — {{ G.blinds.boss.name }} {{ G.blinds.boss.score }} chips**: {{ G.blinds.boss.effect }}{{ "( Current)" if G.blinds.boss.status == "Select" }}
+{% if G.blinds.small.status == "Select" -%}
+If you decide to skip the Small Blind, you will be rewarded with the "{{G.blinds.small.tag_name}}" tag ({{G.blinds.small.tag_effect}})
+{% elif G.blinds.big.status == "Select" -%}
+If you decide to skip the Big Blind, you will be rewarded with the "{{G.blinds.big.tag_name}}" tag ({{G.blinds.big.tag_effect}})
+{%- else %}
+You have to select the Boss Blind to continue.
+{%- endif %}
+{%- endif %}
 
 {% if G.state == 1 -%}
 ## Current Hand
