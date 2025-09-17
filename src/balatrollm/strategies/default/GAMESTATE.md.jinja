@@ -57,13 +57,15 @@ The current Consumables count is {{ G.consumables.config.card_count }}/{{ G.cons
 {%- endif %}
 {%- endfor %}
 
-{% if G.used_vouchers|length > 0 -%}
+{% if G.game.used_vouchers|length > 0 -%}
 ## Vouchers
 
 Here is the list of vouchers redeemed during the run:
 
-{% for v in G.used_vouchers.keys() -%}
-- {{ constants.vouchers[v] }}
+{% for v, redeemed in G.game.used_vouchers.items() -%}
+{% if redeemed -%}
+- {{ v }}: {{ constants.vouchers[v] }}
+{% endif -%}
 {% endfor -%}
 {% endif -%}
 
@@ -83,8 +85,8 @@ Here is a list of the poker hands and their levels:
 
 {% for name, hand in G.game.hands | dictsort -%}
 - **{{ name }}** (Level {{ hand.level }}):
-  - **Chips**: {{ hand.chips }} (Base: {{ hand.s_chips }})
-  - **Mult**: {{ hand.mult }} (Base: {{ hand.s_mult }})
+  - **Chips**: {{ hand.chips }}
+  - **Mult**: {{ hand.mult }}
   - **Example**: `{% for c in hand.example %}{{ c[0] }}{% if not c[1] %} (not scored){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}`
 {% endfor %}
 
@@ -136,9 +138,80 @@ You can play or discard up to {{ G.hand.config.highlighted_limit }} cards.
 {% if G.state == 5 -%}
 ## Shop
 
-TODO
+Here are the available cards in the shop:
 
-{% endif -%}
+{% for card in G.shop_jokers.cards -%}
+{% if card.facing == "front" %}
+{%- if card.ability.set == "Joker" %}
+- {{ loop.index0 }}: {{ card.label }} ({{ constants.jokers[card.config.center_key] }})
+  - **Set**: {{ card.ability.set }}
+  - **Cost**: ${{ card.cost }}
+  - **Sell value**: ${{ card.sell_cost }}
+{%- if card.edition %}
+  - **{{ card.edition.type|title }} Edition**: {{ constants.editions[card.edition.key] }}
+{%- endif %}
+{%- if card.debuff %}
+  - **Debuff**: this card is debuffed and will not be counted in scoring
+{%- endif %}
+{%- elif card.ability.set in ["Tarot", "Planet", "Spectral"] %}
+- {{ loop.index0 }}: {{ card.label }} ({{ constants.consumables[card.config.center_key] }})
+  - **Set**: {{ card.ability.set }}
+  - **Cost**: ${{ card.cost }}
+  - **Sell value**: ${{ card.sell_cost }}
+{%- if card.debuff %}
+  - **Debuff**: this card is debuffed and will not be counted in scoring
+{%- endif %}
+{%- else %}
+{%- if card.ability.name == "Stone Card" %}
+- {{ loop.index0 }}: this is a stone card (no suit and no rank)
+  - **Set**: {{ card.ability.set }}
+  - **Cost**: ${{ card.cost }}
+  - **Sell value**: ${{ card.sell_cost }}
+{%- else %}
+- {{ loop.index0 }}: {{ card.config.card.value }} of {{ card.config.card.suit }} (`{{ card.config.card_key }}`)
+  - **Set**: {{ card.ability.set }}
+  - **Cost**: ${{ card.cost }}
+  - **Sell value**: ${{ card.sell_cost }}
+{%- if card.edition %}
+  - **{{ card.edition.type|title }} Edition**: {{ constants.editions[card.edition.key] }}
+{%- endif %}
+{%- if card.ability.set == "Enhanced" %}
+  - **{{card.ability.name}}**: {{ constants.enhancements['m_' + card.ability.name.lower().replace(' card', '').replace(' ', '_')] }}
+{%- endif %}
+{%- if card.seal %}
+  - **{{ card.seal }} seal**: {{ constants.seals[card.seal] }}
+{%- endif %}
+{%- if card.debuff %}
+  - **Debuff**: this card is debuffed and will not be counted in scoring
+{%- endif %}
+{%- endif %}
+{%- endif %}
+{%- else %}
+- {{ loop.index0 }}: the card is face down
+{%- endif %}
+{%- endfor %}
+
+The cost of the reroll is ${{ G.game.current_round.reroll_cost }}.
+
+Here are the vouchers that can be redeemed:
+{% for voucher in G.shop_vouchers.cards -%}
+{%- if voucher.facing == "front" %}
+- {{ loop.index0 }}: {{ voucher.label }} ({{ constants.vouchers[voucher.config.center_key] }})
+  - **Cost**: ${{ voucher.cost }}
+  - **Sell value**: ${{ voucher.sell_cost }}
+{%- else %}
+- {{ loop.index0 }}: the voucher is face down
+{%- endif %}
+{%- endfor %}
+
+Here are the booster packs that can be opened:
+
+{% for pack in G.shop_booster.cards -%}
+- {{ loop.index0 }}: {{ pack.label }}
+  - **Cost**: ${{ pack.cost }}
+  - **Sell value**: ${{ pack.sell_cost }}
+{% endfor %}
+{%- endif %}
 
 # Tools available
 
