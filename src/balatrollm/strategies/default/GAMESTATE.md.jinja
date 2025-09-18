@@ -3,12 +3,12 @@
 {% if G.state == 7 -%}
 - **Phase**: Blind Select Phase
 - **Round**: {{ G.game.round }}
-- **Ante**: {{ 1 if (G.game.round == 0) else ((G.game.round - 1) // 3) + 1 }}/8
+- **Ante**: {{ G.game.round_resets.ante }}/8
 - **Money**: ${{ G.game.dollars }}
 {%- elif G.state == 1 -%}
 - **Phase**: Playing Phase
 - **Round**: {{ G.game.round }}
-- **Ante**: {{ 1 if (G.game.round == 0) else ((G.game.round - 1) // 3) + 1 }}/8
+- **Ante**: {{ G.game.round_resets.ante }}/8
 - **Money**: ${{ G.game.dollars }}
 - **Hands left**: {{ G.game.current_round.hands_left}}/{{ G.game.current_round.hands_left + G.game.current_round.hands_played}}
 - **Discards left**: {{ G.game.current_round.discards_left }}/{{ G.game.current_round.discards_left + G.game.current_round.discards_used }}
@@ -17,12 +17,12 @@
 {%- elif G.state == 8 -%}
 - **Phase**: Round Evaluation Phase
 - **Round**: {{ G.game.round }}
-- **Ante**: {{ 1 if (G.game.round == 0) else ((G.game.round - 1) // 3) + 1 }}/8
+- **Ante**: {{ G.game.round_resets.ante }}/8
 - **Money**: ${{ G.game.dollars }}
 {%- elif G.state == 5 %}
 - **Phase**: Shop Phase
 - **Round**: {{ G.game.round }}
-- **Ante**: {{ 1 if (G.game.round == 0) else ((G.game.round - 1) // 3) + 1 }}/8
+- **Ante**: {{ G.game.round_resets.ante }}/8
 - **Money**: ${{ G.game.dollars }}
 {%- endif %}
 
@@ -116,7 +116,7 @@ You can play or discard up to {{ G.hand.config.highlighted_limit }} cards.
 {%- if c.facing == "front" %}
 {%- if c.ability.name == "Stone Card" %}
 - {{ loop.index0 }}: this is a stone card (no suit and no rank)
-{%- else %}
+{%- elif c.config.card %}
 - {{ loop.index0 }}: {{ c.config.card.value }} of {{ c.config.card.suit }} (`{{ c.config.card_key }}`)
 {%- if c.edition %}
   - **{{ c.edition.type|title }} Edition**: {{ constants.editions[c.edition.key] }}
@@ -127,6 +127,11 @@ You can play or discard up to {{ G.hand.config.highlighted_limit }} cards.
 {%- if c.seal %}
   - **{{ c.seal }} seal**: {{ constants.seals[c.seal] }}
 {%- endif %}
+{%- if c.debuff %}
+  - **Debuff**: this card is debuffed and will not be counted in scoring
+{%- endif %}
+{%- else %}
+- {{ loop.index0 }}: {{ c.label if c.label else "Unknown card" }}
 {%- if c.debuff %}
   - **Debuff**: this card is debuffed and will not be counted in scoring
 {%- endif %}
@@ -170,6 +175,7 @@ Here are the available cards in the shop:
   - **Cost**: ${{ card.cost }}
   - **Sell value**: ${{ card.sell_cost }}
 {%- else %}
+{%- if card.config.card %}
 - {{ loop.index0 }}: {{ card.config.card.value }} of {{ card.config.card.suit }} (`{{ card.config.card_key }}`)
   - **Set**: {{ card.ability.set }}
   - **Cost**: ${{ card.cost }}
@@ -185,6 +191,18 @@ Here are the available cards in the shop:
 {%- endif %}
 {%- if card.debuff %}
   - **Debuff**: this card is debuffed and will not be counted in scoring
+{%- endif %}
+{%- else %}
+- {{ loop.index0 }}: {{ card.label }} ({{ card.ability.set if card.ability.set else "Unknown" }})
+  - **Set**: {{ card.ability.set }}
+  - **Cost**: ${{ card.cost }}
+  - **Sell value**: ${{ card.sell_cost }}
+{%- if card.edition %}
+  - **{{ card.edition.type|title }} Edition**: {{ constants.editions[card.edition.key] }}
+{%- endif %}
+{%- if card.debuff %}
+  - **Debuff**: this card is debuffed and will not be counted in scoring
+{%- endif %}
 {%- endif %}
 {%- endif %}
 {%- endif %}
