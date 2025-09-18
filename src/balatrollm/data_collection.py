@@ -269,7 +269,7 @@ class StatsCollector:
         return Stats(
             won=state["game"]["won"],
             completed=state["state"] == 4,  # 4 is GAME_OVER gamestate
-            ante_reached=max(1, (state["game"]["round"] // 3) + 1),
+            ante_reached=state["game"]["round_resets"]["ante"],
             final_round=state["game"]["round"],
             providers=stats["providers"],
             calls=call_stats,
