@@ -125,8 +125,13 @@ class StatsCollector:
     def __init__(self, config: Config, base_dir: Path, run_dir: Path | None = None):
         self.config = config
         self.run_dir = run_dir or self._generate_run_dir(base_dir)
+        self.screenshot_dir = self.run_dir / "screenshots"
         self.call_stats = CallStats()
         self._request_count = 0
+
+        # Create directories
+        self.run_dir.mkdir(parents=True, exist_ok=True)
+        self.screenshot_dir.mkdir(parents=True, exist_ok=True)
 
     def _generate_run_dir(self, base_dir: Path) -> Path:
         assert re.match(r"^[a-z0-9.-]+/[a-z0-9:.-]+$", self.config.model), (
