@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.9.0](https://github.com/S1M0N38/balatrollm/compare/v0.8.2...v0.9.0) (2025-09-19)
+
+
+### Features
+
+* add avoiding the sell-buy trap in STRATEGY.md.jinja ([8d163b1](https://github.com/S1M0N38/balatrollm/commit/8d163b1972b1a9b2c6504ba5e233420d1fda9780))
+* add claude-sonnet-4 and gpt-5 to models ([c2065bb](https://github.com/S1M0N38/balatrollm/commit/c2065bb0f7aed148256916b46dd3c1a8faed19bd))
+* add current score and target score to gamestate ([ae45b4d](https://github.com/S1M0N38/balatrollm/commit/ae45b4dc39144ac3570a32ae6b780025b26da143))
+* add gemini-2.5-pro to models ([e93e70d](https://github.com/S1M0N38/balatrollm/commit/e93e70d3bdcf952c1ce5b01951ee8926fe33e44d))
+* add screenshot dir in data collection ([ba8ee53](https://github.com/S1M0N38/balatrollm/commit/ba8ee53f3632f277eeb7bcece8835ccddc312caa))
+* add shop, vouchers to GAMESTATE.md.jinja ([760e5cb](https://github.com/S1M0N38/balatrollm/commit/760e5cbc16339f210a5d8212323ab2cf5f6c6366))
+* add strategic discarding and suggestion about buy-sell ([cfc2066](https://github.com/S1M0N38/balatrollm/commit/cfc20661bfd7f1468715cc8fda8ace89148d0f2f))
+* create details dir for each run in benchmark ([30a4c8c](https://github.com/S1M0N38/balatrollm/commit/30a4c8c04d23eac1ab747cca6f7a7a8563610b89))
+* default actions for round_eval and blind_select ([a273823](https://github.com/S1M0N38/balatrollm/commit/a2738239d95d4ee51c14577650ae583df2d20eda))
+* take screenshot on each request ([4b25a07](https://github.com/S1M0N38/balatrollm/commit/4b25a0739bc92f951827a2926484f4b3fb6c79e9))
+
+
+### Bug Fixes
+
+* computation of pooled variance in benchmark ([ba2d522](https://github.com/S1M0N38/balatrollm/commit/ba2d5225f50d68f288e5fe8cea82abfcf28b6715))
+* consumables and tags representation in GAMESTATE.md.jinja ([5930523](https://github.com/S1M0N38/balatrollm/commit/5930523b99a594dff1852f0ddabdf9e485737b0f))
+* make the highlighted limit more explicit in default strategy ([7dcaa59](https://github.com/S1M0N38/balatrollm/commit/7dcaa5985d0aaf333e9adee989e5f3f7fe96f483))
+* regex for model name add dot ([3aff39f](https://github.com/S1M0N38/balatrollm/commit/3aff39febcc18c6dfca48ca2ea6daaedcf8468f8))
+* set "order of operations" section to h3 ([172e90c](https://github.com/S1M0N38/balatrollm/commit/172e90cc9e742c1bbdfc142b5802aa2ef1ef6fb8))
+* sort poker hands by order ([2a5589a](https://github.com/S1M0N38/balatrollm/commit/2a5589a2ced848d9f6d703b0dbb6b180cc3ed33b))
+* update the BALATRO_CONSTANTS with proper values ([e9a037f](https://github.com/S1M0N38/balatrollm/commit/e9a037fdcc15f470462e27510113c0b7c57dd897))
+* use ante instead of computation of ante from round ([72a0110](https://github.com/S1M0N38/balatrollm/commit/72a011066c87a4aab4de0353080b397294ea21b9))
+* use state["game"]["round_resets"]["ante"] ([5955982](https://github.com/S1M0N38/balatrollm/commit/5955982bfed647896e2998da4884fd11ae8f2530))
+* whitespaces in GAMESTATE.md.jinja template ([76067af](https://github.com/S1M0N38/balatrollm/commit/76067af76d984a51ce6fdbb64b8073fddbc396b6))
+
 ## [0.8.2](https://github.com/S1M0N38/balatrollm/compare/v0.8.1...v0.8.2) (2025-09-09)
 
 
