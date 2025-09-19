@@ -1,6 +1,7 @@
 import json
 import re
 import statistics
+import subprocess
 import time
 from collections import Counter
 from dataclasses import asdict, dataclass
@@ -77,7 +78,11 @@ class BenchmarkAnalyzer:
         models_stats = []
         output_dir = self.benchmak_dir / strategy_dir.relative_to(self.runs_dir)
         for vendor_dir in strategy_dir.iterdir():
+            if not vendor_dir.is_dir():
+                continue
             for model_dir in vendor_dir.iterdir():
+                if not model_dir.is_dir():
+                    continue
                 model_stats = self.compute_model_stats(model_dir)
                 models_stats.append(model_stats)
                 model_stats_path = (
@@ -86,6 +91,10 @@ class BenchmarkAnalyzer:
                 model_stats_path.parent.mkdir(exist_ok=True, parents=True)
                 with open(model_stats_path, "w") as f:
                     json.dump(asdict(model_stats), f, indent=2)
+
+                # Create detailed run directories
+                detailed_output_dir = output_dir / vendor_dir.name
+                self.create_detailed_run_dirs(model_dir, detailed_output_dir)
 
         leaderboard = self.compute_models_leaderboard(models_stats)
         leaderboard_path = output_dir / "leaderboard.json"
@@ -96,9 +105,19 @@ class BenchmarkAnalyzer:
         stats: list[Stats] = []
         configs: list[Config] = []
         for run_dir in model_dir.iterdir():
-            with open(run_dir / "stats.json", "r") as f:
+            if not run_dir.is_dir():
+                continue
+
+            # Skip runs that don't have required files
+            stats_file = run_dir / "stats.json"
+            config_file = run_dir / "config.json"
+            if not stats_file.exists() or not config_file.exists():
+                print(f"Skipping incomplete run: {run_dir.name}")
+                continue
+
+            with open(stats_file, "r") as f:
                 stats.append(Stats.from_dict(json.load(f)))
-            with open(run_dir / "config.json", "r") as f:
+            with open(config_file, "r") as f:
                 configs.append(Config(**json.load(f)))
 
         config = configs[0]
@@ -195,3 +214,120 @@ class BenchmarkAnalyzer:
             stats_dict.pop("stats", None)
             entries.append(ModelStats(**stats_dict))
         return ModelsLeaderboard(generated_at=int(time.time()), entries=entries)
+
+    def convert_pngs_to_avif(self, directory: Path) -> None:
+        """Convert all PNG files in directory to AVIF using cavif."""
+        try:
+            result = subprocess.run(
+                "find . -name 'screenshot.png' | xargs -P 4 -I {} cavif --overwrite --quality=60 --speed=1 --quiet {}",
+                cwd=directory,
+                capture_output=True,
+                text=True,
+                shell=True,
+            )
+            if result.returncode != 0:
+                print(
+                    f"Warning: cavif conversion failed in {directory}: {result.stderr}"
+                )
+            else:
+                for png_file in directory.rglob("screenshot.png"):
+                    try:
+                        png_file.unlink()
+                    except OSError as e:
+                        print(f"Warning: Could not remove {png_file}: {e}")
+        except FileNotFoundError:
+            print("Warning: cavif not found, keeping PNG format")
+        except Exception as e:
+            print(f"Warning: cavif conversion error in {directory}: {e}")
+
+    def extract_request_content(self, requests_file: Path) -> dict[str, str]:
+        """Extract request content from requests.jsonl by custom_id."""
+        content_by_id = {}
+        if not requests_file.exists():
+            return content_by_id
+
+        with open(requests_file) as f:
+            for line in f:
+                data = json.loads(line.strip())
+                custom_id = data.get("custom_id")
+                if custom_id and "body" in data and "messages" in data["body"]:
+                    messages = data["body"]["messages"]
+                    if messages and len(messages) > 0:
+                        content_by_id[custom_id] = messages[0].get("content", "")
+        return content_by_id
+
+    def extract_response_data(self, responses_file: Path) -> dict[str, dict]:
+        """Extract reasoning and tool_call from responses.jsonl by custom_id."""
+        response_by_id = {}
+        if not responses_file.exists():
+            return response_by_id
+
+        with open(responses_file) as f:
+            for line in f:
+                data = json.loads(line.strip())
+                custom_id = data.get("custom_id")
+                if custom_id and "response" in data and "body" in data["response"]:
+                    body = data["response"]["body"]
+                    if "choices" in body and len(body["choices"]) > 0:
+                        choice = body["choices"][0]
+                        message = choice.get("message", {})
+
+                        response_data = {
+                            "reasoning": message.get("reasoning", ""),
+                            "tool_call": message.get("tool_calls", []),
+                        }
+                        response_by_id[custom_id] = response_data
+        return response_by_id
+
+    def create_detailed_run_dirs(self, model_dir: Path, output_dir: Path) -> None:
+        """Create detailed run directories with extracted data."""
+        model_name = model_dir.name
+        detailed_model_dir = output_dir / model_name
+
+        for run_dir in model_dir.iterdir():
+            if not run_dir.is_dir():
+                continue
+
+            run_name = run_dir.name
+            detailed_run_dir = detailed_model_dir / run_name
+
+            # Extract request and response data
+            requests_file = run_dir / "requests.jsonl"
+            responses_file = run_dir / "responses.jsonl"
+            screenshots_dir = run_dir / "screenshots"
+
+            request_content = self.extract_request_content(requests_file)
+            response_data = self.extract_response_data(responses_file)
+
+            # Process each custom_id
+            all_custom_ids = set(request_content.keys()) | set(response_data.keys())
+
+            for custom_id in all_custom_ids:
+                custom_id_dir = detailed_run_dir / custom_id
+                custom_id_dir.mkdir(parents=True, exist_ok=True)
+
+                # Write request.md
+                if custom_id in request_content:
+                    with open(custom_id_dir / "request.md", "w") as f:
+                        f.write(request_content[custom_id])
+
+                # Write reasoning.md and tool_call.json
+                if custom_id in response_data:
+                    data = response_data[custom_id]
+
+                    with open(custom_id_dir / "reasoning.md", "w") as f:
+                        f.write(data["reasoning"])
+
+                    with open(custom_id_dir / "tool_call.json", "w") as f:
+                        json.dump(data["tool_call"], f, indent=2)
+
+                # Copy screenshot
+                if screenshots_dir.exists():
+                    png_file = screenshots_dir / f"{custom_id}.png"
+                    if png_file.exists():
+                        screenshot_dest = custom_id_dir / "screenshot.png"
+                        screenshot_dest.write_bytes(png_file.read_bytes())
+
+            # Convert all PNG files to AVIF after processing the run
+            if detailed_run_dir.exists():
+                self.convert_pngs_to_avif(detailed_run_dir)
