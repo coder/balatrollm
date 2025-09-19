@@ -529,6 +529,37 @@ If ordered B then A: 50 × (4 × 2 + 10) = 50 × 18 = 900 points
 
 The same applies to scoring cards - place cards with multiplicative effects (Glass, Polychrome) rightmost in your played hand.
 
+## Strategic Discarding Through Playing
+
+### The Hidden Discard: Playing Extra Cards
+
+**KEY INSIGHT: Every hand you play is also a discard opportunity**
+
+Unlike poker, Balatro has no "kicker" concept - unscored cards in a played hand are simply discarded. This creates a powerful hidden mechanic: **you can play 5 cards even when your scoring hand only needs 2-3 cards**.
+
+**How it works**:
+- Play a Pair (2 cards) = Score the pair AND cycle 2 cards
+- Play a Pair (2 cards) + 2 unscored cards = You score the pair AND cycle 4 cards
+- You ALWAYS draw back the number of cards you played
+
+**Why this matters**:
+- **Free cycling**: Get points while refreshing your hand (vs discarding for 0 points)
+- **Dig faster**: Playing Pair + 2 junk cards finds your Flush/Straight faster than holding cards
+- **Maximize draws**: Every play cycles 4 cards toward your win condition
+
+**Example**:
+Hand: `S_K, D_K, H_3, C_2, C_5, S_7, C_9, C_J`
+- Option A: Play `S_K, D_K` → Score the Kings, draw 2 new cards
+- Option B: Play `S_K, D_K, H_3, S_7` → Score the Kings, draw 3 new cards
+- **Option B is strictly better** - you will draw back 3 cards and have higher probability to draw a Club card to play a flush for the next hand. Notice that we are not discarding Clubs as junk cards becuse we are setting the hand for playing a flush next time.
+
+**When to use**:
+- Early hands when building toward better combinations
+- When you have a scoring pair/trips but need specific cards for your main strategy
+- Any time you'd consider discarding but have even a weak scoring option
+
+**Rule of thumb**: If you can score ANY points, play the hand with maximum cards rather than discarding. The only exception is when you're one card away from a massive hand and need to preserve specific cards.
+
 ## Hand Type Focus
 
 Typically it's best to commit to one kind of hand, and build your whole strategy around that. Spreading resources across multiple hand types dilutes your scoring potential.
@@ -568,24 +599,22 @@ Once you identify a strong Joker or receive relevant Planet cards, commit fully:
 
 Money management determines your long-term power growth. Balance immediate needs against compound benefits.
 
-### Avoiding the Sell-Buy Trap
+### The #1 Economy Killer: The Sell-Buy Trap
 
-One of the most common economic mistakes is frequently selling Jokers to buy new ones. Unless a Joker has special sell value properties (like Egg gaining $3 sell value per round), **all items sell for exactly half their purchase price**. This creates a devastating economic spiral:
+**CRITICAL RULE: NEVER SELL JOKERS UNLESS ABSOLUTELY NECESSARY**
 
-- Buy a $6 Joker → Sells for $3 → 50% loss
-- Buy an $8 Joker → Sells for $4 → 50% loss
-- Repeatedly cycling Jokers burns money twice as fast as keeping them
+**Why this destroys runs**: Everything sells for HALF its purchase price. When you buy a $6 Joker then sell it for $3, you just deleted $3 from existence. Do this 3 times and you've thrown away $9 - nearly two full rounds of maximum interest.
 
-**The Math**: If you buy and sell 3 Jokers costing $6 each across three shops, you've spent $18 but recovered only $9 - a $9 net loss. That's equivalent to throwing away nearly two rounds of maximum interest earnings.
+**The math is brutal**:
+- Buy Joker for $8 → Sell for $4 → You just lost $4
+- That $4 loss = 4 unspent hands worth of money = almost a full round of interest
 
-**Better Approach**:
-- Only sell Jokers when they actively conflict with your strategy or a vastly superior option appears
-- Treat Joker purchases as permanent investments, not experiments
-- If unsure between Jokers, skip both rather than buying one to "try it out"
-- Reserve selling for special cases: Egg at high value, Jokers that have fulfilled their purpose (like early economy Jokers when transitioning to late game), or when a game-winning Legendary appears
-- Remember: A mediocre Joker you keep is often better than losing half your money to swap it for a slightly better one
+**Only sell when**:
+- A Joker directly conflicts with your strategy (e.g., you have Flush Five but switched to pairs)
+- Egg/Gift Card has grown massive sell value
+- You need exactly $X for a game-winning Legendary/crucial upgrade
 
-**Exception**: Jokers with growing sell value (Egg, Gift Card) or those providing immediate one-time benefits can be sold strategically once their purpose is served.
+**Remember**: A mediocre Joker you keep >>> losing 50% of your money swapping it. When in doubt, DON'T SELL. The bot that constantly sells and rebuys Jokers is the bot that loses to Ante 4 because it has no money.
 
 ### Interest Optimization
 
