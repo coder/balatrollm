@@ -402,14 +402,15 @@ class LLMBot:
             logger.info(f"Current state: {current_state}")
 
             match current_state:
-                case (
-                    State.BLIND_SELECT
-                    | State.SELECTING_HAND
-                    | State.ROUND_EVAL
-                    | State.SHOP
-                ):
+                case State.SELECTING_HAND | State.SHOP:
                     response = await self.get_llm_response(game_state)
                     game_state = self.process_and_execute_tool_call(response)
+                case State.ROUND_EVAL:
+                    game_state = self.balatro_client.send_message("cash_out")
+                case State.BLIND_SELECT:
+                    game_state = self.balatro_client.send_message(
+                        "skip_or_select_blind", arguments={"action": "select"}
+                    )
                 case State.GAME_OVER:
                     logger.info("Game over!")
                     break
