@@ -111,7 +111,8 @@ You have to select the Boss Blind to continue.
 ## Current Hand
 
 The current card count is {{ G.hand.config.card_count }} / {{ G.hand.config.card_limit }}
-You can play or discard up to {{ G.hand.config.highlighted_limit }} cards.
+**CRITICAL LIMIT: You can play or discard MAXIMUM {{ G.hand.config.highlighted_limit }} cards per action - NEVER MORE THAN {{ G.hand.config.highlighted_limit }} CARDS (this is an absolute game rule).**
+
 {% for c in G.hand.cards %}
 {%- if c.facing == "front" %}
 {%- if c.ability.name == "Stone Card" %}
