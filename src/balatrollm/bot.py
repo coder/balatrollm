@@ -211,6 +211,9 @@ class LLMBot:
                 request_id = str(time.time_ns() // 1_000_000)
                 response = await self.llm_client.chat.completions.create(**request_data)
                 self.responses.append(response)
+                self.balatro_client.screenshot(
+                    self.data_collector.screenshot_dir / f"{custom_id}.png"
+                )
                 self.data_collector.write_response(
                     id=str(time.time_ns() // 1_000_000),
                     custom_id=custom_id,
