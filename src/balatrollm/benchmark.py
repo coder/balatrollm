@@ -255,7 +255,9 @@ class BenchmarkAnalyzer:
                 if custom_id and "body" in data and "messages" in data["body"]:
                     messages = data["body"]["messages"]
                     if messages and len(messages) > 0:
-                        content_by_id[custom_id] = messages[0].get("content", "")
+                        content_by_id[custom_id] = (
+                            messages[0].get("content", "") or "Content not available"
+                        )
         return content_by_id
 
     def extract_response_data(self, responses_file: Path) -> dict[str, dict]:
@@ -275,7 +277,8 @@ class BenchmarkAnalyzer:
                         message = choice.get("message", {})
 
                         response_data = {
-                            "reasoning": message.get("reasoning", ""),
+                            "reasoning": message.get("reasoning", "")
+                            or "Reasoning not available for the model",
                             "tool_call": message.get("tool_calls", []),
                         }
                         response_by_id[custom_id] = response_data
