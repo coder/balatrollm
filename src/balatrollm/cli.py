@@ -167,14 +167,20 @@ def cmd_benchmark(args) -> None:
     Analyzes run data and generates comprehensive leaderboards.
 
     Args:
-        args: Parsed command line arguments containing runs_dir and output_dir.
+        args: Parsed command line arguments containing runs_dir, output_dir, and avif flag.
 
     Raises:
         FileNotFoundError: If the runs directory doesn't exist.
         Exception: If benchmark analysis fails for any other reason.
     """
     try:
-        BenchmarkAnalyzer(args.runs_dir, args.output_dir).analyze_all_runs()
+        analyzer = BenchmarkAnalyzer(args.runs_dir, args.output_dir)
+        analyzer.analyze_all_runs()
+
+        # Convert PNGs to AVIF if requested
+        if args.avif:
+            print("Converting PNG screenshots to AVIF format...")
+            analyzer.convert_pngs_to_avif(args.output_dir)
     except FileNotFoundError as e:
         print(f"Error: {e}")
         sys.exit(1)
@@ -276,6 +282,11 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         type=Path,
         default=Path("benchmarks"),
         help="Output directory for benchmark results (default: benchmarks)",
+    )
+    benchmark_parser.add_argument(
+        "--avif",
+        action="store_true",
+        help="Convert PNG screenshots to AVIF format after analysis",
     )
 
     return parser
