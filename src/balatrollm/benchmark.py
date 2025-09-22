@@ -31,7 +31,7 @@ class ModelAggregatedStats:
 
 @dataclass
 class ModelStats:
-    runs: int
+    runs: list[str]
     wins: int
     completed: int
 
@@ -104,6 +104,7 @@ class BenchmarkAnalyzer:
     def compute_model_stats(self, model_dir: Path) -> ModelStatsFull:
         stats: list[Stats] = []
         configs: list[Config] = []
+        run_names: list[str] = []
         for run_dir in model_dir.iterdir():
             if not run_dir.is_dir():
                 continue
@@ -119,6 +120,7 @@ class BenchmarkAnalyzer:
                 stats.append(Stats.from_dict(json.load(f)))
             with open(config_file, "r") as f:
                 configs.append(Config(**json.load(f)))
+            run_names.append(run_dir.name)
 
         config = configs[0]
         for c in configs[1:]:
@@ -188,7 +190,7 @@ class BenchmarkAnalyzer:
         )
 
         return ModelStatsFull(
-            runs=len(stats),
+            runs=run_names,
             wins=len([s for s in stats if s.won]),
             completed=len([s for s in stats if s.completed]),
             avg_final_round=avg_final_round,
@@ -327,7 +329,3 @@ class BenchmarkAnalyzer:
                     if png_file.exists():
                         screenshot_dest = custom_id_dir / "screenshot.png"
                         screenshot_dest.write_bytes(png_file.read_bytes())
-
-            # Convert all PNG files to AVIF after processing the run
-            if detailed_run_dir.exists():
-                self.convert_pngs_to_avif(detailed_run_dir)
