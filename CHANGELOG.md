@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.10.0](https://github.com/S1M0N38/balatrollm/compare/v0.9.0...v0.10.0) (2025-09-22)
+
+
+### Features
+
+* add cli option to convert pngs to avif ([3e8a655](https://github.com/S1M0N38/balatrollm/commit/3e8a65547fcbe67d42407fb8eab8707f5ab56b97))
+* change stats runs from int to list of str ([7560acf](https://github.com/S1M0N38/balatrollm/commit/7560acfddc9776b6cc6d22c04559f3cd93b767c7))
+* make use of balatrobot enums ([8f7185b](https://github.com/S1M0N38/balatrollm/commit/8f7185b50f1e7364c6e4023da9d04d769fc164cf))
+
 ## [0.9.0](https://github.com/S1M0N38/balatrollm/compare/v0.8.2...v0.9.0) (2025-09-19)
 
 
