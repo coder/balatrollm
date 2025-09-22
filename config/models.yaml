@@ -22,7 +22,7 @@ models:
       reasoning:
         effort: medium
 defaults:
-  seed: 0
+  seed: 1
   parallel_tool_calls: false
   tool_choice: auto
   extra_headers:
