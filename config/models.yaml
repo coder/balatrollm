@@ -21,6 +21,10 @@ models:
     extra_body:
       reasoning:
         effort: medium
+  - model: google/gemini-2.5-flash
+    extra_body:
+      reasoning:
+        effort: medium
   - model: anthropic/claude-sonnet-4
     extra_body:
       reasoning:
