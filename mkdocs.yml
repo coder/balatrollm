@@ -1,0 +1,74 @@
+site_name: BalatroLLM
+site_description: LLM-powered bot that plays Balatro using strategic decision making
+site_author: 'S1M0N38'
+repo_name: 'S1M0N38/balatrollm'
+repo_url: https://github.com/S1M0N38/balatrollm
+site_url: https://s1m0n38.github.io/balatrollm/
+docs_dir: docs/
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - content.code.copy
+    - content.tabs.link
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      accent: black
+      primary: red
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - scheme: slate
+      accent: white
+      primary: red
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+extra:
+  generator: false
+plugins:
+  - search
+  - llmstxt:
+      markdown_description: |
+        BalatroLLM is an LLM-powered bot that plays Balatro using strategic decision making.
+        The bot leverages Large Language Models to make intelligent gameplay decisions through OpenAI-compatible APIs.
+        It supports multiple strategies, comprehensive benchmarking, and integration with BalatroB ench for performance analysis.
+        The project provides CLI tools for running bots, analyzing results, and comparing model performance across different strategies.
+      sections:
+        Documentation:
+          - setup.md
+          - usage.md
+          - analysis.md
+      full_output: llms-full.txt
+      autoclean: true
+nav:
+  - index.md
+  - Setup: setup.md
+  - Usage: usage.md
+  - Analysis: analysis.md
+markdown_extensions:
+  - toc:
+      toc_depth: 3
+  - attr_list
+  - md_in_html
+  - pymdownx.blocks.caption
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight:
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
