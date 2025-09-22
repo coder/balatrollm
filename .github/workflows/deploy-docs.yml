@@ -28,14 +28,10 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
-      - name: Install Git LFS
-        run: |
-          git lfs install
-          git lfs pull
       - name: Install dependencies
         run: |
           uv venv
-          uv sync --dev
+          uv sync --only-group dev
       - name: Initialize cache
         uses: actions/cache@v4
         with:
