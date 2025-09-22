@@ -9,6 +9,10 @@ models:
         effort: medium
   - model: qwen/qwen3-235b-a22b-thinking-2507
   - model: qwen/qwen3-235b-a22b-2507
+  - model: deepseek/deepseek-chat-v3.1
+    extra_body:
+      reasoning:
+        effort: medium
   - model: x-ai/grok-4-fast:free
     extra_body:
       reasoning:
