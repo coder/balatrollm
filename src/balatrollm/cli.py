@@ -42,8 +42,8 @@ async def cmd_balatrollm(args) -> None:
             base_url, api_key, config file path, runs count, and other options.
     """
     # Validate runs argument
-    if args.runs < 1:
-        print("Error: --runs must be at least 1")
+    if args.runs_per_seed < 1:
+        print("Error: --runs-per-seed must be at least 1")
         sys.exit(1)
 
     # Handle port default value
@@ -57,6 +57,9 @@ async def cmd_balatrollm(args) -> None:
             strategy=args.strategy,
         )
 
+    # Parse seeds
+    seeds = args.seeds.split(",") if args.seeds else [config.seed]
+
     # Create a bot for model listing (using first port)
     if args.list_models:
         bot = LLMBot(
@@ -67,13 +70,16 @@ async def cmd_balatrollm(args) -> None:
             print(model)
         return
 
-    # Create work queue with all run numbers
-    work_queue: asyncio.Queue[int] = asyncio.Queue()
-    for run_number in range(1, args.runs + 1):
-        work_queue.put_nowait(run_number)
+    # Create work queue with (seed, run_number) pairs
+    work_queue: asyncio.Queue[tuple[str, int]] = asyncio.Queue()
+    for seed in seeds:
+        for run_number in range(1, args.runs_per_seed + 1):
+            work_queue.put_nowait((seed, run_number))
 
+    total_runs = len(seeds) * args.runs_per_seed
     print(
-        f"Running {args.runs} total runs across {len(ports)} ports (dynamic allocation):"
+        f"Running {total_runs} total runs ({len(seeds)} seeds × {args.runs_per_seed} runs/seed) "
+        f"across {len(ports)} ports (dynamic allocation):"
     )
     for port in ports:
         print(f"  Port {port}: available")
@@ -89,7 +95,7 @@ async def cmd_balatrollm(args) -> None:
                 args.api_key,
                 port,
                 args.runs_dir,
-                args.runs,
+                total_runs,
             )
         )
         workers.append(worker)
@@ -108,7 +114,7 @@ async def cmd_balatrollm(args) -> None:
 
 
 async def _port_worker(
-    work_queue: asyncio.Queue[int],
+    work_queue: asyncio.Queue[tuple[str, int]],
     config: Config,
     base_url: str,
     api_key: str,
@@ -119,8 +125,8 @@ async def _port_worker(
     """Worker that pulls runs from queue and executes them on assigned port.
 
     Args:
-        work_queue: Queue containing run numbers to process.
-        config: Bot configuration.
+        work_queue: Queue containing (seed, run_number) tuples to process.
+        config: Bot configuration template.
         base_url: OpenAI-compatible API base URL.
         api_key: API key.
         port: Port number for this worker.
@@ -130,28 +136,35 @@ async def _port_worker(
     while True:
         try:
             # Get next run from queue (non-blocking)
-            run_number = work_queue.get_nowait()
+            seed, run_number = work_queue.get_nowait()
         except asyncio.QueueEmpty:
             # No more work available
             print(f"Port {port}: No more work, shutting down")
             break
 
-        print(f"\n=== Port {port} - Run {run_number}/{total_runs} ===")
+        print(f"\n=== Port {port} - Seed {seed}, Run {run_number}/{total_runs} ===")
+
+        # Create config with specific seed for this run
+        run_config = Config(
+            model=config.model,
+            strategy=config.strategy,
+            seed=seed,
+        )
 
         # Create bot for this run
-        bot = LLMBot(config, base_url=base_url, api_key=api_key, port=port)
+        bot = LLMBot(run_config, base_url=base_url, api_key=api_key, port=port)
 
         try:
             with bot:
                 await bot.play_game(runs_dir=runs_dir)
-            print(f"Port {port} - Run {run_number} completed successfully")
+            print(f"Port {port} - Seed {seed}, Run {run_number} completed successfully")
         except KeyboardInterrupt:
-            print(f"\nPort {port} interrupted during run {run_number}")
+            print(f"\nPort {port} interrupted during seed {seed}, run {run_number}")
             # Put the run back in queue for potential retry by another worker
-            work_queue.put_nowait(run_number)
+            work_queue.put_nowait((seed, run_number))
             raise
         except Exception as e:
-            print(f"Port {port} - Run {run_number} failed: {e}")
+            print(f"Port {port} - Seed {seed}, Run {run_number} failed: {e}")
             # Continue to next run (don't put failed run back in queue)
 
         # Mark this work as done
@@ -252,10 +265,17 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-r",
-        "--runs",
+        "--runs-per-seed",
         type=int,
         default=1,
-        help="Number of times to run the bot with the same configuration (default: 1)",
+        dest="runs_per_seed",
+        help="Number of runs per seed (default: 1)",
+    )
+    parser.add_argument(
+        "--seeds",
+        type=str,
+        default=None,
+        help="Comma-separated list of seeds (e.g., AAAA123,BBBB456,CCCC789)",
     )
     parser.add_argument(
         "-p",

@@ -124,7 +124,14 @@ class BenchmarkAnalyzer:
 
         config = configs[0]
         for c in configs[1:]:
-            assert c == config, f"Configs in {model_dir} are not the same"
+            # Compare all fields except seed (seeds can differ for multi-seed runs)
+            assert (
+                c.model == config.model
+                and c.strategy == config.strategy
+                and c.deck == config.deck
+                and c.stake == config.stake
+                and c.challenge == config.challenge
+            ), f"Configs differ (excluding seed): {c} vs {config}"
 
         avg_final_round = sum(stat.final_round for stat in stats) / len(stats)
         std_final_round = statistics.stdev(stat.final_round for stat in stats)
