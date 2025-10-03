@@ -1,7 +1,7 @@
 # Current Game State
 
 {% if G.state == 1 -%}
-- **Phase**: Playing Phase
+- **Phase**: Playing Phase (gamestate is SELECTING_HAND)
 - **Round**: {{ G.game.round }}
 - **Ante**: {{ G.game.round_resets.ante }}/8
 - **Money**: ${{ G.game.dollars }}
@@ -11,7 +11,7 @@
 - **Target Score**: {% if G.blinds.small.status == "Current" %}{{ G.blinds.small.score }}{% elif G.blinds.big.status == "Current" %}{{ G.blinds.big.score }}{% elif G.blinds.boss.status == "Current" %}{{ G.blinds.boss.score }}{% endif %}
 - **Current Score**: {{ G.game.chips }}
 {%- elif G.state == 5 %}
-- **Phase**: Shop Phase
+- **Phase**: Shop Phase (gamestate is SHOP)
 - **Round**: {{ G.game.round }}
 - **Ante**: {{ G.game.round_resets.ante }}/8
 - **Money**: ${{ G.game.dollars }}
