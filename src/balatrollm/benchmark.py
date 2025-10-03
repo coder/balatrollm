@@ -64,7 +64,7 @@ class BenchmarkAnalyzer:
         benchmark_dir: Path = Path("benchmarks"),
     ):
         self.runs_dir = runs_dir
-        self.benchmak_dir = benchmark_dir
+        self.benchmark_dir = benchmark_dir
 
     def analyze_all_runs(self) -> None:
         for version_dir in self.runs_dir.iterdir():
@@ -76,7 +76,7 @@ class BenchmarkAnalyzer:
 
     def analyze_strategy_runs(self, strategy_dir: Path) -> None:
         models_stats = []
-        output_dir = self.benchmak_dir / strategy_dir.relative_to(self.runs_dir)
+        output_dir = self.benchmark_dir / strategy_dir.relative_to(self.runs_dir)
         for vendor_dir in strategy_dir.iterdir():
             if not vendor_dir.is_dir():
                 continue
@@ -96,6 +96,8 @@ class BenchmarkAnalyzer:
                 detailed_output_dir = output_dir / vendor_dir.name
                 self.create_detailed_run_dirs(model_dir, detailed_output_dir)
 
+        # Ensure output directory exists before writing leaderboard
+        output_dir.mkdir(parents=True, exist_ok=True)
         leaderboard = self.compute_models_leaderboard(models_stats)
         leaderboard_path = output_dir / "leaderboard.json"
         with open(leaderboard_path, "w") as f:
