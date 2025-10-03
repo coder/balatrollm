@@ -5,7 +5,10 @@ validate = true
 exclude = [
   "balatrobot/**",
   "balatrobench/**",
+  "runs/**",
+  "benchmarks/**",
   "CHANGELOG.md",
+  "CONTRIBUTING.md",
   ".venv/**",
-  "docs/**",
+  ".claude/**",
 ]
