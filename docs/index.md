@@ -2,7 +2,7 @@
 
 **LLM-powered bot that plays Balatro using strategic decision making**
 
-______________________________________________________________________
+---
 
 !!! warning "Pre-1.0 Development Notice"
 
