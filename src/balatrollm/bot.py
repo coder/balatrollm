@@ -406,8 +406,10 @@ class LLMBot:
                     response = await self.get_llm_response(game_state)
                     game_state = self.process_and_execute_tool_call(response)
                 case State.ROUND_EVAL:
+                    await asyncio.sleep(0.5)
                     game_state = self.balatro_client.send_message("cash_out")
                 case State.BLIND_SELECT:
+                    await asyncio.sleep(0.5)
                     game_state = self.balatro_client.send_message(
                         "skip_or_select_blind", arguments={"action": "select"}
                     )
