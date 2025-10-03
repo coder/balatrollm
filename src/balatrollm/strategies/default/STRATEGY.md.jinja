@@ -4,15 +4,11 @@ You are an expert Balatro player. Analyze the game state and make strategic deci
 
 Balatro is a roguelike deck-building game where you play poker hands to score points and defeat blinds (score targets). You collect Jokers that modify scoring rules, enhance cards with special abilities, and strategically build synergies to reach exponentially higher scores.
 
-The game alternates between a four main game phases:
+The game alternates between a two main game phases:
 
-1. **Blind Select Phase**: You decide to play or skip the next round (aka blind). If you play and win the blind, you earn money and have access to the shop Phase. If you skip, you won't earn money rewarded for winning a blind, you won't have access to the shop and you will be send to the next Blind Select Phase. However you will gain a Tag, a special item that activate its effect in the next blind played. You can accumulate Tags for consecutive skips (effects of accumulated tags will all activate in the next blind played).
+1. **Playing Phase**: You start with a initial hand of 8 cards. You play a limited number of pokers-like hands (hands left) which scores points according to the scoring system. Scores for the played hands sum together into the current score in order to reach the score target for the round. Under normal circumstances, you can play up to 5 cards at once. You have also access to a limited number of discards (discard left) where you can discard, under normal circumstances, up to 5 cards. In the case of a discard, you will draw from the deck the same amount of cards you have discarded and those cards are added to your current hand. By strategically discard useless cards, you will have a chance to draw new cards that help you creating high scoring hands. If you successfully reach the target score, you will proceed to the Shop Phase otherwise it's Game Over.
 
-2. **Playing Phase**: You start with a initial hand of 8 cards. You play a limited number of pokers-like hands (hands left) which scores points according to the scoring system. Scores for the played hands sum together into the current score in order to reach the score target for the round. Under normal circumstances, you can play up to 5 cards at once. You have also access to a limited number of discards (discard left) where you can discard, under normal circumstances, up to 5 cards. In the case of a discard, you will draw from the deck the same amount of cards you have discarded and those cards are added to your current hand. By strategically discard useless cards, you will have a chance to draw new cards that help you creating high scoring hands. If you successfully reach the target score, you will proceed to the Round Eval Phase otherwise it's Game Over.
-
-3. **Round Eval Phase**: In this phase you collect the rewards money for winning the previous round. The money rewarded is proportional to the number of hands left at the end of the round (1$ each). You can receive also interest money ($1 per $5, max 5$). Then you enter the Shop Phase.
-
-4. **Shop Phase**: You can buy jokers, consumables, packs, cards, and vouchers to modify the scoring system. The objective in this phase is to strategically use (or not use) the shop action to strategically invest (or save) money to upgrade the scoring system for the following rounds. After you have perform all the action you want to perform in the shop, you can proceed to the next Blind Select Phase (next round).
+2. **Shop Phase**: You can buy jokers, consumables, packs, cards, and vouchers to modify the scoring system. The objective in this phase is to strategically use (or not use) the shop action to strategically invest (or save) money to upgrade the scoring system for the following rounds. After you have perform all the action you want to perform in the shop, you can proceed to the Playing Phase (next round).
 
 ## Initial Setup
 
@@ -22,13 +18,9 @@ When starting a new run, players begin with $4, a standard 52-card deck (13 rank
 
 Blinds are the main obstacle that the player must overcome during a run in Balatro. For each selected Blind, the player has to meet or surpass the required score to beat it, otherwise they will lose their run. Defeating the Blind may earn some reward money as well.
 
-An Ante is made up of three Blinds in succession: a Small Blind, a Big Blind, and a random Boss Blind. Special Boss Blinds called Showdown Blinds only appear on the final level of a run, at Ante 8. The player can choose to take on a Small or Big Blind, or to skip one or both and claim one or more Tags instead; Boss Blinds must always be played.
+An Ante is made up of three Blinds in succession: a Small Blind, a Big Blind, and a random Boss Blind. Special Boss Blinds called Showdown Blinds only appear on the final level of a run, at Ante 8.
 
 You start at Ante 1 and go up an Ante level for every Boss Blind defeated. By completing Ante 8 and finishing the Showdown Blind, the run is considered "won".
-
-### Small Blind and Big Blind
-
-Small and Big Blinds have no other effects and can be skipped to receive a Tag.
 
 ### Boss Blinds
 
@@ -84,35 +76,6 @@ Here is the list of all Boss Blinds and Showdown Boss Blinds:
 
 An Ante is made up of three Blinds. A run will always begin at Ante 1.
 
-## Tags
-
-Tags are rewards you can receive for skipping a Small Blind or Big Blind. Depending on the type of tag, it may trigger immediately or it may not trigger until a certain gamestate or condition is met (for example, the next time you visit the Shop). There are 24 different Tags available. The player can keep stacking multiple Tags until they're used. Here is the list of the tags that can appear during the run
-
-- **Uncommon**: The next shop will have a free Uncommon Joker
-- **Rare**: The next shop will have a free Rare Joker
-- **Negative**: The next base edition Joker you find in a Shop becomes Negative (+1 joker slot) and free
-- **Foil**: The next base edition Joker you find in a Shop becomes Foil (+50 Chips) and free
-- **Holographic**: The next base edition Joker you find in a Shop becomes Holographic (+10 Mult) and free
-- **Polychrome**: The next base edition Joker you find in a Shop becomes Polychrome (X1.5 Mult) and free
-- **Investment**: Gain $25 after defeating the next Boss Blind
-- **Voucher**: Adds a Voucher to the next Shop
-- **Boss**: Re-rolls the next Boss Blind
-- **Standard**: Immediately open a free Mega Standard Pack
-- **Charm**: Immediately open a free Mega Arcana Pack
-- **Meteor**: Immediately open a free Mega Celestial Pack
-- **Buffoon**: Immediately open a free Mega Buffoon Pack
-- **Handy**: Gain $1 for each hand played this run
-- **Garbage**: Gain $1 for each unused discard this run
-- **Ethereal**: Immediately open a free Spectral Pack
-- **Coupon**: In the next shop, initial Jokers, Consumables Cards and Booster Packs are free ($0)
-- **Double**: Gives a copy of the next Tag selected (excluding Double Tags)
-- **Juggle**: +3 Hand Size for the next round only
-- **D6**: In the next Shop, Rerolls start at $0
-- **Top-up**: Create up to 2 Common Jokers (if you have space)
-- **Speed**: Gives $5 for each Blind you've skipped this run
-- **Orbital**: Upgrades a specified random Poker Hand by three levels
-- **Economy**: Doubles your money (adds a maximum of $40)
-
 ## Deck Composition
 
 You begin each run with a standard 52-card deck (13 ranks across 4 suits). However, your deck is not static - it evolves throughout the run. You can modify your deck by purchasing individual playing cards directly from the Shop (when available through certain Vouchers), or through various Consumable effects. Tarot cards can change suits and ranks of existing cards, while Spectral cards can add enhanced cards or create copies.
@@ -162,66 +125,66 @@ There are 10 hand types (weakest to strongest).
 
 - **Straight Flush**:
 
-  - Description: Five cards in a row (consecutive ranks) with all cards sharing the same suit.
-  - Base Chips: 100
-  - Base Multiplier: 8
-  - Example: `S_Q, S_J, S_T, S_9, S_8`: Those are five cards with consecutive ranks (8, 9, 10, Jack, Queen) and all cards share the same suit (Spades). This hand scores ((10 + 10 + 10 + 9 + 8) + 100) × (8) = 1176
+    - Description: Five cards in a row (consecutive ranks) with all cards sharing the same suit.
+    - Base Chips: 100
+    - Base Multiplier: 8
+    - Example: `S_Q, S_J, S_T, S_9, S_8`: Those are five cards with consecutive ranks (8, 9, 10, Jack, Queen) and all cards share the same suit (Spades). This hand scores ((10 + 10 + 10 + 9 + 8) + 100) × (8) = 1176
 
 - **Four of a Kind**:
 
-  - Description: Four cards with the same rank. They may be played with one other unscored card.
-  - Base Chips: 60
-  - Base Multiplier: 7
-  - Example: `S_J, H_J, C_J, D_J, C_3`: S_J (Jack of Spades), H_J (Jack of Hearts), C_J (Jack of Clubs), D_J (Jack of Diamonds) create a four of a kind. This hand scores ((10 + 10 + 10 + 10) + 60) × (7) = 700
+    - Description: Four cards with the same rank. They may be played with one other unscored card.
+    - Base Chips: 60
+    - Base Multiplier: 7
+    - Example: `S_J, H_J, C_J, D_J, C_3`: S_J (Jack of Spades), H_J (Jack of Hearts), C_J (Jack of Clubs), D_J (Jack of Diamonds) create a four of a kind. This hand scores ((10 + 10 + 10 + 10) + 60) × (7) = 700
 
 - **Full House**:
 
-  - Description: A three of a kind and a pair.
-  - Base Chips: 40
-  - Base Multiplier: 4
-  - Example: `H_K, C_K, D_K, S_2, D_2`: H_K (King of Hearts), C_K (King of Clubs), D_K (King of Diamonds) create a three of a kind. S_2 (Two of Spades) and D_2 (Two of Diamonds) create a pair. This hand scores ((10 + 10 + 10 + 2 + 2) + 40) × (4) = 296
+    - Description: A three of a kind and a pair.
+    - Base Chips: 40
+    - Base Multiplier: 4
+    - Example: `H_K, C_K, D_K, S_2, D_2`: H_K (King of Hearts), C_K (King of Clubs), D_K (King of Diamonds) create a three of a kind. S_2 (Two of Spades) and D_2 (Two of Diamonds) create a pair. This hand scores ((10 + 10 + 10 + 2 + 2) + 40) × (4) = 296
 
 - **Flush**:
 
-  - Description: Five cards that share the same suit.
-  - Base Chips: 35
-  - Base Multiplier: 4
-  - Example: `H_A, H_K, H_T, H_5, H_4`: Those are five cards with the same suit (Hearts). This hand scores ((11 + 10 + 10 + 5 + 4)) + 35) × (4) = 300
+    - Description: Five cards that share the same suit.
+    - Base Chips: 35
+    - Base Multiplier: 4
+    - Example: `H_A, H_K, H_T, H_5, H_4`: Those are five cards with the same suit (Hearts). This hand scores ((11 + 10 + 10 + 5 + 4)) + 35) × (4) = 300
 
 - **Straight**:
 
-  - Description: Five cards in a row (consecutive ranks).
-  - Base Chips: 30
-  - Base Multiplier: 4
-  - Example: `D_J, C_T, C_9, S_8, H_7`: Those are five cards with consecutive ranks (7, 8, 9, 10, Jack). This hand scores ((10 + 10 + 9 + 8 + 7)) + 30) × (4) = 296
+    - Description: Five cards in a row (consecutive ranks).
+    - Base Chips: 30
+    - Base Multiplier: 4
+    - Example: `D_J, C_T, C_9, S_8, H_7`: Those are five cards with consecutive ranks (7, 8, 9, 10, Jack). This hand scores ((10 + 10 + 9 + 8 + 7)) + 30) × (4) = 296
 
 - **Three of a Kind**:
 
-  - Description: Three cards with the same rank. They may be played with one up to two other unscored cards.
-  - Base Chips: 30
-  - Base Multiplier: 3
-  - Example: `S_T, C_T, D_T, H_6, D_5`: S_T (Ten of Spades), C_T (Ten of Clubs), D_T (Ten of Diamonds) create a three of a kind. This hand scores ((10 + 10 + 10) + 30) × (3) = 180
+    - Description: Three cards with the same rank. They may be played with one up to two other unscored cards.
+    - Base Chips: 30
+    - Base Multiplier: 3
+    - Example: `S_T, C_T, D_T, H_6, D_5`: S_T (Ten of Spades), C_T (Ten of Clubs), D_T (Ten of Diamonds) create a three of a kind. This hand scores ((10 + 10 + 10) + 30) × (3) = 180
 
 - **Two Pair**:
 
-  - Description: Two pairs of cards with different ranks. They may be played with one other unscored card.
-  - Base Chips: 20
-  - Base Multiplier: 2
-  - Example: `H_A, D_A, C_Q, H_4, C_4`: H_A (Ace of Hearts) and D_A (Ace of Diamonds) create a pair. H_4 (Four of Hearts) and C_4 (Four of Clubs) create another pair. This hand scores ((11 + 11 + 4 + 4)) + 20) × (2) = 100
+    - Description: Two pairs of cards with different ranks. They may be played with one other unscored card.
+    - Base Chips: 20
+    - Base Multiplier: 2
+    - Example: `H_A, D_A, C_Q, H_4, C_4`: H_A (Ace of Hearts) and D_A (Ace of Diamonds) create a pair. H_4 (Four of Hearts) and C_4 (Four of Clubs) create another pair. This hand scores ((11 + 11 + 4 + 4)) + 20) × (2) = 100
 
 - **Pair**:
 
-  - Description: Two cards that share the same rank. They may be played with up to three other unscored cards.
-  - Base Chips: 10
-  - Base Multiplier: 2
-  - Example: `S_K, S_9, D_9, H_6, D_3`: S_9 (Nine of Spades) and D_9 (Nine of Diamonds) create a pair. This hand scores ((9 + 9)) + 10) × (2) = 56
+    - Description: Two cards that share the same rank. They may be played with up to three other unscored cards.
+    - Base Chips: 10
+    - Base Multiplier: 2
+    - Example: `S_K, S_9, D_9, H_6, D_3`: S_9 (Nine of Spades) and D_9 (Nine of Diamonds) create a pair. This hand scores ((9 + 9)) + 10) × (2) = 56
 
 - **High Card**:
 
-  - Description: If the played hand is not of any the above hands, only the highest ranked card scores.
-  - Base Chips: 4
-  - Base Multiplier: 1
-  - Example: `S_A, D_Q, D_9, C_4, D_3`: S_A (Ace of Spades) is the highest rank card so it's the only one that will be used to compute the score. This hand scores (11 + 5) × (1) = 16
+    - Description: If the played hand is not of any the above hands, only the highest ranked card scores.
+    - Base Chips: 4
+    - Base Multiplier: 1
+    - Example: `S_A, D_Q, D_9, C_4, D_3`: S_A (Ace of Spades) is the highest rank card so it's the only one that will be used to compute the score. This hand scores (11 + 5) × (1) = 16
 
 NOTE: The Base Chips and Base Multiplier for the described hand types refers to level 1 hand types. The Planet Cards (a type of consumable cards) let you increase the level of the different hand types. Moreover the score calculations in the examples does not take into account the Chip Additions, Mult Additions and Mult Multipliers. Those terms originate from the jokers and enhanced cards and play central roles in a good balatro strategy.
 
@@ -277,8 +240,8 @@ It's important to remember that Balatro is a game about synergies and it's reall
 #### Example 1: Joker influencing the scoring system
 
 - **Mad Joker**:
-  - Effect: "+10 Mult if played hand contains a Two Pair"
-  - Edition: Foil
+    - Effect: "+10 Mult if played hand contains a Two Pair"
+    - Edition: Foil
 
 Let's suppose to own a Mad Joker (Foil). Suppose that our hand is: `D_6, S_2, C_2, H_3, C_4, H_5, C_5, S_K`.
 There are two obvious ways to play this hand:
@@ -290,39 +253,39 @@ If we don't have the Mad Joker, usually a straight yield a higher score than a d
 
 1. Straight:
 
-   - Base Chips (scoring cards): 2 + 3 + 4 + 5 + 6 = 20
-   - Base Chips (for straight at lvl 1): 30
-   - Base Multiplier (for straight at lvl 1): 4
-   - Score: (20 + 30) × (4) = 200
+    - Base Chips (scoring cards): 2 + 3 + 4 + 5 + 6 = 20
+    - Base Chips (for straight at lvl 1): 30
+    - Base Multiplier (for straight at lvl 1): 4
+    - Score: (20 + 30) × (4) = 200
 
 2. Double Pair:
 
-   - Base Chips (scoring cards): 2 + 2 + 5 + 5 = 14
-   - Base Chips (for double pair at lvl 1): 20
-   - Base Multiplier (for double pair at lvl 1): 2
-   - Score (without joker): (14 + 20) × (2) = 68
+    - Base Chips (scoring cards): 2 + 2 + 5 + 5 = 14
+    - Base Chips (for double pair at lvl 1): 20
+    - Base Multiplier (for double pair at lvl 1): 2
+    - Score (without joker): (14 + 20) × (2) = 68
 
-   But we have the Mad Joker and the hand type is a double pair, so the Mad Joker effect activates.
+    But we have the Mad Joker and the hand type is a double pair, so the Mad Joker effect activates.
 
-   - From the Joker effect: +10 Mult
-   - From the Joker edition: +50 Chips
-   - Score (with joker): (14 + 20 + 50) × (2 + 10) = 84 × 12 = 1008
+    - From the Joker effect: +10 Mult
+    - From the Joker edition: +50 Chips
+    - Score (with joker): (14 + 20 + 50) × (2 + 10) = 84 × 12 = 1008
 
 Now we can compare the two options. Normally, playing the straight is better than the double pair (200 > 68). However the presence of the of the Mad Joker drastically turn decision around: now the score yield by the double pair is 1008 due to the joker effect while the score for the straight is still 200 because the straight does not activate the joker effect.
 
 #### Example 2: Joker influencing game economy
 
 - **Egg Joker**:
-  - Effect: "Gains $3 of sell value at end of round"
-  - Edition: Base
+    - Effect: "Gains $3 of sell value at end of round"
+    - Edition: Base
 
 This joker does not modify the scoring system and just occupy a Joker slot. However, at the end of every round gains $3 of sell value. It's easy to foresee that after many round this joker could worth a lot of money a can be a extremely good investment early rounds. We can decide to sell it when we need money or if we need to free a joker slot.
 
 #### Example 3: Joker influencing the card values/suits
 
 - **Smeared Joker**:
-  - Effect: "Hearts and Diamonds count as the same suit, Spades and Clubs count as the same suit"
-  - Edition: Base
+    - Effect: "Hearts and Diamonds count as the same suit, Spades and Clubs count as the same suit"
+    - Edition: Base
 
 This joker change dramatically the way to play the game. If Hearts and Diamonds are considered to be the same suit (and the same for Spades and Clubs), it's far simpler to play flushes because you have a deck effectively contains only to type of suits: "red" and "black".
 
@@ -332,8 +295,8 @@ Normally we wouldn't have a good hand and the best thing to do it to discard som
 #### Example 4: Joker with cumulative effects
 
 - **Flash Card**:
-  - Effect: "This Joker gains +2 Mult per reroll in the shop (Currently +0 Mult)"
-  - Edition: Base
+    - Effect: "This Joker gains +2 Mult per reroll in the shop (Currently +0 Mult)"
+    - Edition: Base
 
 The Flash Card Joker is an example of a Joker that has a cumulative effect. When first bought, it add +0 Mult in the score calculation so initially has no effect. However it permanently increase the Mult addition in it's effect by 2 every time the reroll action is performed in the shop. The reroll cost money but we can think that spending the money in the reroll (maybe because we really want to reroll cards in the shop, maybe because the reroll it's cheap/free) and to have a better Flash card. After the first reroll the new joker effect will be: "This Joker gains +2 Mult per reroll in the shop (Currently +2 Mult)". After another reroll (maybe in following shop phase) the effect will be "This Joker gains +2 Mult per reroll in the shop (Currently +4 Mult)" and so on.
 
@@ -538,22 +501,26 @@ The same applies to scoring cards - place cards with multiplicative effects (Gla
 Unlike poker, Balatro has no "kicker" concept - unscored cards in a played hand are simply discarded. This creates a powerful hidden mechanic: **you can play 5 cards even when your scoring hand only needs 2-3 cards**.
 
 **How it works**:
+
 - Play a Pair (2 cards) = Score the pair AND cycle 2 cards
 - Play a Pair (2 cards) + 2 unscored cards = You score the pair AND cycle 4 cards
 - You ALWAYS draw back the number of cards you played
 
 **Why this matters**:
+
 - **Free cycling**: Get points while refreshing your hand (vs discarding for 0 points)
 - **Dig faster**: Playing Pair + 2 junk cards finds your Flush/Straight faster than holding cards
 - **Maximize draws**: Every play cycles 4 cards toward your win condition
 
 **Example**:
 Hand: `S_K, D_K, H_3, C_2, C_5, S_7, C_9, C_J`
+
 - Option A: Play `S_K, D_K` → Score the Kings, draw 2 new cards
 - Option B: Play `S_K, D_K, H_3, S_7` → Score the Kings, draw 3 new cards
 - **Option B is strictly better** - you will draw back 3 cards and have higher probability to draw a Club card to play a flush for the next hand. Notice that we are not discarding Clubs as junk cards becuse we are setting the hand for playing a flush next time.
 
 **When to use**:
+
 - Early hands when building toward better combinations
 - When you have a scoring pair/trips but need specific cards for your main strategy
 - Any time you'd consider discarding but have even a weak scoring option
@@ -606,10 +573,12 @@ Money management determines your long-term power growth. Balance immediate needs
 **Why this destroys runs**: Everything sells for HALF its purchase price. When you buy a $6 Joker then sell it for $3, you just deleted $3 from existence. Do this 3 times and you've thrown away $9 - nearly two full rounds of maximum interest.
 
 **The math is brutal**:
+
 - Buy Joker for $8 → Sell for $4 → You just lost $4
 - That $4 loss = 4 unspent hands worth of money = almost a full round of interest
 
 **Only sell when**:
+
 - A Joker directly conflicts with your strategy (e.g., you have Flush Five but switched to pairs)
 - Egg/Gift Card has grown massive sell value
 - You need exactly $X for a game-winning Legendary/crucial upgrade
@@ -622,16 +591,6 @@ Money management determines your long-term power growth. Balance immediate needs
 - The more easily you win blinds, the more money you earn from unspent hands
 - Each unused hand after defeating a blind awards $1
 - Don't hoard excessively - spending on key Jokers/upgrades often provides better returns than interest
-
-### Early Game Skipping
-
-Skipping the first Blind will grant a useful Tag. Tags provide significant value:
-
-- Economy Tags (Economy, Investment) can jumpstart your interest
-- Pack Tags (Standard, Buffoon, Celestial) provide free resources
-- Enhancement Tags (Negative, Foil, Holographic, Polychrome) give powerful free Jokers
-
-The Small Blind of Ante 1 requires only 300 chips - easily beatable even after skipping for a tag.
 
 ## Scoring Phases Priority
 

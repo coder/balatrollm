@@ -1,24 +1,15 @@
 # Current Game State
 
-{% if G.state == 7 -%}
-- **Phase**: Blind Select Phase
-- **Round**: {{ G.game.round }}
-- **Ante**: {{ G.game.round_resets.ante }}/8
-- **Money**: ${{ G.game.dollars }}
-{%- elif G.state == 1 -%}
+{% if G.state == 1 -%}
 - **Phase**: Playing Phase
 - **Round**: {{ G.game.round }}
 - **Ante**: {{ G.game.round_resets.ante }}/8
 - **Money**: ${{ G.game.dollars }}
 - **Hands left**: {{ G.game.current_round.hands_left}}/{{ G.game.current_round.hands_left + G.game.current_round.hands_played}}
 - **Discards left**: {{ G.game.current_round.discards_left }}/{{ G.game.current_round.discards_left + G.game.current_round.discards_used }}
-- **Current Score**: {{ G.game.chips }}
+- **Current Blind**: {% if G.blinds.small.status == "Current" %}Small{% elif G.blinds.big.status == "Current" %}Big{% elif G.blinds.boss.status == "Current" %}Boss ({{G.blinds.boss.name}}: {{G.blinds.boss.effect}}){% endif %}
 - **Target Score**: {% if G.blinds.small.status == "Current" %}{{ G.blinds.small.score }}{% elif G.blinds.big.status == "Current" %}{{ G.blinds.big.score }}{% elif G.blinds.boss.status == "Current" %}{{ G.blinds.boss.score }}{% endif %}
-{%- elif G.state == 8 -%}
-- **Phase**: Round Evaluation Phase
-- **Round**: {{ G.game.round }}
-- **Ante**: {{ G.game.round_resets.ante }}/8
-- **Money**: ${{ G.game.dollars }}
+- **Current Score**: {{ G.game.chips }}
 {%- elif G.state == 5 %}
 - **Phase**: Shop Phase
 - **Round**: {{ G.game.round }}
@@ -37,7 +28,7 @@ The current Jokers count is {{ G.jokers.config.card_count }}/{{ G.jokers.config.
   - **{{ j.edition.type|title }} Edition**: {{ constants.editions[j.edition.key] }}
 {%- endif %}
 {%- if j.debuff %}
-  - **Debuff**: this card is debuffed and will not be counted in scoring
+  - **Debuff**: this joker is debuffed so its effect is disabled
 {%- endif%}
 {%- else %}
 - {{ loop.index0 }}: the joker is face down
@@ -52,10 +43,10 @@ The current Consumables count is {{ G.consumables.config.card_count }}/{{ G.cons
 - {{ loop.index0 }}: {{ c.label }} ({{ constants.consumables[c.config.center_key] }})
   - **Sell value**: {{ c.sell_cost }}
 {%- if c.debuff %}
-  - **Debuff**: this card is debuffed and will not be counted in scoring
+  - **Debuff**: this consumable is debuffed so its effect is disabled
 {%- endif %}
 {%- else %}
-- {{ loop.index0 }}: the joker is face down
+- {{ loop.index0 }}: the consumable is face down
 {%- endif %}
 {%- endfor %}
 
@@ -71,16 +62,6 @@ Here is the list of vouchers redeemed during the run:
 {% endfor -%}
 {% endif -%}
 
-{% if G.game.tags|length > 0 -%}
-## Tags
-
-Here is the list of tags you have accumulated so far:
-
-{% for t in G.game.tags -%}
-- {{t.name}}: {{ constants.tags[t.key] }}
-{%- endfor %}
-{%- endif %}
-
 ## Poker Hands
 
 Here is a list of the poker hands and their levels:
@@ -90,22 +71,8 @@ Here is a list of the poker hands and their levels:
   - **Chips**: {{ hand.chips }}
   - **Mult**: {{ hand.mult }}
   - **Example**: `{% for c in hand.example %}{{ c[0] }}{% if not c[1] %} (not scored){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}`
+  - During this run you have played {{ name }} {{ hand.played }} times, {{ hand.played_this_round }} of which were played this round.
 {% endfor %}
-
-{% if G.state == 7 -%}
-## Blind Select Game State
-
-- **Small Blind {{ G.blinds.small.score }} chips**{{ " (Current)" if G.blinds.small.status == "Select" }}
-- **Big Blind {{ G.blinds.big.score }} chips**{{ " (Current)" if G.blinds.big.status == "Select" }}
-- **Blind Boss — {{ G.blinds.boss.name }} {{ G.blinds.boss.score }} chips**: {{ G.blinds.boss.effect }}{{ "( Current)" if G.blinds.boss.status == "Select" }}
-{% if G.blinds.small.status == "Select" -%}
-If you decide to skip the Small Blind, you will be rewarded with the "{{G.blinds.small.tag_name}}" tag ({{G.blinds.small.tag_effect}})
-{% elif G.blinds.big.status == "Select" -%}
-If you decide to skip the Big Blind, you will be rewarded with the "{{G.blinds.big.tag_name}}" tag ({{G.blinds.big.tag_effect}})
-{%- else %}
-You have to select the Boss Blind to continue.
-{%- endif %}
-{%- endif %}
 
 {% if G.state == 1 -%}
 ## Current Hand
@@ -238,13 +205,7 @@ Here are the vouchers that can be redeemed:
 
 You **MUST** use one of the following tools to perform the intended action:
 
-{% if G.state == 7 %}
-- Select or skip the current blind
-  - Function: `skip_or_select_blind`
-  - Parameters:
-    - `action`: (string) `select` or `skip`
-    - `reasoning`: (string) Strategic reasoning for selecting or skipping the blind
-{% elif G.state == 1 -%}
+{% if G.state == 1 -%}
 - Play a Hand or Discard cards
   - Function: `play_hand_or_discard`
   - Parameters:
@@ -256,11 +217,6 @@ You **MUST** use one of the following tools to perform the intended action:
   - Parameters:
     - `cards`: (list) List of 0-indexed card positions in desired new order (must include all cards)
     - `reasoning`: (string) Reasoning for this specific arrangement
-{% elif G.state == 8 -%}
-- Cash out the reward money for the current round
-  - Function: `cash_out`
-  - Parameters:
-    - `reasoning`: (string) Brief reflection on the round performance
 {% elif G.state == 5 -%}
 - Spend money in the shop
   - Function: `shop`
@@ -283,4 +239,5 @@ You **MUST** use one of the following tools to perform the intended action:
   - Function: `use_consumable`
   - Parameters:
     - `index`: (integer) 0-indexed position of the consumable to use
-    - reasoning: (string) Strategic reasoning for using this consumable now
+    - `cards`: (list) List of 0-indexed card positions to select for activate the consumable effect if required
+    - `reasoning`: (string) Strategic reasoning for using this consumable now
