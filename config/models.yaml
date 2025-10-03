@@ -42,6 +42,7 @@ defaults:
     X-Title: BalatroLLM
   extra_body:
     provider:
+      order: ['cerebras']
       sort: price
     usage:
       include: true
