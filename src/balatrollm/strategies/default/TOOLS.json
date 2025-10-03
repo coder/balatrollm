@@ -123,6 +123,13 @@
               "type": "integer",
               "description": "0-indexed position of the consumable to use"
             },
+            "cards": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "List of 0-indexed card positions to select for activate the consumable effect if required"
+            },
             "reasoning": {
               "type": "string",
               "description": "Strategic reasoning for using this consumable now"
@@ -230,6 +237,13 @@
             "index": {
               "type": "integer",
               "description": "0-indexed position of the consumable to use"
+            },
+            "cards": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "List of 0-indexed card positions to select for activate the consumable effect if required"
             },
             "reasoning": {
               "type": "string",
