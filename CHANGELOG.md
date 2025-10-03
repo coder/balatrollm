@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.11.0](https://github.com/S1M0N38/balatrollm/compare/v0.10.0...v0.11.0) (2025-10-03)
+
+
+### Features
+
+* add support for multiple seeds ([a598e8e](https://github.com/S1M0N38/balatrollm/commit/a598e8eca76a863fefb45cadd915e84ce5e08330))
+* default to cerebras provider if available ([18b58ec](https://github.com/S1M0N38/balatrollm/commit/18b58ec38dec03110546d4fc22f431a708e9eedb))
+* **models:** add deepseek v3.1 ([561ac82](https://github.com/S1M0N38/balatrollm/commit/561ac8221a576e5bbe311f7f2c6cb7e11b2e10c5))
+* **models:** add google/gemini-2.5-flash ([7807fbe](https://github.com/S1M0N38/balatrollm/commit/7807fbe1bb3d7ee00d31a54346c85a5856a40389))
+* **models:** add grok-4-fast ([85ebb9c](https://github.com/S1M0N38/balatrollm/commit/85ebb9c1051b05aa4baa13b7cf5f2af6a0aa1499))
+* move seed into stats to support multi-seed runs ([54775a7](https://github.com/S1M0N38/balatrollm/commit/54775a7d67fc6b586b0af65c933257184908a619))
+* remove blind select and cash_out phases from default strategy ([bf8e0f2](https://github.com/S1M0N38/balatrollm/commit/bf8e0f271d743e1ee8f6883327ca67dd49e3835b))
+
+
+### Bug Fixes
+
+* add cards param to use_consumable in TOOLS.json ([0faa085](https://github.com/S1M0N38/balatrollm/commit/0faa085e461f4cfc21ddbe3af42ee54503058946))
+* add fallback for reasoning not available ([fa530c5](https://github.com/S1M0N38/balatrollm/commit/fa530c54a37f7cd45054eda48b33904ab3cdbe0b))
+* add small sleeps in round eval and blind select ([38fd254](https://github.com/S1M0N38/balatrollm/commit/38fd254004fe7bccc8564db643908f0ec08230f3))
+* include gamestate (SELECTING_HAND and SHOP) in GAMESTATE.md.jinja ([7b2fcec](https://github.com/S1M0N38/balatrollm/commit/7b2fcecfe1e9cea54e6644e9f22f4e909d6db88c))
+* set seed to positive integer ([b4c753a](https://github.com/S1M0N38/balatrollm/commit/b4c753af4ad0dad80f581118083ef0cd75383d19))
+* typo and ensure benchmarks dir creation ([cead758](https://github.com/S1M0N38/balatrollm/commit/cead75816800712a7dac519541ea4ff77873b3b3))
+
+
+### Documentation
+
+* add balatrobench images ([8db3017](https://github.com/S1M0N38/balatrollm/commit/8db30170d5d881677fafb8a199ca718273e0f777))
+* add first version of the docs (WIP) ([74aa38f](https://github.com/S1M0N38/balatrollm/commit/74aa38f94372c5e319bd9f6864b775f566fbc7f7))
+* add mkdocs.yml for generating documentation with mkdocs ([72701ea](https://github.com/S1M0N38/balatrollm/commit/72701ea3183509b1433c551f08dfb091759ead52))
+* update analysis.md ([903f4ab](https://github.com/S1M0N38/balatrollm/commit/903f4ab28aedb6949495b152e9cd086a5ac7d2f2))
+* update analysis.md (WIP) ([b7ad0af](https://github.com/S1M0N38/balatrollm/commit/b7ad0af8d876244cc1a3de2d926a7fd9dca99a07))
+
 ## [0.10.0](https://github.com/S1M0N38/balatrollm/compare/v0.9.0...v0.10.0) (2025-09-22)
 
 
