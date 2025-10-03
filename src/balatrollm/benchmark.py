@@ -89,8 +89,10 @@ class BenchmarkAnalyzer:
                     output_dir / vendor_dir.name / f"{model_dir.name}.json"
                 )
                 model_stats_path.parent.mkdir(exist_ok=True, parents=True)
+                stats_dict = asdict(model_stats)
+                stats_dict["config"].pop("seed")
                 with open(model_stats_path, "w") as f:
-                    json.dump(asdict(model_stats), f, indent=2)
+                    json.dump(stats_dict, f, indent=2)
 
                 # Create detailed run directories
                 detailed_output_dir = output_dir / vendor_dir.name

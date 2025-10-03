@@ -41,6 +41,7 @@ class Stats:
     completed: bool
     ante_reached: int
     final_round: int
+    seed: str
     providers: list[str]
     calls: CallStats
     total: AggregatedStats
@@ -59,6 +60,7 @@ class Stats:
             completed=data["completed"],
             ante_reached=data["ante_reached"],
             final_round=data["final_round"],
+            seed=data["seed"],
             providers=data["providers"],
             calls=calls,
             total=total,
@@ -276,6 +278,7 @@ class StatsCollector:
             completed=state["state"] == 4,  # 4 is GAME_OVER gamestate
             ante_reached=state["game"]["round_resets"]["ante"],
             final_round=state["game"]["round"],
+            seed=self.config.seed,
             providers=stats["providers"],
             calls=call_stats,
             total=total,
