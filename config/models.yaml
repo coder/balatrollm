@@ -13,7 +13,7 @@ models:
     extra_body:
       reasoning:
         effort: medium
-  - model: x-ai/grok-4-fast:free
+  - model: x-ai/grok-4-fast
     extra_body:
       reasoning:
         effort: medium
