@@ -43,6 +43,6 @@ defaults:
   extra_body:
     provider:
       order: ['cerebras']
-      sort: price
+      sort: throughput
     usage:
       include: true
