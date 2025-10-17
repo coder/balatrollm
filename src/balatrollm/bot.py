@@ -7,7 +7,6 @@ import time
 from pathlib import Path
 from typing import Any
 
-from balatrobot.enums import State
 from openai import (
     APIConnectionError,
     APIStatusError,
@@ -19,6 +18,7 @@ from openai import (
 from openai.types.chat import ChatCompletion
 
 from balatrobot import BalatroClient, BalatroError
+from balatrobot.enums import State
 
 from .config import Config, load_model_config
 from .data_collection import ChatCompletionError, ChatCompletionResponse, StatsCollector
@@ -162,18 +162,34 @@ class LLMBot:
         state_name = State(game_state["state"]).name
 
         # Generate prompts
-        user_content = "\n\n".join(
-            [
-                self.strategy_manager.render_strategy(game_state),
-                self.strategy_manager.render_gamestate(game_state),
-                self.strategy_manager.render_memory(
-                    self.responses,
-                    self.last_error_call_msg,
-                    self.last_failed_call_msg,
-                ),
-            ]
+        strategy_content = self.strategy_manager.render_strategy(game_state)
+        gamestate_content = self.strategy_manager.render_gamestate(game_state)
+        memory_content = self.strategy_manager.render_memory(
+            self.responses,
+            self.last_error_call_msg,
+            self.last_failed_call_msg,
         )
-        messages = [{"role": "user", "content": user_content}]
+
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": strategy_content,
+                        "cache_control": {"type": "ephemeral"},
+                    },
+                    {
+                        "type": "text",
+                        "text": gamestate_content,
+                    },
+                    {
+                        "type": "text",
+                        "text": memory_content,
+                    },
+                ],
+            }
+        ]
         tools = self.tools[state_name]
 
         # Make LLM request with retries
