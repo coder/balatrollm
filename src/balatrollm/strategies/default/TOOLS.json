@@ -66,6 +66,33 @@
     {
       "type": "function",
       "function": {
+        "name": "rearrange_jokers",
+        "description": "Reorder jokers for optimal scoring sequence (left-to-right activation)",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "jokers": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "List of 0-indexed joker positions in desired new order (must include all jokers)"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for this joker arrangement"
+            }
+          },
+          "required": [
+            "jokers",
+            "reasoning"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
         "name": "sell_joker",
         "description": "Sell a joker from your collection for money",
         "parameters": {
@@ -252,6 +279,33 @@
           },
           "required": [
             "index",
+            "reasoning"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "rearrange_jokers",
+        "description": "Reorder jokers for optimal scoring sequence (left-to-right activation)",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "jokers": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "List of 0-indexed joker positions in desired new order (must include all jokers)"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for this joker arrangement"
+            }
+          },
+          "required": [
+            "jokers",
             "reasoning"
           ]
         }

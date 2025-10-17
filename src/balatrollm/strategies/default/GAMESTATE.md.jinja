@@ -217,6 +217,11 @@ You **MUST** use one of the following tools to perform the intended action:
   - Parameters:
     - `cards`: (list) List of 0-indexed card positions in desired new order (must include all cards)
     - `reasoning`: (string) Reasoning for this specific arrangement
+- Rearrange jokers for optimal scoring sequence
+  - Function: `rearrange_jokers`
+  - Parameters:
+    - `jokers`: (list) List of 0-indexed joker positions in desired new order (must include all jokers)
+    - `reasoning`: (string) Strategic reasoning for this joker arrangement
 {% elif G.state == 5 -%}
 - Spend money in the shop
   - Function: `shop`
@@ -241,3 +246,8 @@ You **MUST** use one of the following tools to perform the intended action:
     - `index`: (integer) 0-indexed position of the consumable to use
     - `cards`: (list) List of 0-indexed card positions to select for activate the consumable effect if required
     - `reasoning`: (string) Strategic reasoning for using this consumable now
+- Rearrange jokers for optimal scoring sequence
+  - Function: `rearrange_jokers`
+  - Parameters:
+    - `jokers`: (list) List of 0-indexed joker positions in desired new order (must include all jokers)
+    - `reasoning`: (string) Strategic reasoning for this joker arrangement
