@@ -400,7 +400,7 @@ class LLMBot:
             "stake": self.config.stake,
             "seed": self.config.seed,
             "challenge": self.config.challenge,
-            # "log_path": self.data_collector.run_dir / "gamestates.jsonl",
+            "log_path": self.data_collector.run_dir / "gamestates.jsonl",
         }
 
         return self.balatro_client.send_message("start_run", start_run_args)
