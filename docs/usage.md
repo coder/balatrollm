@@ -96,6 +96,21 @@ balatrollm --runs-dir ./my-experiments
 balatrollm --config ./runs/v0.10.0/default/openrouter/gpt-oss-20b/20240922_red_deck_12345/config.json
 ```
 
+### Storage and Output Options
+
+Control screenshot and file output behavior:
+
+```bash
+# Disable screenshots (ideal for headless mode)
+balatrollm --no-screenshot
+
+# Use BalatroBot's default paths (ideal for distributed systems)
+balatrollm --use-default-paths
+
+# Combine both for optimized distributed/headless setups
+balatrollm --no-screenshot --use-default-paths
+```
+
 ## Parallel Execution
 
 ### Multiple Instances
@@ -110,6 +125,21 @@ Run multiple bot instances simultaneously:
 balatrollm --port 12346 --port 12347 --port 12348 --runs 15
 ```
 
+### Distributed Systems
+
+Run balatrollm and BalatroBot on different systems:
+
+```bash
+# Docker containers and remote deployments
+balatrollm --use-default-paths
+
+# Containerized environments (no GUI, optimized storage)
+balatrollm --no-screenshot --use-default-paths
+
+# High-volume distributed testing
+balatrollm --use-default-paths --runs 100 --model x-ai/grok-code-fast-1
+```
+
 ### Performance Optimization
 
 For faster execution:
@@ -121,9 +151,12 @@ For faster execution:
 # Choose faster models
 balatrollm --model x-ai/grok-code-fast-1
 
+# Optimize for automated/headless environments
+balatrollm --no-screenshot --model x-ai/grok-code-fast-1
+
 # Combine multiple optimizations
 ./balatro.sh --headless --fast -p 12346 -p 12347
-balatrollm --model x-ai/grok-code-fast-1 --port 12346 --port 12347 --runs 20
+balatrollm --model x-ai/grok-code-fast-1 --no-screenshot --port 12346 --port 12347 --runs 20
 ```
 
 ## Configuration Files

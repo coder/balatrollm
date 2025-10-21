@@ -78,6 +78,11 @@ The CLI uses sensible defaults for all other configuration:
 
 # 2. Run the bot with default settings
 balatrollm
+
+# 3. Run with optimizations for different environments
+balatrollm --no-screenshot                    # Headless mode (no screenshots)
+balatrollm --use-default-paths              # Distributed systems
+balatrollm --no-screenshot --use-default-paths  # Both optimizations
 ```
 
 #### `balatrollm` - Command Line Interface
@@ -88,7 +93,7 @@ balatrollm --help
 
 ```
 usage: balatrollm [-h] [-m MODEL] [-l] [-s STRATEGY] [-u BASE_URL] [-k API_KEY] [-c CONFIG]
-                  [-d RUNS_DIR] [-r RUNS] [-p PORT]
+                  [-d RUNS_DIR] [-r RUNS] [-p PORT] [--no-screenshot] [--use-default-paths]
                   {benchmark} ...
 
 LLM-powered Balatro bot
@@ -112,6 +117,8 @@ options:
                         Base directory for storing run data (default: current directory)
   -r, --runs RUNS       Number of times to run the bot with the same configuration (default: 1)
   -p, --port PORT       Port for BalatroBot client connection (can specify multiple, default: 12346)
+  --no-screenshot       Disable taking screenshots during gameplay (use for headless mode)
+  --use-default-paths   Use BalatroBot's default storage paths (use for distributed systems)
 ```
 
 #### `Makefile` - Development Workflow

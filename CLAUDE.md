@@ -21,7 +21,7 @@ source .envrc
 
 ```
 usage: balatrollm [-h] [-m MODEL] [-l] [-s STRATEGY] [-u BASE_URL] [-k API_KEY] [-c CONFIG]
-                  [-d RUNS_DIR] [-r RUNS] [-p PORT]
+                  [-d RUNS_DIR] [-r RUNS] [-p PORT] [--no-screenshot] [--use-default-paths]
                   {benchmark} ...
 
 LLM-powered Balatro bot
@@ -45,6 +45,8 @@ options:
                         Base directory for storing run data (default: current directory)
   -r, --runs RUNS       Number of times to run the bot with the same configuration (default: 1)
   -p, --port PORT       Port for BalatroBot client connection (can specify multiple, default: 12346)
+  --no-screenshot       Disable taking screenshots during gameplay (use when running Balatro in headless mode)
+  --use-default-paths   Use BalatroBot's default storage paths for screenshots and game logs (use when balatrobot and balatrollm are running on different systems)
 ```
 
 ### Development
