@@ -55,6 +55,7 @@ async def cmd_balatrollm(args) -> None:
         config = Config(
             model=args.model,
             strategy=args.strategy,
+            take_screenshots=args.take_screenshots,
         )
 
     # Parse seeds
@@ -149,6 +150,7 @@ async def _port_worker(
             model=config.model,
             strategy=config.strategy,
             seed=seed,
+            take_screenshots=config.take_screenshots,
         )
 
         # Create bot for this run
@@ -283,6 +285,12 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         type=int,
         action="append",
         help="Port for BalatroBot client connection (can specify multiple, default: 12346)",
+    )
+    parser.add_argument(
+        "--no-screenshot",
+        action="store_false",
+        dest="take_screenshots",
+        help="Disable taking screenshots during gameplay",
     )
 
     # Benchmark subcommand

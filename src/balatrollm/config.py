@@ -76,6 +76,7 @@ class Config:
         stake: Difficulty stake level (default: 1).
         seed: Game seed for reproducible runs (default: 'OOOO155').
         challenge: Optional challenge mode identifier.
+        take_screenshots: Whether to take screenshots during gameplay (default: True).
         version: Software version string.
         name: Human-readable configuration name.
         description: Configuration description.
@@ -89,6 +90,7 @@ class Config:
     stake: int = 1
     seed: str = "OOOO155"
     challenge: str | None = None
+    take_screenshots: bool = True
     version: str = __version__
     name: str = "Unknown Name"
     description: str = "Unknown Description"
@@ -109,6 +111,7 @@ class Config:
             stake=1,
             seed="OOOO155",
             challenge=None,
+            take_screenshots=True,
             version="",
             name="Unknown Name",
             description="Unknown Description",
