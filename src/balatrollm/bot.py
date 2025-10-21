@@ -228,9 +228,12 @@ class LLMBot:
                 response = await self.llm_client.chat.completions.create(**request_data)
                 self.responses.append(response)
                 if self.config.take_screenshots:
-                    self.balatro_client.screenshot(
-                        self.data_collector.screenshot_dir / f"{custom_id}.png"
-                    )
+                    if self.config.use_default_paths:
+                        self.balatro_client.screenshot(None)
+                    else:
+                        self.balatro_client.screenshot(
+                            self.data_collector.screenshot_dir / f"{custom_id}.png"
+                        )
                 self.data_collector.write_response(
                     id=str(time.time_ns() // 1_000_000),
                     custom_id=custom_id,
@@ -400,8 +403,13 @@ class LLMBot:
             "stake": self.config.stake,
             "seed": self.config.seed,
             "challenge": self.config.challenge,
-            "log_path": self.data_collector.run_dir / "gamestates.jsonl",
         }
+
+        # Only include log_path if not using default paths
+        if not self.config.use_default_paths:
+            start_run_args["log_path"] = (
+                self.data_collector.run_dir / "gamestates.jsonl"
+            )
 
         return self.balatro_client.send_message("start_run", start_run_args)
 

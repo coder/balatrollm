@@ -56,6 +56,7 @@ async def cmd_balatrollm(args) -> None:
             model=args.model,
             strategy=args.strategy,
             take_screenshots=args.take_screenshots,
+            use_default_paths=args.use_default_paths,
         )
 
     # Parse seeds
@@ -151,6 +152,7 @@ async def _port_worker(
             strategy=config.strategy,
             seed=seed,
             take_screenshots=config.take_screenshots,
+            use_default_paths=config.use_default_paths,
         )
 
         # Create bot for this run
@@ -291,6 +293,11 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         action="store_false",
         dest="take_screenshots",
         help="Disable taking screenshots during gameplay",
+    )
+    parser.add_argument(
+        "--use-default-paths",
+        action="store_true",
+        help="Use BalatroBot's default storage paths for screenshots and game logs",
     )
 
     # Benchmark subcommand

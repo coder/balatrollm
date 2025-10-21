@@ -77,6 +77,7 @@ class Config:
         seed: Game seed for reproducible runs (default: 'OOOO155').
         challenge: Optional challenge mode identifier.
         take_screenshots: Whether to take screenshots during gameplay (default: True).
+        use_default_paths: Whether to use BalatroBot's default storage paths (default: False).
         version: Software version string.
         name: Human-readable configuration name.
         description: Configuration description.
@@ -91,6 +92,7 @@ class Config:
     seed: str = "OOOO155"
     challenge: str | None = None
     take_screenshots: bool = True
+    use_default_paths: bool = False
     version: str = __version__
     name: str = "Unknown Name"
     description: str = "Unknown Description"
@@ -112,6 +114,7 @@ class Config:
             seed="OOOO155",
             challenge=None,
             take_screenshots=True,
+            use_default_paths=False,
             version="",
             name="Unknown Name",
             description="Unknown Description",
