@@ -15,7 +15,7 @@ This guide will help you install and configure BalatroLLM for running LLM-powere
 
 ```bash
 # Clone the repository
-git clone https://github.com/S1M0N38/balatrollm.git
+git clone https://github.com/coder/balatrollm.git
 cd balatrollm
 
 # Install with uv (recommended)
@@ -27,7 +27,7 @@ pip install -e .
 
 ### 2. Set up BalatroBot
 
-BalatroLLM depends on BalatroBot for game communication. Follow the [BalatroBot installation guide](https://s1m0n38.github.io/balatrobot/installation/) to:
+BalatroLLM depends on BalatroBot for game communication. Follow the [BalatroBot installation guide](https://coder.github.io/balatrobot/installation/) to:
 
 1. Install the BalatroBot Steamodded mod
 2. Configure Balatro for bot communication

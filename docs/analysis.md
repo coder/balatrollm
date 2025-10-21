@@ -42,7 +42,7 @@ benchmarks/
 
 ### Overview
 
-[BalatroBench](https://s1m0n38.github.io/balatrobench/) is a web-based dashboard for visualizing and comparing LLM performance in Balatro. It provides interactive charts, leaderboards, and detailed analytics.
+[BalatroBench](https://coder.github.io/balatrobench/) is a web-based dashboard for visualizing and comparing LLM performance in Balatro. It provides interactive charts, leaderboards, and detailed analytics.
 
 ### Integrating with BalatroBench
 
@@ -56,7 +56,7 @@ balatrollm --runs-dir example-runs --runs 20
 balatrollm benchmark --runs-dir example-runs --output-dir example-benchmark
 
 # Step 3: Clone BalatroBench repository
-git clone https://github.com/S1M0N38/balatrobench.git /path/to/balatrobench
+git clone https://github.com/coder/balatrobench.git /path/to/balatrobench
 
 # Step 4: Move benchmark data to BalatroBench (or create symbolic link)
 mv example-benchmark/benchmarks /path/to/balatrobench/data/benchmarks

@@ -38,7 +38,7 @@ defaults:
   parallel_tool_calls: false
   tool_choice: auto
   extra_headers:
-    HTTP-Referer: https://github.com/S1M0N38/balatrollm
+    HTTP-Referer: https://github.com/coder/balatrollm
     X-Title: BalatroLLM
   extra_body:
     provider:

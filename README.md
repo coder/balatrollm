@@ -1,8 +1,8 @@
 <div align="center">
   <h1>BalatroLLM</h1>
   <p align="center">
-    <a href="https://github.com/S1M0N38/balatrollm/releases">
-      <img alt="GitHub release" src="https://img.shields.io/github/v/release/S1M0N38/balatrollm?include_prereleases&sort=semver&style=for-the-badge&logo=github"/>
+    <a href="https://github.com/coder/balatrollm/releases">
+      <img alt="GitHub release" src="https://img.shields.io/github/v/release/coder/balatrollm?include_prereleases&sort=semver&style=for-the-badge&logo=github"/>
     </a>
     <a href="https://discord.gg/TPn6FYgGPv">
       <img alt="Discord" src="https://img.shields.io/badge/discord-server?style=for-the-badge&logo=discord&logoColor=%23FFFFFF&color=%235865F2"/>
@@ -15,7 +15,7 @@
 
 ## Overview
 
-BalatroLLM is a bot that uses Large Language Models (LLMs) to play [Balatro](https://www.playbalatro.com/), the popular roguelike poker deck-building game. The bot analyzes game states, makes strategic decisions, and executes actions through the [BalatroBot](https://github.com/S1M0N38/balatrobot) client.
+BalatroLLM is a bot that uses Large Language Models (LLMs) to play [Balatro](https://www.playbalatro.com/), the popular roguelike poker deck-building game. The bot analyzes game states, makes strategic decisions, and executes actions through the [BalatroBot](https://github.com/coder/balatrobot) client.
 
 The system combines multiple components to make informed decisions:
 
@@ -31,13 +31,13 @@ These components are processed together in a single LLM call, enabling the bot t
 ### Prerequisites
 
 - [uv](https://docs.astral.sh/uv/) package manager
-- Balatro instance with [BalatroBot](https://github.com/S1M0N38/balatrobot) mod installed
+- Balatro instance with [BalatroBot](https://github.com/coder/balatrobot) mod installed
 
 ### Setup
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/S1M0N38/balatrollm.git
+git clone https://github.com/coder/balatrollm.git
 cd balatrollm
 
 # 2. Create and activate environment

@@ -182,7 +182,7 @@ tests/test_llm.py                  # Test suite
 
 ## Context7 Library IDs
 
-**Core**: `/s1m0n38/balatrobot`, `/pallets/jinja`, `/openai/openai-python`, `/encode/httpx`
+**Core**: `/coder/balatrobot`, `/pallets/jinja`, `/openai/openai-python`, `/encode/httpx`
 **Dev**: `/detachhead/basedpyright`, `/pytest-dev/pytest`, `/pytest-dev/pytest-asyncio`, `/astral-sh/ruff`, `/astral-sh/uv`
 
 ## Results Tracking

@@ -1,9 +1,9 @@
 site_name: BalatroLLM
 site_description: LLM-powered bot that plays Balatro using strategic decision making
-site_author: 'S1M0N38'
-repo_name: 'S1M0N38/balatrollm'
-repo_url: https://github.com/S1M0N38/balatrollm
-site_url: https://s1m0n38.github.io/balatrollm/
+site_author: 'coder'
+repo_name: 'coder/balatrollm'
+repo_url: https://github.com/coder/balatrollm
+site_url: https://coder.github.io/balatrollm/
 docs_dir: docs/
 theme:
   name: material

@@ -18,10 +18,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/S1M0N38/balatrollm"
-Issues = "https://github.com/S1M0N38/balatrollm/issues"
-Repository = "https://github.com/S1M0N38/balatrollm"
-Changelog = "https://github.com/S1M0N38/balatrollm/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/coder/balatrollm"
+Issues = "https://github.com/coder/balatrollm/issues"
+Repository = "https://github.com/coder/balatrollm"
+Changelog = "https://github.com/coder/balatrollm/blob/main/CHANGELOG.md"
 
 [project.scripts]
 balatrollm = "balatrollm:main"
@@ -37,7 +37,7 @@ allow-direct-references = true
 publish-url = "https://upload.pypi.org/legacy/"
 
 [tool.uv.sources]
-balatrobot = { git = "https://github.com/S1M0N38/balatrobot.git", rev = "main" }
+balatrobot = { git = "https://github.com/coder/balatrobot.git", rev = "main" }
 # Or use local balatrobot for local development
 # balatrobot = { path = "/Users/simo/Developer/balatrobot", editable = true }
 
