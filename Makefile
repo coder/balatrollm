@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install install-dev lint lint-fix format typecheck test test-cov quality clean setup teardown all balatrobench
+.PHONY: help install install-dev lint format typecheck test test-cov quality clean setup teardown all balatrobench
 
 # Colors for output
 YELLOW := \033[33m
@@ -9,7 +9,7 @@ RED := \033[31m
 RESET := \033[0m
 
 # Project variables
-PYTHON := python3
+PYTHON := python
 UV := uv
 RUFF := ruff
 TYPECHECK := basedpyright
@@ -32,12 +32,7 @@ install-dev: ## Install package with development dependencies
 	$(UV) sync --all-extras --group dev
 
 # Code quality targets
-lint: ## Run ruff linter (check only)
-	@echo "$(YELLOW)Running ruff linter...$(RESET)"
-	$(RUFF) check --select I .
-	$(RUFF) check .
-
-lint-fix: ## Run ruff linter with auto-fixes
+lint: ## Run ruff linter with auto-fixes
 	@echo "$(YELLOW)Running ruff linter with fixes...$(RESET)"
 	$(RUFF) check --select I --fix .
 	$(RUFF) check --fix .
