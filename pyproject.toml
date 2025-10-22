@@ -6,11 +6,11 @@ readme = "README.md"
 authors = [{ name = "S1M0N38", email = "bertolottosimone@gmail.com" }]
 requires-python = ">=3.13"
 dependencies = [
-  "balatrobot",
   "jinja2>=3.1.6",
   "openai>=1.99.3",
   "httpx>=0.27.0",
   "pyyaml>=6.0.2",
+  "balatrobot>=0.6.0",
 ]
 classifiers = [
   "License :: OSI Approved :: MIT License",
@@ -36,10 +36,10 @@ allow-direct-references = true
 [tool.uv]
 publish-url = "https://upload.pypi.org/legacy/"
 
-[tool.uv.sources]
-balatrobot = { git = "https://github.com/coder/balatrobot.git", rev = "main" }
-# Or use local balatrobot for local development
-# balatrobot = { path = "/Users/simo/Developer/balatrobot", editable = true }
+# [tool.uv.sources]
+# balatrobot = { git = "https://github.com/coder/balatrobot.git", rev = "render-on-api" }
+# # Or use local balatrobot for local development
+# # balatrobot = { path = "/root/.config/love/Mods/balatrobot", editable = false }
 
 [tool.ruff]
 exclude = [".venv", "balatrobot", "balatro"]
