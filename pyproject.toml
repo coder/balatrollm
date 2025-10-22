@@ -1,6 +1,6 @@
 [project]
 name = "balatrollm"
-version = "0.11.0"
+version = "0.12.0"
 description = "LLM-powered bot that plays Balatro using strategic decision making"
 readme = "README.md"
 authors = [{ name = "S1M0N38", email = "bertolottosimone@gmail.com" }]

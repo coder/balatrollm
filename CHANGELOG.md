@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.12.0](https://github.com/coder/balatrollm/compare/v0.11.0...v0.12.0) (2025-10-22)
+
+
+### Features
+
+* add --no-screenshot flag to balatrollm ([d15f087](https://github.com/coder/balatrollm/commit/d15f0876e2930feec0aed8d31a97287a92116ec7))
+* add --use-default-paths flag to use balatrobot's default storage paths ([0d47320](https://github.com/coder/balatrollm/commit/0d473203a118082974697fd5b499321145a9bd6c))
+* add rearrnge jokers tool to default strategy ([64016d9](https://github.com/coder/balatrollm/commit/64016d9e778dda89c8648fc15beffb649752380e))
+* use prompt caching ([2315919](https://github.com/coder/balatrollm/commit/23159197a5975c93d9c538532e7426b1abdb7f31))
+* use throughput instead of price for sorting ([63d4b01](https://github.com/coder/balatrollm/commit/63d4b01f53066e24d94f48aed248510cde29703e))
+
+
+### Bug Fixes
+
+* add log_path back again ([bc0c87c](https://github.com/coder/balatrollm/commit/bc0c87c5d5fc52a365329c7a5cca59a054af694c))
+* update grok-4-fast model slug ([02e2a9f](https://github.com/coder/balatrollm/commit/02e2a9f58f99ee1f62112d43d8b2fcb2e997f8d9))
+
+
+### Performance Improvements
+
+* send message get_game_state to trigger frame rendering ([8e89521](https://github.com/coder/balatrollm/commit/8e89521accdafa05c2577ca2232453f3c97f21e3))
+
+
+### Documentation
+
+* explain --no-screenshot --use-default-paths flags ([27a8585](https://github.com/coder/balatrollm/commit/27a8585e5947a66e49ec427601aa9e22149648ec))
+* update links from S1M0N38 to coder ([9681cf5](https://github.com/coder/balatrollm/commit/9681cf5c37a5ba438fbd63bb7059e2838ebbf3b1))
+
 ## [0.11.0](https://github.com/S1M0N38/balatrollm/compare/v0.10.0...v0.11.0) (2025-10-03)
 
 
