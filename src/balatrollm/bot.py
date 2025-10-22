@@ -426,15 +426,19 @@ class LLMBot:
             current_state = State(game_state["state"])
             logger.info(f"Current state: {current_state}")
 
+            # HACK: this is reqired when balatrobot is running with --render-on-api
+            # Hitting the API endpoint enables the frame to be rendered so we can
+            # take a screenshot of the actual game state.
+            await asyncio.sleep(0.5)
+            _ = self.balatro_client.send_message("get_game_state")
+
             match current_state:
                 case State.SELECTING_HAND | State.SHOP:
                     response = await self.get_llm_response(game_state)
                     game_state = self.process_and_execute_tool_call(response)
                 case State.ROUND_EVAL:
-                    await asyncio.sleep(0.5)
                     game_state = self.balatro_client.send_message("cash_out")
                 case State.BLIND_SELECT:
-                    await asyncio.sleep(0.5)
                     game_state = self.balatro_client.send_message(
                         "skip_or_select_blind", arguments={"action": "select"}
                     )
