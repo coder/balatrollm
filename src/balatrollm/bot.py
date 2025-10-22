@@ -7,6 +7,7 @@ import time
 from pathlib import Path
 from typing import Any
 
+from balatrobot import BalatroClient, BalatroError
 from balatrobot.enums import State
 from openai import (
     APIConnectionError,
@@ -17,8 +18,6 @@ from openai import (
     LengthFinishReasonError,
 )
 from openai.types.chat import ChatCompletion
-
-from balatrobot import BalatroClient, BalatroError
 
 from .config import Config, load_model_config
 from .data_collection import ChatCompletionError, ChatCompletionResponse, StatsCollector

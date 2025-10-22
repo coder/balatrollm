@@ -4,9 +4,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from jinja2 import Environment, FileSystemLoader
-
 from balatrobot import enums
+from jinja2 import Environment, FileSystemLoader
 
 BALATRO_CONSTANTS = {
     "jokers": {j.name: j.value for j in enums.Jokers},
