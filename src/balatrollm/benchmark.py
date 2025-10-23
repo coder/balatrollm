@@ -4,8 +4,11 @@ import statistics
 import subprocess
 import time
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass
 from pathlib import Path
+
+from tqdm import tqdm
 
 from balatrollm.config import Config
 from balatrollm.data_collection import Stats
@@ -228,26 +231,43 @@ class BenchmarkAnalyzer:
             entries.append(ModelStats(**stats_dict))
         return ModelsLeaderboard(generated_at=int(time.time()), entries=entries)
 
-    def convert_pngs_to_avif(self, directory: Path) -> None:
-        """Convert all PNG files in directory to AVIF using cavif."""
+    def _convert_single_png(self, png_file: Path) -> None:
+        """Convert a single PNG file to AVIF."""
         try:
-            result = subprocess.run(
-                "find . -name 'screenshot.png' | xargs -P 4 -I {} cavif --overwrite --quality=60 --speed=1 --quiet {}",
-                cwd=directory,
+            subprocess.run(
+                [
+                    "cavif",
+                    "--overwrite",
+                    "--quality=60",
+                    "--speed=1",
+                    "--quiet",
+                    str(png_file),
+                ],
                 capture_output=True,
                 text=True,
-                shell=True,
+                check=True,
             )
-            if result.returncode != 0:
-                print(
-                    f"Warning: cavif conversion failed in {directory}: {result.stderr}"
+            png_file.unlink()
+        except subprocess.CalledProcessError as e:
+            print(f"Warning: cavif conversion failed for {png_file}: {e.stderr}")
+        except OSError as e:
+            print(f"Warning: Could not remove {png_file}: {e}")
+
+    def convert_pngs_to_avif(self, directory: Path) -> None:
+        """Convert all PNG files in directory to AVIF using cavif with parallelization."""
+        try:
+            png_files = list(directory.rglob("screenshot.png"))
+            if not png_files:
+                return
+
+            with ThreadPoolExecutor(max_workers=8) as executor:
+                list(
+                    tqdm(
+                        executor.map(self._convert_single_png, png_files),
+                        total=len(png_files),
+                        desc="Converting to AVIF",
+                    )
                 )
-            else:
-                for png_file in directory.rglob("screenshot.png"):
-                    try:
-                        png_file.unlink()
-                    except OSError as e:
-                        print(f"Warning: Could not remove {png_file}: {e}")
         except FileNotFoundError:
             print("Warning: cavif not found, keeping PNG format")
         except Exception as e:
