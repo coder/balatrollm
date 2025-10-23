@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.13.1](https://github.com/coder/balatrollm/compare/v0.13.0...v0.13.1) (2025-10-23)
+
+
+### Bug Fixes
+
+* extract reasoning from tool calls if not available in response ([0422061](https://github.com/coder/balatrollm/commit/042206116e2932f1c8661dc0525073f840fb4ce0))
+* update benchmark.py to handle multimodal content ([97b5b04](https://github.com/coder/balatrollm/commit/97b5b04545f6ba93c38d2371c1f42082db633e30))
+
+
+### Performance Improvements
+
+* improve conversion to AVIF ([2e3be75](https://github.com/coder/balatrollm/commit/2e3be75d70c0824dd8661275828531bf6045407e))
+
 ## [0.13.0](https://github.com/coder/balatrollm/compare/v0.12.0...v0.13.0) (2025-10-23)
 
 
