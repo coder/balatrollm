@@ -10,7 +10,7 @@ dependencies = [
   "openai>=1.99.3",
   "httpx>=0.27.0",
   "pyyaml>=6.0.2",
-  "balatrobot>=0.6.0",
+  "balatrobot>=0.6.1",
 ]
 classifiers = [
   "License :: OSI Approved :: MIT License",
