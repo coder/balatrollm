@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.0](https://github.com/coder/balatrollm/compare/v0.12.0...v0.13.0) (2025-10-23)
+
+
+### Features
+
+* use cards descriptions instead of hard-coded strings ([7b2fab5](https://github.com/coder/balatrollm/commit/7b2fab5d2e95d50b359f7447f59770a2fbd68639)), closes [#18](https://github.com/coder/balatrollm/issues/18)
+
 ## [0.12.0](https://github.com/coder/balatrollm/compare/v0.11.0...v0.12.0) (2025-10-22)
 
 
