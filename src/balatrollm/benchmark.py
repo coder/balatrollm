@@ -266,9 +266,22 @@ class BenchmarkAnalyzer:
                 if custom_id and "body" in data and "messages" in data["body"]:
                     messages = data["body"]["messages"]
                     if messages and len(messages) > 0:
-                        content_by_id[custom_id] = (
-                            messages[0].get("content", "") or "Content not available"
-                        )
+                        content = messages[0].get("content", "")
+                        if isinstance(content, list):
+                            # Handle multimodal content: extract text from each item
+                            text_parts = [
+                                item.get("text", "")
+                                for item in content
+                                if "text" in item
+                            ]
+                            content_by_id[custom_id] = (
+                                "\n".join(text_parts) or "Content not available"
+                            )
+                        else:
+                            # Handle simple string content
+                            content_by_id[custom_id] = (
+                                content or "Content not available"
+                            )
         return content_by_id
 
     def extract_response_data(self, responses_file: Path) -> dict[str, dict]:
