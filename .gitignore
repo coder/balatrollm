@@ -176,7 +176,7 @@ cython_debug/
 # Project-specific
 .envrc
 balatrobot
-runs
+runs*
 benchmark_results
 balatrobench
 benchmarks
