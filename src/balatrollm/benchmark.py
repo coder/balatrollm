@@ -304,6 +304,26 @@ class BenchmarkAnalyzer:
                             )
         return content_by_id
 
+    def extract_reasoning_from_tool_calls(self, tool_calls: list) -> str:
+        """Extract reasoning from tool call arguments if available.
+
+        Looks for a "reasoning" field in the parsed arguments of tool calls.
+        Returns the first reasoning found, or empty string if none found.
+        """
+        for tool_call in tool_calls:
+            if "function" in tool_call:
+                function = tool_call["function"]
+                if "arguments" in function:
+                    try:
+                        # arguments is a JSON string that needs to be parsed
+                        args = json.loads(function["arguments"])
+                        if "reasoning" in args and args["reasoning"]:
+                            return args["reasoning"]
+                    except (json.JSONDecodeError, TypeError):
+                        # Skip if arguments can't be parsed as JSON
+                        continue
+        return ""
+
     def extract_response_data(self, responses_file: Path) -> dict[str, dict]:
         """Extract reasoning and tool_call from responses.jsonl by custom_id."""
         response_by_id = {}
@@ -320,10 +340,15 @@ class BenchmarkAnalyzer:
                         choice = body["choices"][0]
                         message = choice.get("message", {})
 
+                        tool_calls = message.get("tool_calls", [])
+                        # Try explicit reasoning first, then fall back to tool call arguments
+                        reasoning = message.get(
+                            "reasoning", ""
+                        ) or self.extract_reasoning_from_tool_calls(tool_calls)
+
                         response_data = {
-                            "reasoning": message.get("reasoning", "")
-                            or "Reasoning not available for the model",
-                            "tool_call": message.get("tool_calls", []),
+                            "reasoning": reasoning,
+                            "tool_call": tool_calls,
                         }
                         response_by_id[custom_id] = response_data
         return response_by_id
