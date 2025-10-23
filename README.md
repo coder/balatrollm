@@ -4,6 +4,9 @@
     <a href="https://github.com/coder/balatrollm/releases">
       <img alt="GitHub release" src="https://img.shields.io/github/v/release/coder/balatrollm?include_prereleases&sort=semver&style=for-the-badge&logo=github"/>
     </a>
+    <a href="https://pypi.org/project/balatrollm/">
+      <img alt="PyPI" src="https://img.shields.io/pypi/v/balatrollm?style=for-the-badge&logo=pypi&logoColor=white"/>
+    </a>
     <a href="https://discord.gg/TPn6FYgGPv">
       <img alt="Discord" src="https://img.shields.io/badge/discord-server?style=for-the-badge&logo=discord&logoColor=%23FFFFFF&color=%235865F2"/>
     </a>
