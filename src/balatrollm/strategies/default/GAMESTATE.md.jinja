@@ -22,7 +22,7 @@
 The current Jokers count is {{ G.jokers.config.card_count }}/{{ G.jokers.config.card_limit }}.
 {% for j in G.jokers.cards -%}
 {% if j.facing == "front" %}
-- {{ loop.index0 }}: {{ j.label }} ({{ constants.jokers[j.config.center_key] }})
+- {{ loop.index0 }}: {{ j.label }} ({{ j.description }})
   - **Sell value**: {{ j.sell_cost }}
 {%- if j.edition %}
   - **{{ j.edition.type|title }} Edition**: {{ constants.editions[j.edition.key] }}
@@ -40,7 +40,7 @@ The current Jokers count is {{ G.jokers.config.card_count }}/{{ G.jokers.config.
 The current Consumables count is {{ G.consumables.config.card_count }}/{{ G.consumables.config.card_limit }}.
 {% for c in G.consumables.cards -%}
 {% if c.facing == "front" %}
-- {{ loop.index0 }}: {{ c.label }} ({{ constants.consumables[c.config.center_key] }})
+- {{ loop.index0 }}: {{ c.label }} ({{ c.description }})
   - **Sell value**: {{ c.sell_cost }}
 {%- if c.debuff %}
   - **Debuff**: this consumable is debuffed so its effect is disabled
@@ -57,7 +57,7 @@ Here is the list of vouchers redeemed during the run:
 
 {% for v, redeemed in G.game.used_vouchers.items() -%}
 {% if redeemed -%}
-- {{ v }}: {{ constants.vouchers[v] }}
+- {{ v }}: {{ v.description }}
 {% endif -%}
 {% endfor -%}
 {% endif -%}
@@ -118,7 +118,7 @@ Here are the available cards in the shop:
 {% for card in G.shop_jokers.cards -%}
 {% if card.facing == "front" %}
 {%- if card.ability.set == "Joker" %}
-- {{ loop.index0 }}: {{ card.label }} ({{ constants.jokers[card.config.center_key] }})
+- {{ loop.index0 }}: {{ card.label }} ({{ card.description }})
   - **Set**: {{ card.ability.set }}
   - **Cost**: ${{ card.cost }}
   - **Sell value**: ${{ card.sell_cost }}
@@ -129,7 +129,7 @@ Here are the available cards in the shop:
   - **Debuff**: this card is debuffed and will not be counted in scoring
 {%- endif %}
 {%- elif card.ability.set in ["Tarot", "Planet", "Spectral"] %}
-- {{ loop.index0 }}: {{ card.label }} ({{ constants.consumables[card.config.center_key] }})
+- {{ loop.index0 }}: {{ card.label }} ({{ card.description }})
   - **Set**: {{ card.ability.set }}
   - **Cost**: ${{ card.cost }}
   - **Sell value**: ${{ card.sell_cost }}
@@ -184,7 +184,7 @@ The cost of the reroll is ${{ G.game.current_round.reroll_cost }}.
 Here are the vouchers that can be redeemed:
 {% for voucher in G.shop_vouchers.cards -%}
 {%- if voucher.facing == "front" %}
-- {{ loop.index0 }}: {{ voucher.label }} ({{ constants.vouchers[voucher.config.center_key] }})
+- {{ loop.index0 }}: {{ voucher.label }} ({{ voucher.description }})
   - **Cost**: ${{ voucher.cost }}
   - **Sell value**: ${{ voucher.sell_cost }}
 {%- else %}
