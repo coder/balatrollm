@@ -14,7 +14,11 @@ jobs:
       - name: Extract version from payload
         id: version
         run: |
-          echo "VERSION=${{ github.event.client_payload.version }}" >> $GITHUB_OUTPUT
+          VERSION="${{ github.event.client_payload.version }}"
+          if [ -z "$VERSION" ]; then
+            VERSION=$(curl -s https://pypi.org/pypi/balatrobot/json | jq -r .info.version)
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
@@ -22,9 +26,12 @@ jobs:
           cache-dependency-glob: "uv.lock"
       - name: Update balatrobot dependency
         run: |
-          uv add balatrobot==${{ steps.version.outputs.VERSION }}
+          # Update exact version in pyproject.toml
+          sed -i 's/balatrobot>=.*/balatrobot>=${{ steps.version.outputs.VERSION }}",/' pyproject.toml
           # Verify the change
           grep balatrobot pyproject.toml
+      - name: Update lock file
+        run: uv sync
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
