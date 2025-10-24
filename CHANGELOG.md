@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.2](https://github.com/coder/balatrollm/compare/v0.13.1...v0.13.2) (2025-10-24)
+
+
+### Documentation
+
+* add pypi badge ([94b4fbf](https://github.com/coder/balatrollm/commit/94b4fbf17044f398548bf3a903288139d46200e5))
+
 ## [0.13.1](https://github.com/coder/balatrollm/compare/v0.13.0...v0.13.1) (2025-10-23)
 
 
