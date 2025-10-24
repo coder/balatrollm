@@ -2,6 +2,6 @@
 
 __version__ = "0.13.2"
 
-from .cli import main
+from .balatrollm_cli import main
 
 __all__ = ["main"]
