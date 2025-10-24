@@ -8,7 +8,6 @@
     ],
     "deny": [
       "Edit(CHANGELOG.md)",
-      "MultiEdit(CHANGELOG.md)",
       "Write(CHANGELOG.md)"
     ]
   },
@@ -23,7 +22,7 @@
           },
           {
             "type": "command",
-            "command": "mdformat ."
+            "command": "mdformat docs/ README.md"
           }
         ]
       }
