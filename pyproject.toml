@@ -24,7 +24,8 @@ Repository = "https://github.com/coder/balatrollm"
 Changelog = "https://github.com/coder/balatrollm/blob/main/CHANGELOG.md"
 
 [project.scripts]
-balatrollm = "balatrollm:main"
+balatrollm = "balatrollm.balatrollm_cli:main"
+balatrobench = "balatrollm.balatrobench_cli:main"
 
 [build-system]
 requires = ["hatchling"]
