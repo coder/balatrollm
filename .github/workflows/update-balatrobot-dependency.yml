@@ -2,6 +2,7 @@ name: Update balatrobot dependency
 on:
   repository_dispatch:
     types: [balatrobot_release]
+  workflow_dispatch:
 permissions:
   contents: write
   pull-requests: write
@@ -22,7 +23,7 @@ jobs:
       - name: Update balatrobot dependency
         run: |
           # Update exact version in pyproject.toml
-          sed -i 's/balatrobot>=.*/balatrobot==${{ steps.version.outputs.VERSION }}/' pyproject.toml
+          sed -i 's/balatrobot>=.*/balatrobot==${{ steps.version.outputs.VERSION }}",/' pyproject.toml
           # Verify the change
           grep balatrobot pyproject.toml
       - name: Update lock file
