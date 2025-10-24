@@ -1,108 +1,253 @@
-# Game State
+# Current Game State
 
-## Current Situation
-- **Phase**: {{ state_name }}
-{% if game_state.game -%}
-- **Round**: {{ game_state.game.round }} | **Ante**: {{ (game_state.game.round + 2) // 3 }}
-- **Money**: ${{ game_state.game.dollars }}{% if game_state.game.dollars >= 25 %} ✓ (earning max interest){% elif game_state.game.dollars >= 5 %} (earning ${{ (game_state.game.dollars // 5) }} interest){% endif %}
-{% if game_state.game.current_round -%}
-- **Hands**: {{ game_state.game.current_round.hands_left | default(0) }} | **Discards**: {{ game_state.game.current_round.discards_left | default(0) }}
-{% endif -%}
-{% endif %}
+{% if G.state == 1 -%}
+- **Phase**: Playing Phase (gamestate is SELECTING_HAND)
+- **Round**: {{ G.game.round }}
+- **Ante**: {{ G.game.round_resets.ante }}/8
+- **Money**: ${{ G.game.dollars }}
+- **Hands left**: {{ G.game.current_round.hands_left}}/{{ G.game.current_round.hands_left + G.game.current_round.hands_played}}
+- **Discards left**: {{ G.game.current_round.discards_left }}/{{ G.game.current_round.discards_left + G.game.current_round.discards_used }}
+- **Current Blind**: {% if G.blinds.small.status == "Current" %}Small{% elif G.blinds.big.status == "Current" %}Big{% elif G.blinds.boss.status == "Current" %}Boss ({{G.blinds.boss.name}}: {{G.blinds.boss.effect}}){% endif %}
+- **Target Score**: {% if G.blinds.small.status == "Current" %}{{ G.blinds.small.score }}{% elif G.blinds.big.status == "Current" %}{{ G.blinds.big.score }}{% elif G.blinds.boss.status == "Current" %}{{ G.blinds.boss.score }}{% endif %}
+- **Current Score**: {{ G.game.chips }}
+{%- elif G.state == 5 %}
+- **Phase**: Shop Phase (gamestate is SHOP)
+- **Round**: {{ G.game.round }}
+- **Ante**: {{ G.game.round_resets.ante }}/8
+- **Money**: ${{ G.game.dollars }}
+{%- endif %}
 
-{% if game_state.game and game_state.game.blind_on_deck %}
-## Current Challenge
-- **Blind**: {{ game_state.game.blind_on_deck }}
-{% endif %}
-
-{% if game_state.hand and game_state.hand.cards -%}
-## Hand ({{ game_state.hand.cards | length }} cards)
-{%- set value_map = {"Ace": "A", "King": "K", "Queen": "Q", "Jack": "J", "10": "T", "9": "9", "8": "8", "7": "7", "6": "6", "5": "5", "4": "4", "3": "3", "2": "2"} -%}
-{%- set suit_map = {"Spades": "♠", "Hearts": "♥", "Diamonds": "♦", "Clubs": "♣"} -%}
-{% for card in game_state.hand.cards -%}
-{%- set card_config = card.config.card -%}
-{%- set short_value = value_map.get(card_config.value, "?") -%}
-{%- set short_suit = suit_map.get(card_config.suit, "?") -%}
-{{ loop.index0 }}: {{ short_value }}{{ short_suit }}{% if not loop.last %} | {% endif %}
-{%- endfor %}
-{% else -%}
-## Hand
-Empty
-{% endif %}
-
-{% if game_state.jokers and game_state.jokers.cards %}
-## Jokers ({{ game_state.jokers.cards | length }}{% if game_state.jokers.config and game_state.jokers.config.card_limit %}/{{ game_state.jokers.config.card_limit }}{% endif %})
-{% for joker in game_state.jokers.cards -%}
-{{ loop.index0 }}: **{{ joker.label | default('Unknown Joker') }}**{% if joker.sell_cost %} (${{ joker.sell_cost }} sell){% endif %}{% if joker.debuff %} [DEBUFFED]{% endif %}
-{% endfor %}
-{% else %}
 ## Jokers
-None
-{% endif %}
 
-{% if game_state.consumables and game_state.consumables.cards and (game_state.consumables.cards | length) > 0 %}
-## Consumables ({{ game_state.consumables.cards | length }})
-{% for c in game_state.consumables.cards -%}
-{{ loop.index0 }}: {{ c.label }}{% if c.sell_cost %} (${{ c.sell_cost }} sell){% endif %}
-{% endfor %}
-{% endif %}
+The current Jokers count is {{ G.jokers.config.card_count }}/{{ G.jokers.config.card_limit }}.
+{% for j in G.jokers.cards -%}
+{% if j.facing == "front" %}
+- {{ loop.index0 }}: {{ j.label }} ({{ j.description }})
+  - **Sell value**: {{ j.sell_cost }}
+{%- if j.edition %}
+  - **{{ j.edition.type|title }} Edition**: {{ constants.editions[j.edition.key] }}
+{%- endif %}
+{%- if j.debuff %}
+  - **Debuff**: this joker is debuffed so its effect is disabled
+{%- endif%}
+{%- else %}
+- {{ loop.index0 }}: the joker is face down
+{%- endif %}
+{%- endfor %}
 
-## Available Actions
+## Consumables
 
-{% if state_name == "BLIND_SELECT" -%}
-**PRIMARY**: Use `skip_or_select_blind` to choose:
-- **select** (recommended): Play the blind to earn money and progress
-- **skip**: Only if blind is impossible or you desperately need a tag
+The current Consumables count is {{ G.consumables.config.card_count }}/{{ G.consumables.config.card_limit }}.
+{% for c in G.consumables.cards -%}
+{% if c.facing == "front" %}
+- {{ loop.index0 }}: {{ c.label }} ({{ c.description }})
+  - **Sell value**: {{ c.sell_cost }}
+{%- if c.debuff %}
+  - **Debuff**: this consumable is debuffed so its effect is disabled
+{%- endif %}
+{%- else %}
+- {{ loop.index0 }}: the consumable is face down
+{%- endif %}
+{%- endfor %}
 
-**SECONDARY**: If needed for preparation:
-- `sell_joker` / `sell_consumable`: Generate money for crucial purchases
-- `use_consumable`: Strengthen your deck before the blind
+{% if G.game.used_vouchers|length > 0 -%}
+## Vouchers
 
-{% elif state_name == "SELECTING_HAND" -%}
-**PRIMARY**: Use `play_hand_or_discard`:
-- **play**: Submit your best poker hand (select card indices)
-- **discard**: Improve weak hands (select cards to replace)
+Here is the list of vouchers redeemed during the run:
 
-**SECONDARY**: 
-- `sell_joker` / `sell_consumable`: Generate emergency funds
-- `use_consumable`: Enhance cards or hand types strategically
-
-{% elif state_name == "SHOP" -%}
-**PRIMARY**: Use `shop` with these actions:
-- **next_round**: Leave shop and proceed (do this when done shopping)
-- **buy_card**: Purchase jokers/consumables that synergize with your build
-- **reroll**: Refresh shop items (costs ${{ game_state.game.current_round.reroll_cost | default('5') }}, increases each time)
-- **redeem_voucher**: Buy permanent upgrades
-
-{% if game_state.shop_jokers and game_state.shop_jokers.cards and (game_state.shop_jokers.cards | length) > 0 -%}
-### Shop Items
-{% for card in game_state.shop_jokers.cards -%}
-{{ loop.index0 }}: **{{ card.label }}** - ${{ card.cost }}
-{% endfor %}
+{% for v, redeemed in G.game.used_vouchers.items() -%}
+{% if redeemed -%}
+- {{ v }}: {{ v.description }}
+{% endif -%}
+{% endfor -%}
 {% endif -%}
 
-{% if game_state.shop_vouchers and game_state.shop_vouchers.cards and (game_state.shop_vouchers.cards | length) > 0 -%}
-### Vouchers
-{% for card in game_state.shop_vouchers.cards -%}
-{{ loop.index0 }}: **{{ card.label }}** - ${{ card.cost }}
+## Poker Hands
+
+Here is a list of the poker hands and their levels:
+
+{% for name, hand in G.game.hands.items() | sort(attribute='1.order') -%}
+- **{{ name }}** (Level {{ hand.level }}):
+  - **Chips**: {{ hand.chips }}
+  - **Mult**: {{ hand.mult }}
+  - **Example**: `{% for c in hand.example %}{{ c[0] }}{% if not c[1] %} (not scored){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}`
+  - During this run you have played {{ name }} {{ hand.played }} times, {{ hand.played_this_round }} of which were played this round.
 {% endfor %}
+
+{% if G.state == 1 -%}
+## Current Hand
+
+The current card count is {{ G.hand.config.card_count }} / {{ G.hand.config.card_limit }}
+**CRITICAL LIMIT: You can play or discard MAXIMUM {{ G.hand.config.highlighted_limit }} cards per action - NEVER MORE THAN {{ G.hand.config.highlighted_limit }} CARDS (this is an absolute game rule).**
+
+{% for c in G.hand.cards %}
+{%- if c.facing == "front" %}
+{%- if c.ability.name == "Stone Card" %}
+- {{ loop.index0 }}: this is a stone card (no suit and no rank)
+{%- elif c.config.card %}
+- {{ loop.index0 }}: {{ c.config.card.value }} of {{ c.config.card.suit }} (`{{ c.config.card_key }}`)
+{%- if c.edition %}
+  - **{{ c.edition.type|title }} Edition**: {{ constants.editions[c.edition.key] }}
+{%- endif %}
+{%- if c.ability.set == "Enhanced" %}
+  - **{{c.ability.name}}**: {{ constants.enhancements['m_' + c.ability.name.lower().replace(' card', '').replace(' ', '_')] }}
+{%- endif %}
+{%- if c.seal %}
+  - **{{ c.seal }} seal**: {{ constants.seals[c.seal] }}
+{%- endif %}
+{%- if c.debuff %}
+  - **Debuff**: this card is debuffed and will not be counted in scoring
+{%- endif %}
+{%- else %}
+- {{ loop.index0 }}: {{ c.label if c.label else "Unknown card" }}
+{%- if c.debuff %}
+  - **Debuff**: this card is debuffed and will not be counted in scoring
+{%- endif %}
+{%- endif %}
+{%- else %}
+- {{ loop.index0 }}: the card is face down
+{%- endif %}
+{%- endfor %}
+{%- endif %}
+
+{% if G.state == 5 -%}
+## Shop
+
+Here are the available cards in the shop:
+
+{% for card in G.shop_jokers.cards -%}
+{% if card.facing == "front" %}
+{%- if card.ability.set == "Joker" %}
+- {{ loop.index0 }}: {{ card.label }} ({{ card.description }})
+  - **Set**: {{ card.ability.set }}
+  - **Cost**: ${{ card.cost }}
+  - **Sell value**: ${{ card.sell_cost }}
+{%- if card.edition %}
+  - **{{ card.edition.type|title }} Edition**: {{ constants.editions[card.edition.key] }}
+{%- endif %}
+{%- if card.debuff %}
+  - **Debuff**: this card is debuffed and will not be counted in scoring
+{%- endif %}
+{%- elif card.ability.set in ["Tarot", "Planet", "Spectral"] %}
+- {{ loop.index0 }}: {{ card.label }} ({{ card.description }})
+  - **Set**: {{ card.ability.set }}
+  - **Cost**: ${{ card.cost }}
+  - **Sell value**: ${{ card.sell_cost }}
+{%- if card.debuff %}
+  - **Debuff**: this card is debuffed and will not be counted in scoring
+{%- endif %}
+{%- else %}
+{%- if card.ability.name == "Stone Card" %}
+- {{ loop.index0 }}: this is a stone card (no suit and no rank)
+  - **Set**: {{ card.ability.set }}
+  - **Cost**: ${{ card.cost }}
+  - **Sell value**: ${{ card.sell_cost }}
+{%- else %}
+{%- if card.config.card %}
+- {{ loop.index0 }}: {{ card.config.card.value }} of {{ card.config.card.suit }} (`{{ card.config.card_key }}`)
+  - **Set**: {{ card.ability.set }}
+  - **Cost**: ${{ card.cost }}
+  - **Sell value**: ${{ card.sell_cost }}
+{%- if card.edition %}
+  - **{{ card.edition.type|title }} Edition**: {{ constants.editions[card.edition.key] }}
+{%- endif %}
+{%- if card.ability.set == "Enhanced" %}
+  - **{{card.ability.name}}**: {{ constants.enhancements['m_' + card.ability.name.lower().replace(' card', '').replace(' ', '_')] }}
+{%- endif %}
+{%- if card.seal %}
+  - **{{ card.seal }} seal**: {{ constants.seals[card.seal] }}
+{%- endif %}
+{%- if card.debuff %}
+  - **Debuff**: this card is debuffed and will not be counted in scoring
+{%- endif %}
+{%- else %}
+- {{ loop.index0 }}: {{ card.label }} ({{ card.ability.set if card.ability.set else "Unknown" }})
+  - **Set**: {{ card.ability.set }}
+  - **Cost**: ${{ card.cost }}
+  - **Sell value**: ${{ card.sell_cost }}
+{%- if card.edition %}
+  - **{{ card.edition.type|title }} Edition**: {{ constants.editions[card.edition.key] }}
+{%- endif %}
+{%- if card.debuff %}
+  - **Debuff**: this card is debuffed and will not be counted in scoring
+{%- endif %}
+{%- endif %}
+{%- endif %}
+{%- endif %}
+{%- else %}
+- {{ loop.index0 }}: the card is face down
+{%- endif %}
+{%- endfor %}
+
+The cost of the reroll is ${{ G.game.current_round.reroll_cost }}.
+
+Here are the vouchers that can be redeemed:
+{% for voucher in G.shop_vouchers.cards -%}
+{%- if voucher.facing == "front" %}
+- {{ loop.index0 }}: {{ voucher.label }} ({{ voucher.description }})
+  - **Cost**: ${{ voucher.cost }}
+  - **Sell value**: ${{ voucher.sell_cost }}
+{%- else %}
+- {{ loop.index0 }}: the voucher is face down
+{%- endif %}
+{%- endfor %}
+
+{#- Here are the booster packs that can be opened:
+
+{% for pack in G.shop_booster.cards -%}
+- {{ loop.index0 }}: {{ pack.label }}
+  - **Cost**: ${{ pack.cost }}
+  - **Sell value**: ${{ pack.sell_cost }}
+{% endfor %} -#}
+{%- endif %}
+
+# Tools available
+
+You **MUST** use one of the following tools to perform the intended action:
+
+{% if G.state == 1 -%}
+- Play a Hand or Discard cards
+  - Function: `play_hand_or_discard`
+  - Parameters:
+    - `action`: (string) `play_hand` or `discard`
+    - `cards`: (list) List of 0-indexed card positions to play or discard
+    - `reasoning`: (string) A quick reasoning for play or discard the cards
+- Rearrange the cards in your current hand
+  - Function: `rearrange_hand`
+  - Parameters:
+    - `cards`: (list) List of 0-indexed card positions in desired new order (must include all cards)
+    - `reasoning`: (string) Reasoning for this specific arrangement
+- Rearrange jokers for optimal scoring sequence
+  - Function: `rearrange_jokers`
+  - Parameters:
+    - `jokers`: (list) List of 0-indexed joker positions in desired new order (must include all jokers)
+    - `reasoning`: (string) Strategic reasoning for this joker arrangement
+{% elif G.state == 5 -%}
+- Spend money in the shop
+  - Function: `shop`
+  - Parameters:
+    - `action`: (string) `next_round`, `reroll`, `buy_card`, or `redeem_voucher`
+    - `index`: (integer) 0-indexed position in the relevant shop area (required for buy_card)
+    - `reasoning`: (string) Strategic reasoning for this shop action
 {% endif -%}
-
-{% if game_state.shop_booster and game_state.shop_booster.cards and (game_state.shop_booster.cards | length) > 0 -%}
-### Boosters
-{% for card in game_state.shop_booster.cards -%}
-{{ loop.index0 }}: **{{ card.label }}** - ${{ card.cost }}
-{% endfor %}
-{% endif -%}
-
-**REMEMBER**: Only buy what clearly improves your strategy. Keep money for interest ($25+ ideal) and future rounds.
-
-{% elif state_name == "ROUND_EVAL" -%}
-**PRIMARY**: Use `cash_out` to proceed to shop
-
-**OPTIONAL**: Before cashing out:
-- `use_consumable`: Use Planet cards to upgrade hand types you just played successfully
-- `sell_joker` / `sell_consumable`: Generate money for the upcoming shop
-{% endif %}
-
-**Strategic Reminder**: Selling items gives approximately **half** their original cost. Avoid unnecessary buy/sell cycles that drain your money.
+- Sell a Joker
+  - Function: `sell_joker`
+  - Parameters:
+    - `index`: (integer) 0-indexed position of the joker to sell
+    - `reasoning`: (string) Strategic reasoning for selling this specific joker
+- Sell a Consumable
+  - Function: `sell_consumable`
+  - Parameters:
+    - `index`: (integer) 0-indexed position of the consumable to sell
+    - `reasoning`: (string) Strategic reasoning for selling this consumable
+- Use a Consumable
+  - Function: `use_consumable`
+  - Parameters:
+    - `index`: (integer) 0-indexed position of the consumable to use
+    - `cards`: (list) List of 0-indexed card positions to select for activate the consumable effect if required
+    - `reasoning`: (string) Strategic reasoning for using this consumable now
+- Rearrange jokers for optimal scoring sequence
+  - Function: `rearrange_jokers`
+  - Parameters:
+    - `jokers`: (list) List of 0-indexed joker positions in desired new order (must include all jokers)
+    - `reasoning`: (string) Strategic reasoning for this joker arrangement
