@@ -29,7 +29,7 @@ async def cmd_balatrollm(args) -> None:
 
     Args:
         args: Parsed command line arguments containing model, strategy,
-            base_url, api_key, config file path, runs count, and other options.
+            base_url, api_key, runs count, and other options.
     """
     # Validate runs argument
     if args.runs_per_seed < 1:
@@ -39,15 +39,12 @@ async def cmd_balatrollm(args) -> None:
     # Handle port default value
     ports = args.port if args.port else [12346]
 
-    if args.config:
-        config = Config.from_config_file(args.config)
-    else:
-        config = Config(
-            model=args.model,
-            strategy=args.strategy,
-            take_screenshots=args.take_screenshots,
-            use_default_paths=args.use_default_paths,
-        )
+    config = Config(
+        model=args.model,
+        strategy=args.strategy,
+        take_screenshots=args.take_screenshots,
+        use_default_paths=args.use_default_paths,
+    )
 
     # Parse seeds
     seeds = args.seeds.split(",") if args.seeds else [config.seed]
@@ -211,11 +208,6 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         "--api-key",
         default=os.getenv("OPENROUTER_API_KEY"),
         help="API key (default: OPENROUTER_API_KEY env var)",
-    )
-    parser.add_argument(
-        "-c",
-        "--config",
-        help="Load configuration from a previous run's config.json file",
     )
     parser.add_argument(
         "-d",

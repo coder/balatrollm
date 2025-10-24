@@ -115,7 +115,6 @@ options:
                         OpenAI-compatible API base URL (default: https://openrouter.ai/api/v1)
   -k, --api-key API_KEY
                         API key (default: OPENROUTER_API_KEY env var)
-  -c, --config CONFIG   Load configuration from a previous run's config.json file
   -d, --runs-dir RUNS_DIR
                         Base directory for storing run data (default: current directory)
   -r, --runs RUNS       Number of times to run the bot with the same configuration (default: 1)

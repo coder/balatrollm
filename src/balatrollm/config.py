@@ -188,41 +188,6 @@ class Config:
             use_default_paths=False,
         )
 
-    @classmethod
-    def from_config_file(cls, config_path: Path) -> "Config":
-        """Create configuration from a previous run's config.json file.
-
-        Loads model and strategy from config.json, uses CLI overrides if provided,
-        otherwise falls back to environment defaults for base_url and api_key.
-
-        Args:
-            config_path: Path to the config.json file.
-
-        Returns:
-            Config instance loaded from the JSON file.
-
-        Raises:
-            FileNotFoundError: If the config file doesn't exist.
-            ValueError: If config version doesn't match current repository version.
-        """
-        config_file = Path(config_path)
-        if not config_file.exists():
-            raise FileNotFoundError(f"Config file not found: {config_file}")
-
-        with config_file.open() as f:
-            config_data = json.load(f)
-
-        # Version validation - check if config version matches current repo version
-        if "version" in config_data:
-            config_version = config_data["version"]
-            if config_version != __version__:
-                raise ValueError(
-                    f"Version mismatch: Config file version '{config_version}' "
-                    f"does not match current repository version '{__version__}'. "
-                    f"Please use a config file from the same version or update your repository."
-                )
-        return cls(**config_data)
-
     def to_config_file(self, config_path: Path) -> None:
         """Write configuration to a JSON file.
 

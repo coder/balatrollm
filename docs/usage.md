@@ -91,9 +91,6 @@ Control where run data is stored:
 ```bash
 # Custom runs directory
 balatrollm --runs-dir ./my-experiments
-
-# Load configuration from previous run
-balatrollm --config ./runs/v0.10.0/default/openrouter/gpt-oss-20b/20240922_red_deck_12345/config.json
 ```
 
 ### Storage and Output Options
@@ -159,21 +156,7 @@ balatrollm --no-screenshot --model x-ai/grok-code-fast-1
 balatrollm --model x-ai/grok-code-fast-1 --no-screenshot --port 12346 --port 12347 --runs 20
 ```
 
-## Configuration Files
-
-### Loading Previous Configurations
-
-Reuse successful configurations:
-
-```bash
-# Load exact configuration from previous run
-balatrollm --config path/to/config.json
-
-# Override specific parameters
-balatrollm --config path/to/config.json --model different/model --runs 10
-```
-
-### Environment Variables
+## Environment Variables
 
 Set defaults in your environment:
 
