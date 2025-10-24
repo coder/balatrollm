@@ -19,7 +19,7 @@ from openai import (
 )
 from openai.types.chat import ChatCompletion
 
-from .config import Config, load_model_config
+from .config import Config, StrategyManifest, load_model_config
 from .data_collection import ChatCompletionError, ChatCompletionResponse, StatsCollector
 from .strategies import StrategyManager
 
@@ -390,6 +390,13 @@ class LLMBot:
         """
         self.data_collector = StatsCollector(self.config, base_dir)
         self.config.to_config_file(self.data_collector.run_dir / "config.json")
+
+        # Load and save strategy manifest
+        strategy_manifest = StrategyManifest.from_manifest_file(self.config.strategy)
+        strategy_manifest.to_strategy_file(
+            self.data_collector.run_dir / "strategy.json"
+        )
+
         logger.info(f"Run data will be saved to: {self.data_collector.run_dir}")
 
         # Set up logging to write to run.log file
