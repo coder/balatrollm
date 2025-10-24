@@ -22,12 +22,9 @@ jobs:
           cache-dependency-glob: "uv.lock"
       - name: Update balatrobot dependency
         run: |
-          # Update exact version in pyproject.toml
-          sed -i 's/balatrobot>=.*/balatrobot==${{ steps.version.outputs.VERSION }}",/' pyproject.toml
+          uv add balatrobot==${{ steps.version.outputs.VERSION }}
           # Verify the change
           grep balatrobot pyproject.toml
-      - name: Update lock file
-        run: uv sync
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
