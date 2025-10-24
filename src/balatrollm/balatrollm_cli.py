@@ -6,7 +6,6 @@ import os
 import sys
 from pathlib import Path
 
-from .benchmark import BenchmarkAnalyzer
 from .bot import LLMBot, setup_logging
 from .config import Config
 
@@ -14,22 +13,13 @@ from .config import Config
 def main() -> None:
     """Main CLI entry point for balatrollm.
 
-    Parses command line arguments and executes the appropriate command.
-    Supports both the main balatrollm command and benchmark subcommand.
+    Parses command line arguments and executes the game.
     """
     parser = _create_argument_parser()
     args = parser.parse_args()
 
     setup_logging()
-
-    match args.command:
-        case "benchmark":
-            cmd_benchmark(args)
-        case None:
-            asyncio.run(cmd_balatrollm(args))
-        case _:
-            print(f"Unknown command: {args.command}")
-            sys.exit(1)
+    asyncio.run(cmd_balatrollm(args))
 
 
 async def cmd_balatrollm(args) -> None:
@@ -178,52 +168,19 @@ async def _port_worker(
         await asyncio.sleep(1)
 
 
-def cmd_benchmark(args) -> None:
-    """Run the benchmark command.
-
-    Analyzes run data and generates comprehensive leaderboards.
-
-    Args:
-        args: Parsed command line arguments containing runs_dir, output_dir, and avif flag.
-
-    Raises:
-        FileNotFoundError: If the runs directory doesn't exist.
-        Exception: If benchmark analysis fails for any other reason.
-    """
-    try:
-        analyzer = BenchmarkAnalyzer(args.runs_dir, args.output_dir)
-        analyzer.analyze_all_runs()
-
-        # Convert PNGs to AVIF if requested
-        if args.avif:
-            print("Converting PNG screenshots to AVIF format...")
-            analyzer.convert_pngs_to_avif(args.output_dir)
-    except FileNotFoundError as e:
-        print(f"Error: {e}")
-        sys.exit(1)
-    except Exception as e:
-        print(f"Benchmark analysis failed: {e}")
-        sys.exit(1)
-
-
 def _create_argument_parser() -> argparse.ArgumentParser:
     """Create and configure argument parser.
 
-    Sets up command line argument parsing for both the main balatrollm
-    command and the benchmark subcommand.
+    Sets up command line argument parsing for the balatrollm command.
 
     Returns:
-        Configured ArgumentParser instance with all commands and options.
+        Configured ArgumentParser instance with all options.
     """
     parser = argparse.ArgumentParser(
         description="LLM-powered Balatro bot",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
-    # Add subcommands
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
-
-    # Default command (play game) - no subcommand needed, just use main parser
     parser.add_argument(
         "-m",
         "--model",
@@ -298,30 +255,6 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         "--use-default-paths",
         action="store_true",
         help="Use BalatroBot's default storage paths for screenshots and game logs",
-    )
-
-    # Benchmark subcommand
-    benchmark_parser = subparsers.add_parser(
-        "benchmark",
-        help="Analyze runs and generate leaderboards",
-        description="Analyze BalatroLLM runs and generate comprehensive leaderboards",
-    )
-    benchmark_parser.add_argument(
-        "--runs-dir",
-        type=lambda p: Path(p).resolve(),
-        default=Path("runs").resolve(),
-        help="Directory containing run data (default: runs)",
-    )
-    benchmark_parser.add_argument(
-        "--output-dir",
-        type=Path,
-        default=Path("benchmarks"),
-        help="Output directory for benchmark results (default: benchmarks)",
-    )
-    benchmark_parser.add_argument(
-        "--avif",
-        action="store_true",
-        help="Convert PNG screenshots to AVIF format after analysis",
     )
 
     return parser
