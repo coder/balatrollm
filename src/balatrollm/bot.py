@@ -103,8 +103,8 @@ class LLMBot:
         self.config = config
         self.model_config = load_model_config(config.model)
 
-        self.llm_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
-        self.balatro_client = BalatroClient(port=port)
+        self.llm_client = AsyncOpenAI(api_key=api_key, base_url=base_url, timeout=240.0)
+        self.balatro_client = BalatroClient(port=port, timeout=300.0)
         self.strategy_manager = StrategyManager(config.strategy)
         self.responses: list[ChatCompletion] = []
         self.tools = self.strategy_manager.load_tools()
