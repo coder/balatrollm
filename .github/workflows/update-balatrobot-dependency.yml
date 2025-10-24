@@ -1,0 +1,50 @@
+name: Update balatrobot dependency
+on:
+  repository_dispatch:
+    types: [balatrobot_release]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-dependency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from payload
+        id: version
+        run: |
+          echo "VERSION=${{ github.event.client_payload.version }}" >> $GITHUB_OUTPUT
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Update balatrobot dependency
+        run: |
+          # Update exact version in pyproject.toml
+          sed -i 's/balatrobot>=.*/balatrobot==${{ steps.version.outputs.VERSION }}/' pyproject.toml
+          # Verify the change
+          grep balatrobot pyproject.toml
+
+      - name: Update lock file
+        run: uv sync
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(deps): update balatrobot to ${{ steps.version.outputs.VERSION }}"
+          title: "chore(deps): bump balatrobot to ${{ steps.version.outputs.VERSION }}"
+          body: |
+            Automatic dependency update after balatrobot release `${{ steps.version.outputs.VERSION }}`
+
+            Updated:
+            - `pyproject.toml`: balatrobot pinned to `${{ steps.version.outputs.VERSION }}`
+            - `uv.lock`: regenerated with new dependencies
+          branch: "deps/balatrobot-${{ steps.version.outputs.VERSION }}"
+          delete-branch: true
