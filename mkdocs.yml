@@ -33,10 +33,8 @@ plugins:
   - search
   - llmstxt:
       markdown_description: |
-        BalatroLLM is an LLM-powered bot that plays Balatro using strategic decision making.
-        The bot leverages Large Language Models to make intelligent gameplay decisions through OpenAI-compatible APIs.
-        It supports multiple strategies, comprehensive benchmarking, and integration with BalatroB ench for performance analysis.
-        The project provides CLI tools for running bots, analyzing results, and comparing model performance across different strategies.
+        BalatroLLM is a bot that uses Large Language Models (LLMs) to play [Balatro](https://www.playbalatro.com/), the popular roguelike poker deck-building game.
+        The bot analyzes game states, makes strategic decisions, and executes actions through the [BalatroBot](https://github.com/coder/balatrobot) client.
       sections:
         Documentation:
           - setup.md
@@ -45,7 +43,7 @@ plugins:
       full_output: llms-full.txt
       autoclean: true
 nav:
-  - index.md
+  - Home: index.md
   - Setup: setup.md
   - Usage: usage.md
   - Analysis: analysis.md
