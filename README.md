@@ -27,7 +27,9 @@ The system combines multiple components to make informed decisions:
 
 These components are processed together in a single LLM call, enabling the bot to understand the current situation and perform the optimal tool call based on its configured strategy.
 
-## 📋 Requirements
+---
+
+### 📋 Requirements
 
 - [uv](https://docs.astral.sh/uv/) package manager
 - Balatro instance with [BalatroBot](https://github.com/coder/balatrobot) mod installed
@@ -35,7 +37,7 @@ These components are processed together in a single LLM call, enabling the bot t
 > [!IMPORTANT]
 > Setting up Balatro with the BalatroBot mod requires careful configuration. Please refer to the [BalatroBot](https://github.com/coder/balatrobot) documentation and follow the instructions step by step.
 
-## 📦 Installation
+### 📦 Installation
 
 1. Clone the repository
 
@@ -60,7 +62,7 @@ source .venv/bin/activate
 > You can use [direnv](https://direnv.net/) to automatically activate the environment when you enter the project directory. The `.envrc.example` file contains an example configuration for direnv.
 
 
-## ⚙️ LLM Configuration
+### ⚙️ LLM Configuration
 
 BalatroLLM performs single requests to an OpenAI-compatible chat/completions endpoint. You need to configure:
 
@@ -77,7 +79,9 @@ The default configuration uses [OpenRouter](https://openrouter.ai/), which provi
 > [!TIP]
 > After configuring the base URL and API key, you can check the available models by running `balatrollm --list-models`
 
-## ⚡ Usage
+---
+
+### ⚡ Usage
 
 The typical workflow to run BalatroLLM is:
 
@@ -102,7 +106,8 @@ balatrobench --models
 > [!TIP]
 > You can run `bash balatro.sh --help`, `balatrollm --help`, and `balatrobench --help` to see all available options.
 
+---
 
-## 📚 Documentation
+### 📚 Documentation
 
 https://coder.github.io/balatrollm/
