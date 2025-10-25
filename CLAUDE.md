@@ -19,33 +19,53 @@ source .envrc
 
 ### Running the Application
 
+**balatrollm** - Main bot CLI:
+
 ```
-usage: balatrollm [-h] [-m MODEL] [-l] [-s STRATEGY] [-u BASE_URL] [-k API_KEY] [-c CONFIG]
-                  [-d RUNS_DIR] [-r RUNS] [-p PORT] [--no-screenshot] [--use-default-paths]
-                  {benchmark} ...
+usage: balatrollm [-h] [-m MODEL] [-l] [-s STRATEGY] [-u BASE_URL]
+                  [-k API_KEY] [-d RUNS_DIR] [-r RUNS_PER_SEED]
+                  [--seeds SEEDS] [-p PORTS] [--no-screenshot]
+                  [--use-default-paths]
 
 LLM-powered Balatro bot
 
-positional arguments:
-  {benchmark}           Available commands
-    benchmark           Analyze runs and generate leaderboards
-
 options:
   -h, --help            show this help message and exit
-  -m, --model MODEL     Model name to use from OpenRouter (default: openai/gpt-oss-20b)
-  -l, --list-models     List available models from OpenRouter and exit
+  -m, --model MODEL     Model name to use from OpenAI-compatible API (required, uses BALATROLLM_MODEL env var if set)
+  -l, --list-models     List available models from OpenAI-compatible API and exit
   -s, --strategy STRATEGY
                         Name of the strategy to use (default: default)
   -u, --base-url BASE_URL
-                        OpenAI-compatible API base URL (default: https://openrouter.ai/api/v1)
+                        OpenAI-compatible API base URL (required, uses BALATROLLM_BASE_URL env var if set)
   -k, --api-key API_KEY
-                        API key (default: OPENROUTER_API_KEY env var)
+                        API key (default: BALATROLLM_API_KEY env var)
   -d, --runs-dir RUNS_DIR
                         Base directory for storing run data (default: current directory)
-  -r, --runs RUNS       Number of times to run the bot with the same configuration (default: 1)
-  -p, --port PORT       Port for BalatroBot client connection (can specify multiple, default: 12346)
-  --no-screenshot       Disable taking screenshots during gameplay (use when running Balatro in headless mode)
-  --use-default-paths   Use BalatroBot's default storage paths for screenshots and game logs (use when balatrobot and balatrollm are running on different systems)
+  -r, --runs-per-seed RUNS_PER_SEED
+                        Number of runs per seed (default: 1)
+  --seeds SEEDS         Comma-separated list of seeds (e.g., AAAA123,BBBB456,CCCC789)
+  -p, --ports PORTS     Comma-separated list of ports for BalatroBot client connections (default: 12346, e.g., 12346,12347,12348)
+  --no-screenshot       Disable taking screenshots during gameplay
+  --use-default-paths   Use BalatroBot's default storage paths for screenshots and game logs
+```
+
+**balatrobench** - Benchmark analysis CLI:
+
+```
+usage: balatrobench [-h] (--models | --strategies) [--input-dir INPUT_DIR]
+                    [--output-dir OUTPUT_DIR] [--avif]
+
+Analyze BalatroLLM runs and generate benchmark leaderboards
+
+options:
+  -h, --help            show this help message and exit
+  --models              Analyze by models (compare models within strategies)
+  --strategies          Analyze by strategies (compare strategies for each model)
+  --input-dir INPUT_DIR
+                        Input directory with run data (default: runs/v{version})
+  --output-dir OUTPUT_DIR
+                        Output directory for benchmark results (default: benchmarks/[models|strategies]/v{version})
+  --avif                Convert PNG screenshots to AVIF format after analysis
 ```
 
 ### Development
@@ -55,20 +75,13 @@ BalatroLLM Development Makefile
 
 Available targets:
   help               Show this help message
-  install            Install package dependencies
-  install-dev        Install package with development dependencies
-  lint               Run ruff linter (check only)
-  lint-fix           Run ruff linter with auto-fixes
+  install            Install dependencies
+  lint               Run ruff linter with auto-fixes
   format             Run ruff formatter
   typecheck          Run type checker
   quality            Run all code quality checks
-  test               Run tests
-  test-cov           Run tests with coverage report
-  all                Run all code quality checks and tests
-  clean              Clean build artifacts and caches
-  setup              Kill previous instances and start Balatro
+  setup              Kill previous instances and start Balatro (INSTANCES=1)
   teardown           Stop Balatro processes
-  balatrobench       Run benchmark for all models and generate analysis
 ```
 
 ### Game Automation
@@ -190,15 +203,23 @@ tests/test_llm.py                  # Test suite
 
 **Run Data Structure:**
 
-- `runs/[version]/[strategy]/[vendor]/[model-name]/[timestamp]_[deck]_[seed]/`
-- JSONL format for performance analysis across vendors, models, and strategies
+- `runs/v{version}/{strategy}/{vendor}/{model}/{timestamp}_{deck}_s{stake}_{seed}/`
+- Each run directory contains: config.json, strategy.json, stats.json, gamestates.jsonl, requests.jsonl, responses.jsonl, run.log, screenshots/
 - Strategy-first organization enables easy comparison across vendors/models within strategies
 
-**Benchmark Results Structure:**
+**Benchmark Results Structure (Dual Modes):**
 
-- `benchmarks/[version]/[strategy]/[vendor]/[model-name].json` - Detailed model analysis
-- `benchmarks/[version]/[strategy]/leaderboard.json` - Strategy-specific leaderboard
-- Hierarchical structure matches runs organization for consistency
+Benchmarks can be generated in two modes using the `balatrobench` CLI:
+
+**By Models Mode** (`--models`):
+- `benchmarks/models/v{version}/{strategy}/leaderboard.json` - Models ranked within each strategy
+- `benchmarks/models/v{version}/{vendor}/{model}/{strategy}/stats.json` - Detailed model stats per strategy
+- Compare different models within each strategy
+
+**By Strategies Mode** (`--strategies`):
+- `benchmarks/strategies/v{version}/{strategy}/leaderboard.json` - Models ranked within strategy
+- `benchmarks/strategies/v{version}/{vendor}/{model}.json` - Model stats across strategies
+- Compare different strategies for each model
 
 ## Strategy System
 
