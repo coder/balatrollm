@@ -2,251 +2,127 @@
 
 Learn how to run BalatroLLM, configure strategies, and customize gameplay parameters.
 
-## Basic Usage
+## Simple Run
 
-### Simple Bot Run
+Assuming that you have followed the [setup guide](setup.md) and configured the provider, you can run BalatroLLM with the following steps:
 
-Start a basic bot session with default settings:
+1. Start Balatro with the BalatroBot mod using the utility script:
 
 ```bash
-# Run once with default model and strategy
-balatrollm
-
-# Run with a specific model
-balatrollm --model openai/gpt-oss-120b
-
-# Run multiple times for consistency testing
-balatrollm --runs 5
+bash balatro.sh
 ```
 
-### Model Selection
-
-List and choose from available models:
+2. Start BalatroLLM:
 
 ```bash
-# See all available models
-balatrollm --list-models
-
-# Popular models for different use cases
-balatrollm --model openai/gpt-oss-20b        # Default, good balance
-balatrollm --model openai/gpt-oss-120b       # More powerful
-balatrollm --model qwen/qwen3-235b-a22b-2507 # Alternative provider
-balatrollm --model x-ai/grok-code-fast-1     # Fast responses
-```
-
-## Strategy Configuration
-
-### Built-in Strategies
-
-BalatroLLM includes pre-configured strategies:
-
-```bash
-# Conservative, financially disciplined approach (default)
-balatrollm --strategy default
-
-# High-risk, high-reward approach
-balatrollm --strategy aggressive
-```
-
-### Strategy Behavior
-
-Each strategy has different characteristics:
-
-- **Default Strategy**: Conservative play, careful resource management, long-term planning
-- **Aggressive Strategy**: Bold plays, higher spending, risk-taking for bigger rewards
-
-## Advanced Configuration
-
-### Custom API Providers
-
-Use different LLM providers:
-
-```bash
-# OpenRouter (default)
-balatrollm --base-url https://openrouter.ai/api/v1 --api-key $OPENROUTER_API_KEY
-
-# Custom OpenAI-compatible API
-balatrollm --base-url https://api.example.com/v1 --api-key your-key
-
-# Local LLM server
-balatrollm --base-url http://localhost:1234/v1 --api-key local
-```
-
-### Port Configuration
-
-Run on different ports for parallel execution:
-
-```bash
-# Single instance on custom port
-balatrollm --port 12347
-
-# Multiple ports for parallel runs
-balatrollm --port 12346 --port 12347 --runs 10
-```
-
-### Data Organization
-
-Control where run data is stored:
-
-```bash
-# Custom runs directory
-balatrollm --runs-dir ./my-experiments
-```
-
-### Storage and Output Options
-
-Control screenshot and file output behavior:
-
-```bash
-# Disable screenshots (ideal for headless mode)
-balatrollm --no-screenshot
-
-# Use BalatroBot's default paths (ideal for distributed systems)
-balatrollm --use-default-paths
-
-# Combine both for optimized distributed/headless setups
-balatrollm --no-screenshot --use-default-paths
-```
-
-## Parallel Execution
-
-### Multiple Instances
-
-Run multiple bot instances simultaneously:
-
-```bash
-# Start multiple Balatro instances
-./balatro.sh -p 12346 -p 12347 -p 12348
-
-# Run bots in parallel
-balatrollm --port 12346 --port 12347 --port 12348 --runs 15
-```
-
-### Distributed Systems
-
-Run balatrollm and BalatroBot on different systems:
-
-```bash
-# Docker containers and remote deployments
-balatrollm --use-default-paths
-
-# Containerized environments (no GUI, optimized storage)
-balatrollm --no-screenshot --use-default-paths
-
-# High-volume distributed testing
-balatrollm --use-default-paths --runs 100 --model x-ai/grok-code-fast-1
-```
-
-### Performance Optimization
-
-For faster execution:
-
-```bash
-# Use headless mode
-./balatro.sh --headless --fast
-
-# Choose faster models
-balatrollm --model x-ai/grok-code-fast-1
-
-# Optimize for automated/headless environments
-balatrollm --no-screenshot --model x-ai/grok-code-fast-1
-
-# Combine multiple optimizations
-./balatro.sh --headless --fast -p 12346 -p 12347
-balatrollm --model x-ai/grok-code-fast-1 --no-screenshot --port 12346 --port 12347 --runs 20
-```
-
-## Environment Variables
-
-Set defaults in your environment:
-
-```bash
-# In .envrc or shell profile
-export OPENROUTER_API_KEY="your-key"
-export BALATROLLM_MODEL="openai/gpt-oss-120b"
-export BALATROLLM_STRATEGY="aggressive"
-export BALATROLLM_RUNS_DIR="./experiments"
-
-# Use environment defaults
-balatrollm
-```
-
-## Game Management
-
-### Balatro Instance Control
-
-Manage Balatro game instances:
-
-```bash
-# Start single instance
-./balatro.sh
-
-# Start multiple instances
-./balatro.sh -p 12346 -p 12347 -p 12348
-
-# Check running instances
-./balatro.sh --status
-
-# Kill all instances
-./balatro.sh --kill
-
-# Start with performance optimizations
-./balatro.sh --headless --fast --audio
-```
-
-### Monitoring Runs
-
-Track bot progress:
-
-```bash
-# Run with verbose output
-balatrollm --runs 10 | tee bot_output.log
-
-# Monitor multiple parallel runs
-balatrollm --port 12346 --port 12347 --runs 20 &
-balatrollm --port 12348 --port 12349 --runs 20 &
-wait
-```
-
-## Troubleshooting
-
-### Common Issues
-
-**Bot won't connect:**
-
-```bash
-# Check Balatro is running
-./balatro.sh --status
-
-# Verify port availability
-netstat -an | grep 12346
-
-# Test with different port
-balatrollm --port 12347
-```
-
-**API errors:**
-
-```bash
-# Test API connectivity
-balatrollm --list-models
-
-# Try different model
 balatrollm --model openai/gpt-oss-20b
-
-# Check API key
-echo $OPENROUTER_API_KEY
 ```
 
-**Performance issues:**
+3. Watch the gameplay!
+
+## Advanced Usage
+
+### BalatroBot
+
+The `BALATROBOT_*` variables are used to configure Balatro and BalatroBot. It is recommended to set the variables that you don't change often in the `.envrc`.
+
+- `BALATROBOT_HOST`: The host to run the server on. Defaults to `127.0.0.1`.
+- `BALATROBOT_PORT`: The port to run the server on. Defaults to `12346`.
+
+- `BALATROBOT_HEADLESS`: Avoid rendering the game on the screen. Set to `1` to enable.
+- `BALATROBOT_FAST`: Faster animations and gameplay. Set to `1` to enable.
+- `BALATROBOT_AUDIO`: Enable audio. Set to `1` to enable.
+- `BALATROBOT_RENDER_ON_API`: Render the frame only on an API call.
+
+These are the environment variables set by `balatro.sh` using its flags. For example, to run the game in fast mode, you can run: `bash balatro.sh --fast`.
+
+Usually, you don't need to set these variables manually.
+
+### BalatroLLM
+
+The `BALATROLLM_*` variables are used as defaults for the BalatroLLM CLI. It is recommended to set the variables that you don't change often in the `.envrc`.
+
+- `BALATROLLM_BASE_URL`: The base URL to use. (required)
+- `BALATROLLM_API_KEY`: The API key to use. (usually required)
+- `BALATROLLM_MODEL`: The model to use. (required)
+
+- `BALATROLLM_STRATEGY`: The strategy to use. (default: `default`)
+- `BALATROLLM_RUNS_PER_SEED`: The number of runs per seed. (default: `1`)
+- `BALATROLLM_SEEDS`: The seeds to use. If empty, a random seed is used. You can also use a comma-separated list of seeds.
+- `BALATROLLM_NO_SCREENSHOT`: Whether to take screenshots. Screenshots are not available in headless mode. (default: `0`, i.e. take screenshots)
+- `BALATROLLM_USE_DEFAULT_PATHS`: Whether to use BalatroBot's default storage paths. It's not recommended to change this. (default: `0`)
+
+Each of these variables has a corresponding BalatroLLM CLI flag. For example, `--model` is the BalatroLLM CLI flag for `BALATROLLM_MODEL`.
+
+### Examples
+
+- Run on two seeds (3 runs each):
+
+```
+bash balatro.sh --fast
+balatrollm \
+  --model openai/gpt-oss-20b \
+  --seeds AAAAAAA,BBBBBBB \
+  --runs-per-seed 3
+```
+
+- Run faster across 2 Balatro instances in parallel:
+
+```
+bash balatro.sh --fast --ports 12346,12347
+balatrollm \
+  --model openai/gpt-oss-20b \
+  --seeds AAAAAAA,BBBBBBB \
+  --runs-per-seed 3 \
+  --ports 12346,12347
+```
+
+- Run even faster in headless mode:
+
+```
+bash balatro.sh --headless --fast --ports 12346,12347
+balatrollm \
+  --model openai/gpt-oss-20b \
+  --seeds AAAAAAA,BBBBBBB \
+  --runs-per-seed 3 \
+  --ports 12346,12347 \
+  --no-screenshot
+```
+
+- Run on resource-constrained devices with screenshots:
+
+```
+bash balatro.sh --fast --render-on-api
+balatrollm \
+  --model openai/gpt-oss-20b \
+  --seeds AAAAAAA,BBBBBBB \
+  --runs-per-seed 3
+```
+
+## Models
+
+If you have configured the provider, you should be able to see the available models by running
 
 ```bash
-# Use faster model
-balatrollm --model x-ai/grok-code-fast-1
+balatrollm --list-models
+```
 
-# Enable optimizations
-./balatro.sh --headless --fast
+Before using a model, ensure that the model (exact name) is already present in the `config/models.yaml` file. This YAML file is used for model configuration. Update it accordingly to run balatrollm with the model of your choice.
 
-# Reduce parallel instances
-balatrollm --port 12346 --runs 5
+The current model configuration includes some of the models supported by [OpenRouter](https://openrouter.ai/). This is the provider we are using to run balatrollm with various models.
+
+## Strategies
+
+One aspect that we are interested in exploring is the strategy: i.e., the prompt sent to the LLM.
+
+BalatroLLM ships with two strategies (default and aggressive) but we encourage the community to contribute their own strategies. See [CONTRIBUTING.md](https://github.com/coder/balatrollm/blob/main/CONTRIBUTING.md#contributing-strategies) for more details.
+
+To run balatrollm with a specific strategy, use the `--strategy` flag:
+
+```bash
+balatrollm --strategy default
+```
+
+```bash
+balatrollm --strategy aggressive
 ```

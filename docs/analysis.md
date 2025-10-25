@@ -1,204 +1,120 @@
 # Analysis
 
-Generate comprehensive benchmarks, analyze performance metrics, and integrate with BalatroBench for detailed statistics visualization.
+Analyze run data, generate performance benchmarks, and visualize results with BalatroBench.
 
-## Benchmark Generation
+## Run Data Collection
 
-Run benchmarks to evaluate model performance:
+When you run BalatroLLM, all game data is automatically collected and organized in the `runs` directory. Each run is stored in a hierarchical structure that makes it easy to compare different models, strategies, and game sessions.
+
+```
+runs/
+└── v0.13.2/                          # Version
+    └── default/                      # Strategy
+        └── openai/                   # Vendor
+            └── gpt-oss-20b/          # Model
+                └── 20251024_120206_331_RedDeck_s1__AAAAAAA/  # Run directory
+                    ├── config.json           # Model configuration and API settings
+                    ├── strategy.json         # Strategy template used
+                    ├── stats.json            # Aggregated performance metrics
+                    ├── gamestates.jsonl      # Game state at each decision point
+                    ├── requests.jsonl        # Prompts sent to the LLM
+                    ├── responses.jsonl       # Model responses and actions
+                    ├── run.log               # Complete text log
+                    └── screenshots/          # PNG images of game states
+```
+
+Each run directory contains several files that capture different aspects of the game session. The configuration and strategy files record the setup used for the run. The stats file contains aggregated performance metrics like total rounds completed, token usage, and costs. The three JSONL files log every step of the game, recording game states, LLM prompts, and model responses. The run log provides a complete text record, and the screenshots directory contains PNG images of the game state at each step (when screenshot mode is enabled).
+
+## Benchmark Analysis
+
+The `balatrobench` CLI tool processes run data to generate comprehensive benchmark statistics and leaderboards. Benchmarks can be generated in two different modes depending on what you want to analyze.
+
+### Models
+
+Use the models mode when you want to compare how different models perform within the same strategy. This mode is useful for answering questions like "Which model plays the default strategy best?" or "How do different vendors' models compare on the aggressive strategy?"
 
 ```bash
-balatrollm benchmark
+balatrobench --models
 ```
 
-## Benchmark Results
-
-Benchmarks are organized hierarchically:
+The results are organized with leaderboards for each strategy, making it easy to identify the top-performing models:
 
 ```
-benchmarks/
-├── v0.10.0/                    # Version
-│   ├── default/                # Strategy
-│   │   ├── leaderboard.json    # Strategy summary with aggregated stats
-│   │   └── openai/             # Provider
-│   │       ├── gpt-oss-20b.json        # Model performance summary
-│   │       ├── gpt-oss-120b.json       # Model performance summary
-│   │       ├── gpt-oss-20b/            # Individual runs for model
-│   │       │   ├── 20250922_124308_887_RedDeck_s1__OOOO155/
-│   │       │   │   ├── request-00001/  # Individual LLM request
-│   │       │   │   │   ├── reasoning.md    # LLM reasoning process
-│   │       │   │   │   ├── request.md      # Full request sent to LLM
-│   │       │   │   │   ├── screenshot.png  # Game state screenshot
-│   │       │   │   │   └── tool_call.json  # Function call details
-│   │       │   │   ├── request-00002/
-│   │       │   │   └── ...
-│   │       │   └── [other runs]
-│   │       └── gpt-oss-120b/           # Individual runs for model
-│   │           └── [similar structure]
-│   └── aggressive/             # Other strategies
-│       └── [similar structure]
+benchmarks/models/
+├── manifest.json
+└── v0.13.2/                          # Version
+    └── default/                      # Strategy
+        ├── leaderboard.json          # Models ranked for this strategy
+        └── openai/                   # Vendor
+            ├── gpt-oss-20b/          # Model
+            │   └── 20251024_120206_331_RedDeck_s1__AAAAAAA/  # Run
+            │       └── request-00001/         # Individual request
+            │           ├── request.md         # Full LLM prompt
+            │           ├── reasoning.md       # Model reasoning
+            │           ├── tool_call.json     # Action taken
+            │           └── screenshot.png     # Game state
+            └── gpt-oss-20b.json      # Aggregated model statistics
 ```
+
+### Strategies
+
+Use the strategies mode when you want to compare how different strategies perform for the same model. This mode helps answer questions like "Does the aggressive strategy work better than the default for GPT-4?" or "Which strategy should I use with Claude?"
+
+```bash
+balatrobench --strategies
+```
+
+The strategies mode generates leaderboards organized by model, with statistics for each strategy:
+
+```
+benchmarks/strategies/
+├── manifest.json
+└── v0.13.2/                          # Version
+    └── openai/                       # Vendor
+        └── gpt-oss-20b/              # Model
+            ├── leaderboard.json      # Strategies ranked for this model
+            ├── default/              # Strategy
+            │   ├── stats.json        # Aggregated statistics
+            │   └── gpt-oss-20b/      # Run details
+            │       └── 20251024_120206_331_RedDeck_s1__AAAAAAA/  # Run
+            │           └── request-00001/         # Individual request
+            │               ├── request.md         # Full LLM prompt
+            │               ├── reasoning.md       # Model reasoning
+            │               ├── tool_call.json     # Action taken
+            │               └── screenshot.png     # Game state
+            └── aggressive/           # Other strategies
+                └── [similar structure]
+```
+
+Both modes preserve detailed request-level data including the full LLM prompts, reasoning output, tool calls, and screenshots for in-depth analysis.
 
 ## BalatroBench Integration
 
-### Overview
+[BalatroBench](https://coder.github.io/balatrobench/) is a web-based dashboard for visualizing benchmark results. You can run it locally to explore your data through interactive charts and leaderboards.
 
-[BalatroBench](https://coder.github.io/balatrobench/) is a web-based dashboard for visualizing and comparing LLM performance in Balatro. It provides interactive charts, leaderboards, and detailed analytics.
-
-### Integrating with BalatroBench
-
-To use BalatroBench as a local dashboard for visualizing your benchmark results:
+First, clone the BalatroBench repository:
 
 ```bash
-# Step 1: Generate runs with custom output directory
-balatrollm --runs-dir example-runs --runs 20
-
-# Step 2: Generate benchmark analysis
-balatrollm benchmark --runs-dir example-runs --output-dir example-benchmark
-
-# Step 3: Clone BalatroBench repository
-git clone https://github.com/coder/balatrobench.git /path/to/balatrobench
-
-# Step 4: Move benchmark data to BalatroBench (or create symbolic link)
-mv example-benchmark/benchmarks /path/to/balatrobench/data/benchmarks
-# OR create a symbolic link:
-# ln -s $(pwd)/example-benchmark/benchmarks /path/to/balatrobench/data/benchmarks
-
-# Step 5: Host BalatroBench locally
-cd /path/to/balatrobench
-python3 -m http.server 8001
-# Then visit http://localhost:8001
+git clone https://github.com/coder/balatrobench.git
 ```
 
-## BalatroBench Dashboard Views
+Next, copy or symlink your benchmark data into the BalatroBench data directory. You can move the benchmarks directly:
 
-BalatroBench provides three primary views for analyzing LLM performance in Balatro, each offering different levels of detail and insights into model behavior and strategic decision-making.
+```bash
+mv benchmarks /path/to/balatrobench/data/benchmarks
+```
 
-### 1. Main Leaderboard and Performance Overview
+Or create a symbolic link to keep the data in your BalatroLLM directory:
 
-The main dashboard presents a comprehensive comparison of all evaluated models, combining visual and tabular representations of performance metrics.
+```bash
+ln -s $(pwd)/benchmarks /path/to/balatrobench/data/benchmarks
+```
 
-![Main Leaderboard - Light Theme](assets/balatrobench-light-1.png#only-light)
-![Main Leaderboard - Dark Theme](assets/balatrobench-dark-1.png#only-dark)
+Finally, start a local web server to view the dashboard:
 
-**Visual Performance Comparison**
+```bash
+cd /path/to/balatrobench
+python3 -m http.server 8001
+```
 
-The top section features an interactive bar chart displaying average performance across models, with each bar representing the mean number of rounds achieved. Error bars indicate the standard deviation, providing insight into performance consistency. Models are color-coded for easy identification, with higher-performing models typically shown in more prominent colors (purple for top performers, progressing through gray, green, and blue for lower performers).
-
-**Detailed Leaderboard Table**
-
-Below the chart, a comprehensive table provides granular performance metrics for each model:
-
-- **Model & Vendor**: Lists the specific model name and its provider (x-ai, openai, google, deepseek)
-
-- **Round Performance**: Shows average rounds achieved with standard deviation, indicating both performance level and consistency
-
-- **Success Rate Indicators**: Three color-coded percentage columns:
-
-    - **Green (✓)**: Successful round completions
-    - **Yellow (⚠)**: Partial completions or warnings
-    - **Red (✗)**: Failed attempts or errors
-
-- **Financial Metrics**:
-
-    - **In $/¥**: Input token costs with standard deviation
-    - **Out $/¥**: Output token costs with standard deviation
-
-- **Performance Timing**:
-
-    - **Duration**: Average time per decision with variability measures
-    - **Total Cost**: Comprehensive cost analysis including standard deviations
-
-This view enables researchers to quickly identify top-performing models, understand cost-performance trade-offs, and assess model reliability through consistency metrics.
-
-### 2. Model Details and Analytics
-
-Clicking on any model in the leaderboard expands to reveal detailed analytics and run breakdowns for that specific model.
-
-![Model Details - Light Theme](assets/balatrobench-light-2.png#only-light)
-![Model Details - Dark Theme](assets/balatrobench-dark-2.png#only-dark)
-
-**Performance Distribution Analysis**
-
-The expanded view includes three key analytical components:
-
-**Rounds Distribution Histogram**: A bar chart showing the frequency distribution of rounds achieved across all runs for the selected model. This reveals whether the model's performance is consistent or highly variable, with patterns indicating:
-
-- Consistent performers show narrow, tall distributions
-- Variable performers show wide, scattered distributions
-- Multi-modal distributions may indicate different strategic approaches
-
-**Provider Breakdown**: A donut chart visualizing the proportion of runs from different API providers, useful for understanding data source diversity and potential provider-specific performance variations.
-
-**Aggregated Statistics Panel**: A summary box displaying key totals:
-
-- **Input/Output Token Counts**: Total tokens processed across all runs
-- **Financial Totals**: Cumulative costs in dollars
-- **Total Processing Time**: Aggregate time spent on decision-making
-
-**Individual Run Analysis Table**
-
-The bottom section provides a detailed breakdown of individual game runs, with each row representing a complete Balatro session:
-
-- **Round-by-Round Results**: Shows progression through different game rounds with success/warning/failure indicators
-- **Performance Metrics**: Input/output costs and timing for each individual run
-- **Success Patterns**: Color-coded indicators help identify at which stages models typically succeed or fail
-
-This view helps researchers understand model behavior patterns, identify optimal performance conditions, and analyze the relationship between different performance factors.
-
-### 3. Individual Run Analysis
-
-The most detailed view opens when clicking on a specific run, providing a step-by-step analysis of the LLM's decision-making process throughout a complete Balatro game session.
-
-![Run Details - Light Theme](assets/balatrobench-light-3.png#only-light)
-![Run Details - Dark Theme](assets/balatrobench-dark-3.png#only-dark)
-
-**Game State Visualization**
-
-The left panel displays an actual screenshot of the Balatro game state at the moment of decision, showing:
-
-- **Current Game Phase**: Whether in shop, hand selection, or other game modes
-- **Available Options**: Cards, jokers, and other game elements visible to the LLM
-- **Resource Status**: Money, joker slots, and other strategic resources
-- **Visual Context**: The exact visual information the LLM uses for decision-making
-
-**Strategic Analysis Panel**
-
-The right panel provides comprehensive insight into the LLM's reasoning process:
-
-**Contextual Situation Analysis**: A detailed text description explaining:
-
-- Current game state and available options
-- Strategic considerations and constraints
-- Resource management situation
-- Previous game history and context
-
-**LLM Reasoning Process**: The model's internal reasoning, showing:
-
-- Strategic analysis of available options
-- Cost-benefit calculations
-- Risk assessment considerations
-- Long-term planning thoughts
-- Decision rationale and justification
-
-**Function Call Details**: Technical information about the executed action:
-
-- **Function Name**: The specific game action taken (e.g., "shop", "select_hand")
-- **Parameters**: Exact arguments passed to the game engine
-- **Action Description**: Human-readable explanation of what the model decided to do
-- **Strategic Reasoning**: Why this particular action was chosen
-
-**Navigation and Analysis Tools**
-
-- **Step Navigation**: Arrow controls allow researchers to move through the chronological sequence of decisions within a single game run
-- **Request Numbering**: Clear labeling of each decision point for reference and analysis
-- **Modal Interface**: Clean overlay design that allows easy comparison with the main dashboard
-
-This detailed view enables researchers to:
-
-- Understand exactly how LLMs interpret visual game states
-- Analyze the quality and depth of strategic reasoning
-- Identify decision-making patterns and potential improvements
-- Debug specific failure modes or suboptimal choices
-- Study the relationship between reasoning quality and performance outcomes
-
-The combination of visual game state, strategic reasoning, and technical execution details provides a complete picture of LLM behavior in complex, multi-step decision-making scenarios.
+Open your browser to `http://localhost:8001` to explore the interactive visualization of your benchmark results.

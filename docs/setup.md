@@ -1,135 +1,70 @@
 # Setup
 
-This guide will help you install and configure BalatroLLM for running LLM-powered Balatro bots.
+This guide will help you install and configure BalatroLLM.
 
 ## Prerequisites
 
-- **Python 3.13+**: BalatroLLM requires Python 3.13 or later
-- **Balatro Game**: You need a copy of Balatro installed
-- **BalatroBot**: The underlying framework for Balatro automation
-- **API Access**: An API key for LLM providers (OpenRouter recommended)
+- **[uv](https://docs.astral.sh/uv/)**: for managing Python environment and dependencies
+- **[Balatro Game](https://www.playbalatro.com/)**: You need a copy of Balatro installed
+- **[BalatroBot](https://github.com/coder/balatrobot)**: The underlying framework for Balatro automation
+- **Access to LLM model**: exposing an OpenAI-compatible chat/completion API
+
+!!! warning "BalatroBot Setup"
+
+    Setting up Balatro with the BalatroBot mod requires careful configuration. Please refer to the [BalatroBot](https://github.com/coder/balatrobot) documentation and follow the instructions step by step.
+    Ensure that BalatroBot is installed and running before proceeding with the BalatroLLM installation.
 
 ## Installation
 
-### 1. Install BalatroLLM
+1. Clone the repository
 
 ```bash
-# Clone the repository
-git clone https://github.com/coder/balatrollm.git
+git clone --depth 1 https://github.com/coder/balatrollm.git
 cd balatrollm
-
-# Install with uv (recommended)
-uv sync --all-extras --group dev
-
-# Or install with pip
-pip install -e .
 ```
 
-### 2. Set up BalatroBot
-
-BalatroLLM depends on BalatroBot for game communication. Follow the [BalatroBot installation guide](https://coder.github.io/balatrobot/installation/) to:
-
-1. Install the BalatroBot Steamodded mod
-2. Configure Balatro for bot communication
-3. Verify the setup works
-
-### 3. Configure Environment Variables
-
-Create a `.envrc` file in the project root:
+2. Create environment and install dependencies
 
 ```bash
-# Copy the example file
-cp .envrc.example .envrc
-
-# Edit with your API key
-export OPENROUTER_API_KEY="your-api-key-here"
-
-# Load the environment
-source .envrc
+uv sync --no-dev
 ```
 
-### 4. Verify Installation
+When running `uv sync`, `uv` automatically downloads the required Python version, creates a new environment at `.venv`, and installs the project dependencies.
 
-Test that everything is working:
+3. Activate environment
 
 ```bash
-# Check available models
-balatrollm --list-models
+source .venv/bin/activate
+```
 
-# Test bot connectivity (requires Balatro running)
+4. Test that the new commands are available
+
+```bash
 balatrollm --help
+balatrobench --help
 ```
 
-## API Key Setup
+!!! tip "Auto venv activation & Environment Variables"
 
-### OpenRouter (Recommended)
+    You can use [direnv](https://direnv.net/) to automatically activate the environment when you enter the project directory. The `.envrc.example` file contains an example configuration for direnv.
 
-OpenRouter provides access to multiple LLM providers through a single API:
+##  Provider Configuration
 
-1. Sign up at [openrouter.ai](https://openrouter.ai)
-2. Generate an API key
-3. Add to your `.envrc` file as `OPENROUTER_API_KEY`
+You need to configure your chosen provider. We recommend configuring the provider through environment variables using `.envrc` (see `.envrc.example`)
 
-### Other Providers
+- `BALATROLLM_BASE_URL`: API base URL
+- `BALATROLLM_API_KEY`: API key for LLM provider
 
-BalatroLLM supports any OpenAI-compatible API:
+Now you should be able to run
 
 ```bash
-# Use custom provider
-balatrollm --base-url https://api.your-provider.com/v1 --api-key your-key
+balatrollm --list-models
 ```
 
-## Game Setup
+to see the available models. You can now set the model environment variable:
 
-### Start Balatro
+- `BALATROLLM_MODEL`: Model to use
 
-Use the provided script to launch Balatro with bot support:
+!!! note "CLI precedence"
 
-```bash
-# Start single instance on default port 12346
-./balatro.sh
-
-# Start with custom port
-./balatro.sh -p 12347
-
-# Start multiple instances for parallel runs
-./balatro.sh -p 12346 -p 12347
-
-# Start in headless mode for servers
-./balatro.sh --headless --fast
-```
-
-### Verify Connection
-
-Check that BalatroLLM can connect to the game:
-
-```bash
-# Run a quick test (will exit after connection)
-balatrollm --runs 1
-```
-
-## Troubleshooting
-
-### Connection Issues
-
-If the bot can't connect to Balatro:
-
-1. Ensure Balatro is running with the BalatroBot mod
-2. Check that the port matches (default: 12346)
-3. Verify firewall settings allow local connections
-
-### API Issues
-
-If you get API errors:
-
-1. Verify your API key is correct
-2. Check your account balance/credits
-3. Test with a different model using `--model`
-
-### Performance Issues
-
-For better performance:
-
-1. Use `--fast` mode in the Balatro script
-2. Run multiple instances in parallel
-3. Choose faster models for initial testing
+    All `BALATROLLM_*` environment variables have a corresponding CLI argument. The environment variables are used as defaults when running `balatrollm`. CLI arguments take precedence over the corresponding environment variable. For example, you can set a default model with `BALATROLLM_MODEL` but use another one: `balatrollm --model "..."`.
