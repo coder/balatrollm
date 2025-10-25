@@ -11,6 +11,7 @@
       <img alt="Discord" src="https://img.shields.io/badge/discord-server?style=for-the-badge&logo=discord&logoColor=%23FFFFFF&color=%235865F2"/>
     </a>
   </p>
+  <div><video src="https://github.com/user-attachments/assets/777d0c4f-d66a-47dd-9eab-7efb20beaaf2" alt="BalatroLLM playing Balatro"></div>
   <p><em>A Balatro bot powered by LLMs</em></p>
 </div>
 
