@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.14.0](https://github.com/coder/balatrollm/compare/v0.13.2...v0.14.0) (2025-10-25)
+
+
+### Features
+
+* add logic to load/save strategy manifest ([e55b885](https://github.com/coder/balatrollm/commit/e55b885051b1f2f0206835c2eaa5ab0b42cb547e))
+* add manifest.json files for strategies ([14978aa](https://github.com/coder/balatrollm/commit/14978aa57dc48627116e90093079fe9d31f10445))
+* add strategy metadata to benchmark ([88ebc44](https://github.com/coder/balatrollm/commit/88ebc44b4aada5a581a480990e6c906464241d99))
+* configure balatrollm via env vars ([03c0fd0](https://github.com/coder/balatrollm/commit/03c0fd07a1f2bba1f44cf855f72732d4400f7903))
+* new cli for balatrobench ([973bc3e](https://github.com/coder/balatrollm/commit/973bc3e0285eb0117348f6c7d5c810219cd068f3))
+* new separate command for benchmarking ([b9a1284](https://github.com/coder/balatrollm/commit/b9a12841111bc651688983140a63189b922e9951))
+* update the aggressive strategy ([e51b9ca](https://github.com/coder/balatrollm/commit/e51b9ca2c76c499c6e6bbbafe632a166a791771f))
+
+
+### Bug Fixes
+
+* decrease timeout for llm client ([e7f2c91](https://github.com/coder/balatrollm/commit/e7f2c9138fec93237a8c686f1e085121f535dd9c))
+* use comma-separated ports in balatro.sh ([404b748](https://github.com/coder/balatrollm/commit/404b74860ac6a8add0a8d62f4470b2b726e008c4))
+
+
+### Documentation
+
+* add video in the readme ([328d9bc](https://github.com/coder/balatrollm/commit/328d9bc1e285ee8b29d72244632737d5b1916e7c))
+* fix list rendering using sane_lists ([a52decb](https://github.com/coder/balatrollm/commit/a52decbcf3f81eaf6d92332d3273f85717307d18))
+* remove old screenshots assets ([ef831a0](https://github.com/coder/balatrollm/commit/ef831a094886754f385df96c7cbc0f46c1d1e28b))
+* rewrite docs from scratch ([8c78a9b](https://github.com/coder/balatrollm/commit/8c78a9b3efa0838d639c0f5ef51bd1d9d2cda57b))
+* update .envrc.example with all the env vars ([8852bc5](https://github.com/coder/balatrollm/commit/8852bc5a0911c2762e7359c3664045c4d29fcd22))
+* update desc for llms-txt and set index.md as home ([dbe4a95](https://github.com/coder/balatrollm/commit/dbe4a95d75579e812ed27c360e8a3715a4fe2e03))
+* update README.md ([8ab0aa8](https://github.com/coder/balatrollm/commit/8ab0aa8fc1c6a8834d8c0ce1e29955c52afc1bec))
+* update titles in the README ([27006f5](https://github.com/coder/balatrollm/commit/27006f519335fc7a9cc67263c2ac6046afa6abd4))
+
 ## [0.13.2](https://github.com/coder/balatrollm/compare/v0.13.1...v0.13.2) (2025-10-24)
 
 
