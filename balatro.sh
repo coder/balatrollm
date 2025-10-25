@@ -30,13 +30,13 @@ esac
 show_usage() {
 	cat <<EOF
 Usage: $0 [OPTIONS]
-       $0 -p PORT [OPTIONS]
+       $0 --ports PORTS [OPTIONS]
        $0 --kill
        $0 --status
 
 Options:
-  -p, --port PORT  Specify port for Balatro instance (can be used multiple times)
-                   Default: 12346 if no port specified
+  --ports PORTS    Comma-separated list of ports (e.g., 12346,12347)
+                   Default: 12346 if not specified
   --headless       Enable headless mode (sets BALATROBOT_HEADLESS=1)
   --fast           Enable fast mode (sets BALATROBOT_FAST=1)
   --audio          Enable audio (disabled by default, sets BALATROBOT_AUDIO=1)
@@ -46,8 +46,8 @@ Options:
 
 Examples:
   $0                            # Start single instance on default port 12346
-  $0 -p 12347                   # Start single instance on port 12347
-  $0 -p 12346 -p 12347          # Start two instances on ports 12346 and 12347
+  $0 --ports 12347              # Start single instance on port 12347
+  $0 --ports 12346,12347        # Start two instances on ports 12346 and 12347
   $0 --headless --fast          # Start with headless and fast mode on default port
   $0 --audio                    # Start with audio enabled on default port
   $0 --kill                     # Kill all running Balatro instances
@@ -60,16 +60,20 @@ EOF
 parse_arguments() {
 	while [[ $# -gt 0 ]]; do
 		case $1 in
-		-p | --port)
+		--ports)
 			if [[ -z "$2" ]] || [[ "$2" =~ ^- ]]; then
-				echo "Error: --port requires a port number" >&2
+				echo "Error: --ports requires comma-separated port numbers" >&2
 				exit 1
 			fi
-			if ! [[ "$2" =~ ^[0-9]+$ ]] || [[ "$2" -lt 1024 ]] || [[ "$2" -gt 65535 ]]; then
-				echo "Error: Port must be a number between 1024 and 65535" >&2
-				exit 1
-			fi
-			PORTS+=("$2")
+			# Split comma-separated ports into array
+			IFS=',' read -ra port_list <<< "$2"
+			for port in "${port_list[@]}"; do
+				if ! [[ "$port" =~ ^[0-9]+$ ]] || [[ "$port" -lt 1024 ]] || [[ "$port" -gt 65535 ]]; then
+					echo "Error: Port must be a number between 1024 and 65535" >&2
+					exit 1
+				fi
+				PORTS+=("$port")
+			done
 			shift 2
 			;;
 		--headless)
