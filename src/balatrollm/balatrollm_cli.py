@@ -181,8 +181,8 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-m",
         "--model",
-        default="openai/gpt-oss-20b",
-        help="Model name to use from OpenAI-compatible API (default: openai/gpt-oss-20b)",
+        default=os.getenv("BALATROLLM_MODEL", "openai/gpt-oss-20b"),
+        help="Model name to use from OpenAI-compatible API (default: BALATROLLM_MODEL env var or openai/gpt-oss-20b)",
     )
     parser.add_argument(
         "-l",
@@ -193,21 +193,21 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-s",
         "--strategy",
-        default="default",
+        default=os.getenv("BALATROLLM_STRATEGY", "default"),
         type=str,
-        help="Name of the strategy to use (default: default)",
+        help="Name of the strategy to use (default: BALATROLLM_STRATEGY env var or default)",
     )
     parser.add_argument(
         "-u",
         "--base-url",
-        default="https://openrouter.ai/api/v1",
-        help="OpenAI-compatible API base URL (default: https://openrouter.ai/api/v1)",
+        default=os.getenv("BALATROLLM_BASE_URL", "https://openrouter.ai/api/v1"),
+        help="OpenAI-compatible API base URL (default: BALATROLLM_BASE_URL env var or https://openrouter.ai/api/v1)",
     )
     parser.add_argument(
         "-k",
         "--api-key",
-        default=os.getenv("OPENROUTER_API_KEY"),
-        help="API key (default: OPENROUTER_API_KEY env var)",
+        default=os.getenv("BALATROLLM_API_KEY", ""),
+        help="API key (default: BALATROLLM_API_KEY env var)",
     )
     parser.add_argument(
         "-d",
@@ -220,15 +220,15 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         "-r",
         "--runs-per-seed",
         type=int,
-        default=1,
+        default=int(os.getenv("BALATROLLM_RUNS_PER_SEED", "1")),
         dest="runs_per_seed",
-        help="Number of runs per seed (default: 1)",
+        help="Number of runs per seed (default: BALATROLLM_RUNS_PER_SEED env var or 1)",
     )
     parser.add_argument(
         "--seeds",
         type=str,
-        default=None,
-        help="Comma-separated list of seeds (e.g., AAAA123,BBBB456,CCCC789)",
+        default=os.getenv("BALATROLLM_SEEDS") or None,
+        help="Comma-separated list of seeds (default: BALATROLLM_SEEDS env var, e.g., AAAA123,BBBB456,CCCC789)",
     )
     parser.add_argument(
         "-p",
@@ -241,12 +241,14 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         "--no-screenshot",
         action="store_false",
         dest="take_screenshots",
-        help="Disable taking screenshots during gameplay",
+        default=not bool(int(os.getenv("BALATROLLM_NO_SCREENSHOT", "0"))),
+        help="Disable taking screenshots during gameplay (default: enabled unless BALATROLLM_NO_SCREENSHOT=1)",
     )
     parser.add_argument(
         "--use-default-paths",
         action="store_true",
-        help="Use BalatroBot's default storage paths for screenshots and game logs",
+        default=bool(int(os.getenv("BALATROLLM_USE_DEFAULT_PATHS", "0"))),
+        help="Use BalatroBot's default storage paths for screenshots and game logs (default: BALATROLLM_USE_DEFAULT_PATHS env var or 0)",
     )
 
     return parser

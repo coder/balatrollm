@@ -12,12 +12,30 @@ export PYTHONPATH="${PWD}/src:${PYTHONPATH}"
 export GIT_LFS_SKIP_SMUDGE=1
 
 # BALATROLLM CONFIGURATION
-# The CLI uses sensible defaults - no configuration needed!
-# - Default model: openai/gpt-oss-20b
-# - Default base URL: http://localhost:4000
-# - Default API key: sk-balatrollm-proxy-key
-# - Default strategy: default
+# Configure the CLI using environment variables
+# All values are optional and have sensible defaults
 
-# OPENROUTER API KEY (provides access to all LLM providers)
+# API key for LLM provider (required for most providers)
 # Get your API key from: https://openrouter.ai/keys
-export OPENROUTER_API_KEY="your-openrouter-api-key"
+export BALATROLLM_API_KEY="your-api-key"
+
+# Model to use (default: openai/gpt-oss-20b)
+export BALATROLLM_MODEL="openai/gpt-oss-20b"
+
+# API base URL (default: https://openrouter.ai/api/v1)
+export BALATROLLM_BASE_URL="https://openrouter.ai/api/v1"
+
+# Strategy to use (default: default)
+export BALATROLLM_STRATEGY="default"
+
+# Number of runs per seed (default: 1)
+export BALATROLLM_RUNS_PER_SEED="1"
+
+# Comma-separated list of seeds (default: random seed)
+export BALATROLLM_SEEDS=""
+
+# Disable screenshots (0=take screenshots, 1=no screenshots, default: 0)
+export BALATROLLM_NO_SCREENSHOT="0"
+
+# Use BalatroBot's default storage paths (0=custom paths, 1=default paths, default: 0)
+export BALATROLLM_USE_DEFAULT_PATHS="0"
