@@ -50,6 +50,7 @@ nav:
   - Usage: usage.md
   - Analysis: analysis.md
 markdown_extensions:
+  - sane_lists
   - toc:
       toc_depth: 3
   - attr_list
@@ -72,3 +73,4 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
