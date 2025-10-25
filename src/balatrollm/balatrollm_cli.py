@@ -36,8 +36,8 @@ async def cmd_balatrollm(args) -> None:
         print("Error: --runs-per-seed must be at least 1")
         sys.exit(1)
 
-    # Handle port default value
-    ports = args.port if args.port else [12346]
+    # Parse comma-separated ports
+    ports = [int(p) for p in args.ports.split(",")]
 
     config = Config(
         model=args.model,
@@ -181,8 +181,9 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-m",
         "--model",
-        default=os.getenv("BALATROLLM_MODEL", "openai/gpt-oss-20b"),
-        help="Model name to use from OpenAI-compatible API (default: BALATROLLM_MODEL env var or openai/gpt-oss-20b)",
+        default=os.getenv("BALATROLLM_MODEL"),
+        required=not os.getenv("BALATROLLM_MODEL"),
+        help="Model name to use from OpenAI-compatible API (required, uses BALATROLLM_MODEL env var if set)",
     )
     parser.add_argument(
         "-l",
@@ -200,8 +201,9 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-u",
         "--base-url",
-        default=os.getenv("BALATROLLM_BASE_URL", "https://openrouter.ai/api/v1"),
-        help="OpenAI-compatible API base URL (default: BALATROLLM_BASE_URL env var or https://openrouter.ai/api/v1)",
+        default=os.getenv("BALATROLLM_BASE_URL"),
+        required=not os.getenv("BALATROLLM_BASE_URL"),
+        help="OpenAI-compatible API base URL (required, uses BALATROLLM_BASE_URL env var if set)",
     )
     parser.add_argument(
         "-k",
@@ -232,10 +234,10 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-p",
-        "--port",
-        type=int,
-        action="append",
-        help="Port for BalatroBot client connection (can specify multiple, default: 12346)",
+        "--ports",
+        type=str,
+        default=os.getenv("BALATROLLM_PORTS", "12346"),
+        help="Comma-separated list of ports for BalatroBot client connections (default: BALATROLLM_PORTS env var or 12346, e.g., 12346,12347,12348)",
     )
     parser.add_argument(
         "--no-screenshot",
