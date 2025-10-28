@@ -89,6 +89,8 @@ class LLMBot:
         data_collector: Collector for structured run data and statistics.
         consecutive_failed_calls: Counter for consecutive failed/error calls.
         max_consecutive_failed_calls: Threshold for stopping the run (3 consecutive failed calls).
+        consecutive_timeout_count: Counter for consecutive LLM timeout errors.
+        max_consecutive_timeouts: Threshold for stopping due to timeouts (3 consecutive timeouts).
     """
 
     def __init__(self, config: Config, base_url: str, api_key: str, port: int = 12346):
@@ -121,6 +123,10 @@ class LLMBot:
         # Counter for consecutive failed/error calls. Prenvent infinite loop.
         self.error_or_failed_calls: int = 0
         self.max_error_or_failed_calls: int = 3
+
+        # Counter for consecutive timeout errors. Separate from other errors.
+        self.consecutive_timeout_count: int = 0
+        self.max_consecutive_timeouts: int = 3
 
     def __enter__(self):
         self.balatro_client.connect()
@@ -226,6 +232,9 @@ class LLMBot:
                 request_id = str(time.time_ns() // 1_000_000)
                 response = await self.llm_client.chat.completions.create(**request_data)
                 self.responses.append(response)
+
+                # Reset timeout counter on successful request
+                self.consecutive_timeout_count = 0
                 if self.config.take_screenshots:
                     if self.config.use_default_paths:
                         self.balatro_client.screenshot(None)
@@ -245,7 +254,10 @@ class LLMBot:
                 return response
 
             except APITimeoutError as e:
-                logger.error(e)
+                self.consecutive_timeout_count += 1
+                logger.error(
+                    f"LLM request timeout ({self.consecutive_timeout_count}/{self.max_consecutive_timeouts}): {e}"
+                )
                 self.data_collector.write_response(
                     id=str(time.time_ns() // 1_000_000),
                     custom_id=custom_id,
@@ -254,6 +266,20 @@ class LLMBot:
                         message=str(e),
                     ),
                 )
+
+                # Send get_game_state to keep TCP connection alive
+                try:
+                    self.balatro_client.send_message("get_game_state", {})
+                    logger.info("Sent get_game_state to keep TCP connection alive")
+                except Exception as keepalive_error:
+                    logger.warning(
+                        f"Failed to send keepalive get_game_state: {keepalive_error}"
+                    )
+
+                # Check if we've hit the max consecutive timeouts
+                if self.consecutive_timeout_count >= self.max_consecutive_timeouts:
+                    logger.error("3 consecutive LLM timeouts - ending run")
+                    raise LLMBotError("3 consecutive LLM request timeouts")
 
             except APIConnectionError as e:
                 logger.error(e)
