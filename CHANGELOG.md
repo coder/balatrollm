@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.1](https://github.com/coder/balatrollm/compare/v0.14.0...v0.14.1) (2025-10-28)
+
+
+### Bug Fixes
+
+* add keepalive get_game_state to keep TCP connection alive ([992faf3](https://github.com/coder/balatrollm/commit/992faf367b9454e7513969eff07df8e03eaf5372))
+
 ## [0.14.0](https://github.com/coder/balatrollm/compare/v0.13.2...v0.14.0) (2025-10-25)
 
 
