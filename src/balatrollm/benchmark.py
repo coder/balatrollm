@@ -402,6 +402,50 @@ class BenchmarkAnalyzer:
         except Exception as e:
             print(f"Warning: cavif conversion error in {directory}: {e}")
 
+    def _convert_single_png_to_webp(self, png_file: Path) -> None:
+        """Convert a single PNG file to WebP."""
+        try:
+            webp_file = png_file.with_suffix(".webp")
+            subprocess.run(
+                [
+                    "cwebp",
+                    "-q",
+                    "80",
+                    "-quiet",
+                    str(png_file),
+                    "-o",
+                    str(webp_file),
+                ],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            png_file.unlink()
+        except subprocess.CalledProcessError as e:
+            print(f"Warning: cwebp conversion failed for {png_file}: {e.stderr}")
+        except OSError as e:
+            print(f"Warning: Could not remove {png_file}: {e}")
+
+    def convert_pngs_to_webp(self, directory: Path) -> None:
+        """Convert all PNG files in directory to WebP using cwebp with parallelization."""
+        try:
+            png_files = list(directory.rglob("screenshot.png"))
+            if not png_files:
+                return
+
+            with ThreadPoolExecutor(max_workers=8) as executor:
+                list(
+                    tqdm(
+                        executor.map(self._convert_single_png_to_webp, png_files),
+                        total=len(png_files),
+                        desc="Converting to WebP",
+                    )
+                )
+        except FileNotFoundError:
+            print("Warning: cwebp not found, keeping PNG format")
+        except Exception as e:
+            print(f"Warning: cwebp conversion error in {directory}: {e}")
+
     def extract_request_content(self, requests_file: Path) -> dict[str, str]:
         """Extract request content from requests.jsonl by custom_id."""
         content_by_id = {}

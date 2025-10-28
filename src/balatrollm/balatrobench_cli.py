@@ -49,6 +49,11 @@ def main() -> None:
         action="store_true",
         help="Convert PNG screenshots to AVIF format after analysis",
     )
+    parser.add_argument(
+        "--webp",
+        action="store_true",
+        help="Convert PNG screenshots to WebP format after analysis",
+    )
 
     args = parser.parse_args()
 
@@ -79,6 +84,11 @@ def main() -> None:
         if args.avif:
             print("Converting PNG screenshots to AVIF format...")
             analyzer.convert_pngs_to_avif(args.output_dir)
+
+        # Convert PNGs to WebP if requested
+        if args.webp:
+            print("Converting PNG screenshots to WebP format...")
+            analyzer.convert_pngs_to_webp(args.output_dir)
 
         # Generate manifest.json in the base benchmark directory
         manifest_base_dir = args.output_dir.parent
