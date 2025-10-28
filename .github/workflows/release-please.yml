@@ -49,3 +49,14 @@ jobs:
           else
             echo "No changes to uv.lock"
           fi
+      - name: Notify consumer repo of new balatrollm release
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          BALATRO_REPO: "S1M0N38/balatro"
+          BALATRO_TOKEN: ${{ secrets.BALATRO_TOKEN }}
+        run: |
+          VERSION="${{ steps.release.outputs.version }}"
+          curl -X POST -H "Accept: application/vnd.github+json" \
+            -H "Authorization: token $BALATRO_TOKEN" \
+            https://api.github.com/repos/$BALATRO_REPO/dispatches \
+            -d "{\"event_type\":\"balatrollm_release\",\"client_payload\":{\"version\":\"$VERSION\"}}"
