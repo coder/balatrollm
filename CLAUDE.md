@@ -183,6 +183,7 @@ src/balatrollm/
 └── strategies/                    # Strategy-based templates
     ├── default/                   # Conservative strategy
     └── aggressive/                # High-risk strategy
+        ├── manifest.json          # Strategy metadata
         ├── STRATEGY.md.jinja      # Strategy guide
         ├── GAMESTATE.md.jinja     # Game state representation
         ├── MEMORY.md.jinja        # Response history
@@ -230,9 +231,26 @@ The `--strategy` flag accepts built-in strategy names:
 - **Default** (`--strategy default`): Conservative, financially disciplined approach
 - **Aggressive** (`--strategy aggressive`): High-risk, high-reward approach with aggressive spending
 
-Each strategy directory must contain:
+Each strategy directory must contain **5 required files**:
 
+- `manifest.json`: Strategy metadata (name, description, author, version, tags)
 - `STRATEGY.md.jinja`: Strategy-specific guide
 - `GAMESTATE.md.jinja`: Game state representation
 - `MEMORY.md.jinja`: Response history tracking
 - `TOOLS.json`: Strategy-specific function definitions
+
+**manifest.json Structure**:
+
+```json
+{
+  "name": "Default",
+  "description": "Conservative, financially disciplined approach to Balatro",
+  "author": "BalatroBench",
+  "version": "0.1.0",
+  "tags": ["conservative", "financial"]
+}
+```
+
+All 5 fields are required. Strategy versions are independent from BalatroLLM versions.
+
+For comprehensive strategy documentation including Jinja2 templates, validation, and contribution guidelines, see [docs/strategies.md](https://s1m0n38.github.io/balatrollm/strategies/).

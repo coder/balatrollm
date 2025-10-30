@@ -16,7 +16,7 @@ This document provides guidelines and instructions for contributing to the proje
 
 5. **Use Conventional Commits**: Follow the conventional commits specification for your commit messages.
 
-6. **Submit Strategies**: Community members can contribute new playing strategies by following the strategy submission guidelines below.
+6. **Submit Strategies**: Community members can contribute new playing strategies. See the [Strategies documentation](https://s1m0n38.github.io/balatrollm/strategies/) for detailed guidelines.
 
 ## Environment Setup
 
@@ -49,89 +49,3 @@ source .envrc
 ```
 
 > You can use [direnv](https://github.com/direnv/direnv) to automatically activate the environment when you enter the project directory.
-
-## Contributing Strategies
-
-Community members can contribute new playing strategies to enhance BalatroLLM's gameplay variety. Strategies define how the bot approaches decision-making during different game phases.
-
-### Strategy Structure
-
-Each strategy must be organized as a directory under `src/balatrollm/strategies/` containing exactly four files:
-
-```
-src/balatrollm/strategies/your_strategy_name/
-├── STRATEGY.md.jinja      # Strategy-specific guide and approach
-├── GAMESTATE.md.jinja     # Game state representation template
-├── MEMORY.md.jinja        # Response history tracking template
-└── TOOLS.json             # Strategy-specific function definitions
-```
-
-### Strategy Naming Requirements
-
-Strategy names must follow these rules:
-
-- **Lowercase letters and numbers only** (e.g., `aggressive`, `value_based`, `risky2`)
-- **Valid Python identifier** (cannot start with a number)
-- **Underscores allowed, hyphens forbidden** (e.g., `high_risk` allowed, `high-risk` forbidden)
-- **No spaces or special characters**
-
-### Creating Your Strategy
-
-1. **Study Existing Strategies**: Review `src/balatrollm/strategies/default/` and `src/balatrollm/strategies/aggressive/` to understand the template structure and content expectations.
-
-2. **Create Strategy Directory**: Create a new directory following the naming requirements:
-
-   ```bash
-   mkdir src/balatrollm/strategies/your_strategy_name
-   ```
-
-3. **Required Files**: Create all four required files using the existing strategies as templates:
-
-   - **STRATEGY.md.jinja**: Define your strategy's core philosophy, decision-making approach, and gameplay priorities
-   - **GAMESTATE.md.jinja**: Template for how game state information should be presented to the LLM
-   - **MEMORY.md.jinja**: Template for tracking and presenting response history
-   - **TOOLS.json**: Function definitions available to the LLM during gameplay
-
-4. **Template Compatibility**: Ensure your templates work with the Jinja2 templating system and provide all necessary context for LLM decision-making.
-
-### Submission Process
-
-1. **Fork the Repository**: Fork the BalatroLLM repository to your GitHub account
-
-2. **Create Feature Branch**: Create a new branch for your strategy:
-
-   ```bash
-   git checkout -b feat/add-strategy-your_strategy_name
-   ```
-
-3. **Implement Strategy**: Add your strategy directory with all required files
-
-4. **Test Your Strategy**: Run your strategy locally to ensure it works:
-
-   ```bash
-   balatrollm --strategy your_strategy_name
-   ```
-
-5. **Submit Pull Request**: Open a PR containing only your new strategy directory. The PR should:
-
-   - Have a clear title: `feat: add [strategy_name] strategy`
-   - Include a brief description of your strategy's approach and philosophy
-   - Follow conventional commit standards
-
-### Quality Standards
-
-- **Complete Implementation**: All four files must be present and functional
-- **Clear Documentation**: Strategy philosophy and approach should be well-documented
-- **Template Validation**: Ensure Jinja2 templates render correctly with game data
-- **Unique Approach**: Strategy should offer a meaningfully different gameplay style from existing strategies
-
-### Review Process
-
-Submitted strategies will be reviewed for:
-
-- Compliance with naming and structure requirements
-- Template functionality and Jinja2 compatibility
-- Strategy uniqueness and gameplay value
-- Code quality and documentation standards
-
-Once approved, your strategy will be available to all BalatroLLM users via the `--strategy` flag.

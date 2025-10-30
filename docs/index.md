@@ -1,8 +1,18 @@
 # BalatroLLM
 
-<!-- <figure markdown="span"> -->
+<!-- TODO: This should be uncommented when the balatrollm repo is public -->
 
-<!--   <figcaption>A Balatro bot powered by LLM</figcaption> -->
+<!-- <figure> -->
+
+<!--   <figcaption>BalatroLLM playing Balatro</figcaption> -->
+
+<!--   <video controls playsinline> -->
+
+<!--     <source src="https://github.com/user-attachments/assets/777d0c4f-d66a-47dd-9eab-7efb20beaaf2" type="video/mp4"> -->
+
+<!--     Your browser does not support the video tag. -->
+
+<!--   </video> -->
 
 <!-- </figure> -->
 
@@ -36,12 +46,16 @@ BalatroLLM is a bot that uses Large Language Models (LLMs) to play [Balatro](htt
 
     [:octicons-arrow-right-24: Analysis](analysis.md)
 
-- :octicons-sparkle-fill-16:{ .lg .middle } __Docs for LLM__
+- :material-strategy:{ .lg .middle } __Strategies__
 
     ---
 
-    Documentation in [llms.txt](https://llmstxt.org/) format. Just paste the following link (or its content) into the LLM chat.
+    Learn how strategies work, their structure using Jinja2 templates, and how to contribute your own.
 
-    [:octicons-arrow-right-24: llms-full.txt](llms-full.txt)
+    [:octicons-arrow-right-24: Strategies](strategies.md)
 
 </div>
+
+!!! tip "Docs for LLM"
+
+    Documentation in [llms.txt](https://llmstxt.org/) format. Just paste [this link](llms-full.txt) (or its content) into the LLM chat.

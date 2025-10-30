@@ -113,9 +113,12 @@ The current model configuration includes some of the models supported by [OpenRo
 
 ## Strategies
 
-One aspect that we are interested in exploring is the strategy: i.e., the prompt sent to the LLM.
+Strategies define how the LLM bot approaches decision-making during gameplay. Each strategy consists of Jinja2 templates that generate the prompts sent to the language model, providing different playing styles and approaches.
 
-BalatroLLM ships with two strategies (default and aggressive) but we encourage the community to contribute their own strategies. See [CONTRIBUTING.md](https://github.com/coder/balatrollm/blob/main/CONTRIBUTING.md#contributing-strategies) for more details.
+BalatroLLM ships with two built-in strategies:
+
+- **default**: Conservative, financially disciplined approach
+- **aggressive**: High-risk, high-reward strategy with aggressive spending
 
 To run balatrollm with a specific strategy, use the `--strategy` flag:
 
@@ -126,3 +129,5 @@ balatrollm --strategy default
 ```bash
 balatrollm --strategy aggressive
 ```
+
+For detailed information about how strategies work, their structure, and how to contribute your own strategies, see the [Strategies documentation](strategies.md).

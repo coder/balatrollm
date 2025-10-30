@@ -40,6 +40,7 @@ plugins:
           - setup.md
           - usage.md
           - analysis.md
+          - strategies.md
       full_output: llms-full.txt
       autoclean: true
 nav:
@@ -47,6 +48,7 @@ nav:
   - Setup: setup.md
   - Usage: usage.md
   - Analysis: analysis.md
+  - Strategies: strategies.md
 markdown_extensions:
   - sane_lists
   - toc:
@@ -71,4 +73,3 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
-
