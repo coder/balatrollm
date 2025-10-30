@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.1](https://github.com/coder/balatrollm/compare/v0.15.0...v0.15.1) (2025-10-30)
+
+
+### Dependencies
+
+* update balatrobot to 0.7.5 ([3ae6b1a](https://github.com/coder/balatrollm/commit/3ae6b1ad86620c0b658373b5ea31e01aed795a7d))
+
 ## [0.15.0](https://github.com/coder/balatrollm/compare/v0.14.1...v0.15.0) (2025-10-30)
 
 
