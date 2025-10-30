@@ -36,8 +36,8 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore(deps): update balatrobot to ${{ steps.version.outputs.VERSION }}"
-          title: "chore(deps): bump balatrobot to ${{ steps.version.outputs.VERSION }}"
+          commit-message: "deps: update balatrobot to ${{ steps.version.outputs.VERSION }}"
+          title: "deps: bump balatrobot to ${{ steps.version.outputs.VERSION }}"
           body: |
             Automatic dependency update after balatrobot release `${{ steps.version.outputs.VERSION }}`
 
