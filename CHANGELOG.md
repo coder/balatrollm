@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.15.0](https://github.com/coder/balatrollm/compare/v0.14.1...v0.15.0) (2025-10-30)
+
+
+### Features
+
+* add webp conversion to balatrobench cli ([8afe67c](https://github.com/coder/balatrollm/commit/8afe67c2e076173dcb930f522532bf2bde27c3e6))
+
+
+### Documentation
+
+* add better documentation for strategies ([1af7822](https://github.com/coder/balatrollm/commit/1af782267cc947c1b4cf4dd048e7cd807dfeab78))
+
 ## [0.14.1](https://github.com/coder/balatrollm/compare/v0.14.0...v0.14.1) (2025-10-28)
 
 
