@@ -22,7 +22,7 @@ jobs:
         id: release
         with:
           token: ${{ secrets.PAT }}
-          release-type: python
+          config-file: .github/release-please-config.json
       - uses: actions/checkout@v4
         if: ${{ steps.release.outputs.release_created }}
         with:
