@@ -1,6 +1,6 @@
 """BalatroLLM project."""
 
-__version__ = "0.15.1"
+__version__ = "0.16.0"
 
 from .balatrollm_cli import main
 

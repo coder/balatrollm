@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.16.0](https://github.com/coder/balatrollm/compare/v0.15.1...v0.16.0) (2025-11-03)
+
+
+### Features
+
+* finer metrics generation by balatrobench ([0d684aa](https://github.com/coder/balatrollm/commit/0d684aa6301c4733da1bbd16d0dca0f76bd83f35))
+
 ## [0.15.1](https://github.com/coder/balatrollm/compare/v0.15.0...v0.15.1) (2025-10-30)
 
 
