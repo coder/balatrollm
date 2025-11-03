@@ -446,8 +446,11 @@ class BenchmarkAnalyzer:
         except Exception as e:
             print(f"Warning: cwebp conversion error in {directory}: {e}")
 
-    def extract_request_content(self, requests_file: Path) -> dict[str, str]:
-        """Extract request content from requests.jsonl by custom_id."""
+    def extract_request_content(self, requests_file: Path) -> dict[str, dict[str, str]]:
+        """Extract request content from requests.jsonl by custom_id.
+
+        Returns a dict mapping custom_id to a dict with keys 'strategy', 'gamestate', 'memory'.
+        """
         content_by_id = {}
         if not requests_file.exists():
             return content_by_id
@@ -461,20 +464,33 @@ class BenchmarkAnalyzer:
                     if messages and len(messages) > 0:
                         content = messages[0].get("content", "")
                         if isinstance(content, list):
-                            # Handle multimodal content: extract text from each item
+                            # Handle multimodal content: extract 3 separate text blocks
                             text_parts = [
                                 item.get("text", "")
                                 for item in content
                                 if "text" in item
                             ]
-                            content_by_id[custom_id] = (
-                                "\n".join(text_parts) or "Content not available"
-                            )
+
+                            # Expected structure: [strategy, gamestate, memory]
+                            content_dict = {
+                                "strategy": text_parts[0]
+                                if len(text_parts) > 0
+                                else "Content not available",
+                                "gamestate": text_parts[1]
+                                if len(text_parts) > 1
+                                else "Content not available",
+                                "memory": text_parts[2]
+                                if len(text_parts) > 2
+                                else "Content not available",
+                            }
+                            content_by_id[custom_id] = content_dict
                         else:
-                            # Handle simple string content
-                            content_by_id[custom_id] = (
-                                content or "Content not available"
-                            )
+                            # Handle simple string content (fallback for legacy format)
+                            content_by_id[custom_id] = {
+                                "strategy": content or "Content not available",
+                                "gamestate": "",
+                                "memory": "",
+                            }
         return content_by_id
 
     def extract_reasoning_from_tool_calls(self, tool_calls: list) -> str:
@@ -526,6 +542,145 @@ class BenchmarkAnalyzer:
                         response_by_id[custom_id] = response_data
         return response_by_id
 
+    def extract_request_metadata(self, requests_file: Path) -> dict[str, dict]:
+        """Extract request metadata from requests.jsonl by custom_id."""
+        metadata_by_id = {}
+        if not requests_file.exists():
+            return metadata_by_id
+
+        with open(requests_file) as f:
+            for line in f:
+                data = json.loads(line.strip())
+                custom_id = data.get("custom_id")
+                if custom_id and "body" in data:
+                    body = data["body"]
+                    extra_body = body.get("extra_body", {})
+
+                    metadata = {
+                        "model": body.get("model"),
+                        "seed": body.get("seed"),
+                        "reasoning_effort": extra_body.get("reasoning", {}).get(
+                            "effort"
+                        ),
+                    }
+                    metadata_by_id[custom_id] = metadata
+        return metadata_by_id
+
+    def extract_response_metadata(self, responses_file: Path) -> dict[str, dict]:
+        """Extract response metadata from responses.jsonl by custom_id."""
+        metadata_by_id = {}
+        if not responses_file.exists():
+            return metadata_by_id
+
+        with open(responses_file) as f:
+            for line in f:
+                data = json.loads(line.strip())
+                custom_id = data.get("custom_id")
+
+                if custom_id:
+                    response = data.get("response", {})
+                    body = response.get("body", {})
+                    usage = body.get("usage", {})
+                    cost_details = usage.get("cost_details", {})
+                    completion_details = usage.get("completion_tokens_details", {})
+                    prompt_details = usage.get("prompt_tokens_details", {})
+
+                    metadata = {
+                        "status": "success"
+                        if response.get("status_code") == 200 and not data.get("error")
+                        else "error",
+                        "status_code": response.get("status_code"),
+                        "provider": body.get("provider"),
+                        "generation_id": body.get("id"),
+                        "created_unix": body.get("created"),
+                        "request_id": response.get("request_id"),
+                        "response_id": data.get("id"),
+                        "tokens": {
+                            "prompt": usage.get("prompt_tokens"),
+                            "completion": usage.get("completion_tokens"),
+                            "reasoning": completion_details.get("reasoning_tokens"),
+                            "cached": prompt_details.get("cached_tokens"),
+                            "total": usage.get("total_tokens"),
+                        },
+                        "cost": {
+                            "total_usd": usage.get("cost"),
+                            "prompt_usd": cost_details.get(
+                                "upstream_inference_prompt_cost"
+                            ),
+                            "completion_usd": cost_details.get(
+                                "upstream_inference_completions_cost"
+                            ),
+                        },
+                        "error": data.get("error"),
+                    }
+                    metadata_by_id[custom_id] = metadata
+        return metadata_by_id
+
+    def generate_metadata(
+        self,
+        custom_id: str,
+        request_metadata: dict[str, dict],
+        response_metadata: dict[str, dict],
+        balatro_seed: str | None = None,
+    ) -> dict:
+        """Generate combined metadata for a single request."""
+        req_meta = request_metadata.get(custom_id, {})
+        resp_meta = response_metadata.get(custom_id, {})
+
+        # Determine status
+        if not resp_meta:
+            status = "missing"
+        else:
+            status = resp_meta.get("status", "error")
+
+        metadata = {
+            "custom_id": custom_id,
+            "status": status,
+        }
+
+        # Add Balatro seed if available
+        if balatro_seed is not None:
+            metadata["balatro_seed"] = balatro_seed
+
+        metadata["model"] = {
+            "name": req_meta.get("model"),
+            "provider": resp_meta.get("provider"),
+        }
+
+        # Add tokens only if response exists
+        if resp_meta and resp_meta.get("tokens"):
+            metadata["tokens"] = resp_meta["tokens"]
+
+        # Add cost only if response exists
+        if resp_meta and resp_meta.get("cost"):
+            metadata["cost"] = resp_meta["cost"]
+
+        # Add timing info
+        metadata["timing"] = {
+            "created_unix": resp_meta.get("created_unix"),
+            "request_id": resp_meta.get("request_id"),
+            "response_id": resp_meta.get("response_id"),
+        }
+
+        # Add request details
+        metadata["request"] = {
+            "seed": req_meta.get("seed"),
+            "reasoning_effort": req_meta.get("reasoning_effort"),
+        }
+
+        # Add response details if exists
+        if resp_meta:
+            metadata["response"] = {
+                "status_code": resp_meta.get("status_code"),
+                "generation_id": resp_meta.get("generation_id"),
+            }
+
+        # Add error if exists
+        if resp_meta and resp_meta.get("error"):
+            metadata["error"] = resp_meta["error"]
+
+        return metadata
+
     def create_detailed_run_dirs(self, model_dir: Path, output_dir: Path) -> None:
         """Create detailed run directories with extracted data."""
         model_name = model_dir.name
@@ -542,9 +697,22 @@ class BenchmarkAnalyzer:
             requests_file = run_dir / "requests.jsonl"
             responses_file = run_dir / "responses.jsonl"
             screenshots_dir = run_dir / "screenshots"
+            config_file = run_dir / "config.json"
+
+            # Extract Balatro seed from config.json
+            balatro_seed = None
+            if config_file.exists():
+                try:
+                    with open(config_file, "r") as f:
+                        config = json.load(f)
+                        balatro_seed = config.get("seed")
+                except (json.JSONDecodeError, IOError):
+                    pass
 
             request_content = self.extract_request_content(requests_file)
             response_data = self.extract_response_data(responses_file)
+            request_metadata = self.extract_request_metadata(requests_file)
+            response_metadata = self.extract_response_metadata(responses_file)
 
             # Process each custom_id
             all_custom_ids = set(request_content.keys()) | set(response_data.keys())
@@ -553,10 +721,15 @@ class BenchmarkAnalyzer:
                 custom_id_dir = detailed_run_dir / custom_id
                 custom_id_dir.mkdir(parents=True, exist_ok=True)
 
-                # Write request.md
+                # Write strategy.md, gamestate.md, memory.md
                 if custom_id in request_content:
-                    with open(custom_id_dir / "request.md", "w") as f:
-                        f.write(request_content[custom_id])
+                    content_dict = request_content[custom_id]
+                    with open(custom_id_dir / "strategy.md", "w") as f:
+                        f.write(content_dict["strategy"])
+                    with open(custom_id_dir / "gamestate.md", "w") as f:
+                        f.write(content_dict["gamestate"])
+                    with open(custom_id_dir / "memory.md", "w") as f:
+                        f.write(content_dict["memory"])
 
                 # Write reasoning.md and tool_call.json
                 if custom_id in response_data:
@@ -574,6 +747,13 @@ class BenchmarkAnalyzer:
                     if png_file.exists():
                         screenshot_dest = custom_id_dir / "screenshot.png"
                         screenshot_dest.write_bytes(png_file.read_bytes())
+
+                # Write metadata.json
+                metadata = self.generate_metadata(
+                    custom_id, request_metadata, response_metadata, balatro_seed
+                )
+                with open(custom_id_dir / "metadata.json", "w") as f:
+                    json.dump(metadata, f, indent=2)
 
     def generate_manifest(self, base_dir: Path, current_version: str) -> None:
         """Generate manifest.json tracking available benchmark versions.
