@@ -23,6 +23,7 @@ jobs:
         with:
           token: ${{ secrets.PAT }}
           config-file: .github/release-please-config.json
+          manifest-file: .github/.release-please-manifest.json
       - uses: actions/checkout@v4
         if: ${{ steps.release.outputs.release_created }}
         with:
