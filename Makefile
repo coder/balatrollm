@@ -62,7 +62,7 @@ test: ## Run tests head-less
 	@echo "$(YELLOW)Starting Balatro...$(RESET)"
 	$(BALATRO_SCRIPT) --fast --debug
 	@echo "$(YELLOW)Running tests...$(RESET)"
-	pytest tests/lua $(if $(PYTEST_MARKER),-m "$(PYTEST_MARKER)") -v -s
+	pytest tests $(if $(PYTEST_MARKER),-m "$(PYTEST_MARKER)") -v -s
 
 all: lint format typecheck test ## Run all code quality checks and tests
 	@echo "$(GREEN)✓ All checks completed$(RESET)"
