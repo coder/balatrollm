@@ -17,6 +17,25 @@ REQUEST_TIMEOUT: float = 5.0
 
 _request_id_counter: int = 0
 
+
+# ============================================================================
+# Helpers
+# ============================================================================
+
+
+def is_balatrobot_available() -> bool:
+    """Check if BalatroBot API is reachable."""
+    try:
+        with httpx.Client(timeout=2.0) as client:
+            response = client.post(
+                f"http://{HOST}:{PORT}/",
+                json={"jsonrpc": "2.0", "method": "gamestate", "params": {}, "id": 1},
+            )
+            return response.status_code == 200
+    except (httpx.ConnectError, httpx.TimeoutException):
+        return False
+
+
 # ============================================================================
 # Fixtures
 # ============================================================================
