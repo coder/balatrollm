@@ -6,19 +6,19 @@ Learn how to run BalatroLLM, configure strategies, and customize gameplay parame
 
 Assuming that you have followed the [setup guide](setup.md) and configured the provider, you can run BalatroLLM with the following steps:
 
-1. Start Balatro with the BalatroBot mod using the utility script:
+- Start Balatro with the BalatroBot mod using the utility script:
 
 ```bash
 bash balatro.sh
 ```
 
-2. Start BalatroLLM:
+- Start BalatroLLM:
 
 ```bash
 balatrollm --model openai/gpt-oss-20b
 ```
 
-3. Watch the gameplay!
+- Watch the gameplay!
 
 ## Advanced Usage
 
@@ -27,11 +27,15 @@ balatrollm --model openai/gpt-oss-20b
 The `BALATROBOT_*` variables are used to configure Balatro and BalatroBot. It is recommended to set the variables that you don't change often in the `.envrc`.
 
 - `BALATROBOT_HOST`: The host to run the server on. Defaults to `127.0.0.1`.
+
 - `BALATROBOT_PORT`: The port to run the server on. Defaults to `12346`.
 
 - `BALATROBOT_HEADLESS`: Avoid rendering the game on the screen. Set to `1` to enable.
+
 - `BALATROBOT_FAST`: Faster animations and gameplay. Set to `1` to enable.
+
 - `BALATROBOT_AUDIO`: Enable audio. Set to `1` to enable.
+
 - `BALATROBOT_RENDER_ON_API`: Render the frame only on an API call.
 
 These are the environment variables set by `balatro.sh` using its flags. For example, to run the game in fast mode, you can run: `bash balatro.sh --fast`.
@@ -43,13 +47,19 @@ Usually, you don't need to set these variables manually.
 The `BALATROLLM_*` variables are used as defaults for the BalatroLLM CLI. It is recommended to set the variables that you don't change often in the `.envrc`.
 
 - `BALATROLLM_BASE_URL`: The base URL to use. (required)
+
 - `BALATROLLM_API_KEY`: The API key to use. (usually required)
+
 - `BALATROLLM_MODEL`: The model to use. (required)
 
 - `BALATROLLM_STRATEGY`: The strategy to use. (default: `default`)
+
 - `BALATROLLM_RUNS_PER_SEED`: The number of runs per seed. (default: `1`)
+
 - `BALATROLLM_SEEDS`: The seeds to use. If empty, a random seed is used. You can also use a comma-separated list of seeds.
+
 - `BALATROLLM_NO_SCREENSHOT`: Whether to take screenshots. Screenshots are not available in headless mode. (default: `0`, i.e. take screenshots)
+
 - `BALATROLLM_USE_DEFAULT_PATHS`: Whether to use BalatroBot's default storage paths. It's not recommended to change this. (default: `0`)
 
 Each of these variables has a corresponding BalatroLLM CLI flag. For example, `--model` is the BalatroLLM CLI flag for `BALATROLLM_MODEL`.

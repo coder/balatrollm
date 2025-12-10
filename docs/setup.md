@@ -16,14 +16,14 @@ This guide will help you install and configure BalatroLLM.
 
 ## Installation
 
-1. Clone the repository
+- Clone the repository
 
 ```bash
 git clone --depth 1 https://github.com/coder/balatrollm.git
 cd balatrollm
 ```
 
-2. Create environment and install dependencies
+- Create environment and install dependencies
 
 ```bash
 uv sync --no-dev
@@ -31,13 +31,13 @@ uv sync --no-dev
 
 When running `uv sync`, `uv` automatically downloads the required Python version, creates a new environment at `.venv`, and installs the project dependencies.
 
-3. Activate environment
+- Activate environment
 
 ```bash
 source .venv/bin/activate
 ```
 
-4. Test that the new commands are available
+- Test that the new commands are available
 
 ```bash
 balatrollm --help
@@ -48,7 +48,7 @@ balatrobench --help
 
     You can use [direnv](https://direnv.net/) to automatically activate the environment when you enter the project directory. The `.envrc.example` file contains an example configuration for direnv.
 
-##  Provider Configuration
+## Provider Configuration
 
 You need to configure your chosen provider. We recommend configuring the provider through environment variables using `.envrc` (see `.envrc.example`)
 
