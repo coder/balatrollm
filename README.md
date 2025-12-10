@@ -40,20 +40,20 @@ These components are processed together in a single LLM call, enabling the bot t
 
 ### 📦 Installation
 
-1. Clone the repository
+- Clone the repository
 
 ```bash
 git clone https://github.com/coder/balatrollm.git
 cd balatrollm
 ```
 
-2. Create environment and install dependencies
+- Create environment and install dependencies
 
 ```bash
 uv sync --no-dev
 ```
 
-3. Activate environment
+- Activate environment
 
 ```bash
 source .venv/bin/activate
@@ -61,7 +61,6 @@ source .venv/bin/activate
 
 > [!TIP]
 > You can use [direnv](https://direnv.net/) to automatically activate the environment when you enter the project directory. The `.envrc.example` file contains an example configuration for direnv.
-
 
 ### ⚙️ LLM Configuration
 
@@ -86,19 +85,19 @@ The default configuration uses [OpenRouter](https://openrouter.ai/), which provi
 
 The typical workflow to run BalatroLLM is:
 
-1. Start Balatro with the BalatroBot mod:
+- Start Balatro with the BalatroBot mod:
 
 ```bash
 bash balatro.sh
 ```
 
-2. Run the bot, typically with multiple runs using the same configuration:
+- Run the bot, typically with multiple runs using the same configuration:
 
 ```bash
 balatrollm --runs-per-seed 3 --seed ABCDEFG
 ```
 
-3. Generate benchmark reports from the runs:
+- Generate benchmark reports from the runs:
 
 ```bash
 balatrobench --models
