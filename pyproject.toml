@@ -44,6 +44,7 @@ typeCheckingMode = "basic"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = ["dev: marks tests that are currently developed"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 
