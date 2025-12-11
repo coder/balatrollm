@@ -187,3 +187,8 @@ benchmarks-old
 .DS_Store
 super-runs
 src/balatrollm_old
+
+# Test fixtures
+tests/unit/fixtures/*/*.md
+tests/unit/fixtures/*/*.json
+tests/integration/fixtures/*/*.jkr
