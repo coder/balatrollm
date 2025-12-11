@@ -1,6 +1,5 @@
 """Test configuration and fixtures for BalatroLLM tests."""
 
-from pathlib import Path
 from typing import Any, Generator
 
 import httpx
@@ -76,50 +75,3 @@ def api(
     response = client.post("/", json=payload, timeout=timeout)
     response.raise_for_status()
     return response.json()
-
-
-# ============================================================================
-# Fixture Loading
-# ============================================================================
-
-
-def get_fixture_path(test_module: str, fixture_name: str) -> Path:
-    """Get path to a .jkr fixture file."""
-    fixtures_dir = Path(__file__).parent / "fixtures"
-    return fixtures_dir / test_module / f"{fixture_name}.jkr"
-
-
-def load_fixture(
-    client: httpx.Client,
-    test_module: str,
-    fixture_name: str,
-) -> dict[str, Any]:
-    """Load a .jkr fixture and return the gamestate.
-
-    Args:
-        client: HTTP client connected to Balatro
-        test_module: Test module name (e.g., "strategies", "bot")
-        fixture_name: Fixture name (e.g., "state-SELECTING_HAND")
-
-    Returns:
-        The gamestate dict from Balatro
-    """
-    fixture_path = get_fixture_path(test_module, fixture_name)
-
-    if not fixture_path.exists():
-        raise FileNotFoundError(
-            f"Fixture not found: {fixture_path}\n"
-            f"Run 'python tests/fixtures/generate.py' to generate fixtures."
-        )
-
-    # Load the .jkr save file
-    response = api(client, "load", {"path": str(fixture_path)})
-    assert "result" in response, f"Failed to load fixture: {response}"
-
-    # Get and return the gamestate
-    gamestate_response = api(client, "gamestate", {})
-    assert "result" in gamestate_response, (
-        f"Failed to get gamestate: {gamestate_response}"
-    )
-
-    return gamestate_response["result"]
