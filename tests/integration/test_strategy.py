@@ -36,7 +36,7 @@ class TestPlayingCardModifiers:
         sm = StrategyManager("default")
         result = sm.render_gamestate(gamestate)
 
-        assert f"[{edition}]" in result
+        assert f"**{edition} Edition**" in result
 
     @pytest.mark.parametrize("enhancement", ENHANCEMENTS)
     def test_render_hand_card_enhancement(
@@ -50,7 +50,11 @@ class TestPlayingCardModifiers:
         sm = StrategyManager("default")
         result = sm.render_gamestate(gamestate)
 
-        assert f"[{enhancement}]" in result
+        # STONE cards are rendered specially without Enhancement text
+        if enhancement == "STONE":
+            assert "this is a stone card" in result
+        else:
+            assert f"**{enhancement} Enhancement**" in result
 
     @pytest.mark.parametrize("seal", SEALS)
     def test_render_hand_card_seal(self, client: httpx.Client, seal: str) -> None:
@@ -62,7 +66,7 @@ class TestPlayingCardModifiers:
         sm = StrategyManager("default")
         result = sm.render_gamestate(gamestate)
 
-        assert f"[{seal} Seal]" in result
+        assert f"**{seal} Seal**" in result
 
     def test_render_edition_and_enhancement(self, client: httpx.Client) -> None:
         """Verify edition and enhancement render together on hand cards."""
@@ -73,8 +77,8 @@ class TestPlayingCardModifiers:
         sm = StrategyManager("default")
         result = sm.render_gamestate(gamestate)
 
-        assert "[FOIL]" in result
-        assert "[BONUS]" in result
+        assert "**FOIL Edition**" in result
+        assert "**BONUS Enhancement**" in result
 
     def test_render_edition_and_seal(self, client: httpx.Client) -> None:
         """Verify edition and seal render together on hand cards."""
@@ -85,8 +89,8 @@ class TestPlayingCardModifiers:
         sm = StrategyManager("default")
         result = sm.render_gamestate(gamestate)
 
-        assert "[HOLO]" in result
-        assert "[RED Seal]" in result
+        assert "**HOLO Edition**" in result
+        assert "**RED Seal**" in result
 
     def test_render_all_modifiers_on_hand_card(self, client: httpx.Client) -> None:
         """Verify edition, enhancement, and seal all render together on hand cards."""
@@ -106,9 +110,9 @@ class TestPlayingCardModifiers:
         sm = StrategyManager("default")
         result = sm.render_gamestate(gamestate)
 
-        assert "[POLYCHROME]" in result
-        assert "[GLASS]" in result
-        assert "[GOLD Seal]" in result
+        assert "**POLYCHROME Edition**" in result
+        assert "**GLASS Enhancement**" in result
+        assert "**GOLD Seal**" in result
 
     def test_render_multiple_modified_cards(self, client: httpx.Client) -> None:
         """Verify multiple cards with different modifiers render correctly."""
@@ -121,9 +125,9 @@ class TestPlayingCardModifiers:
         sm = StrategyManager("default")
         result = sm.render_gamestate(gamestate)
 
-        assert "[FOIL]" in result
-        assert "[MULT]" in result
-        assert "[BLUE Seal]" in result
+        assert "**FOIL Edition**" in result
+        assert "**MULT Enhancement**" in result
+        assert "**BLUE Seal**" in result
 
 
 # =============================================================================
@@ -145,7 +149,7 @@ class TestJokerModifiers:
         result = sm.render_gamestate(gamestate)
 
         # Verify in jokers section
-        assert f"[{edition}]" in result
+        assert f"**{edition} Edition**" in result
         assert "Joker" in result
 
     def test_render_eternal_joker(self, client: httpx.Client) -> None:
@@ -157,7 +161,7 @@ class TestJokerModifiers:
         sm = StrategyManager("default")
         result = sm.render_gamestate(gamestate)
 
-        assert "[Eternal]" in result
+        assert "**Eternal**" in result
 
     def test_render_perishable_joker(self, client: httpx.Client) -> None:
         """Verify Perishable modifier is rendered with rounds remaining."""
@@ -168,7 +172,8 @@ class TestJokerModifiers:
         sm = StrategyManager("default")
         result = sm.render_gamestate(gamestate)
 
-        assert "[Perishable: 5 rounds]" in result
+        assert "**Perishable**" in result
+        assert "5 rounds remaining" in result
 
     def test_render_rental_joker(self, client: httpx.Client) -> None:
         """Verify Rental modifier is rendered on jokers."""
@@ -179,7 +184,7 @@ class TestJokerModifiers:
         sm = StrategyManager("default")
         result = sm.render_gamestate(gamestate)
 
-        assert "[Rental]" in result
+        assert "**Rental**" in result
 
     def test_render_joker_with_multiple_modifiers(self, client: httpx.Client) -> None:
         """Verify joker with edition and eternal renders both."""
@@ -190,8 +195,8 @@ class TestJokerModifiers:
         sm = StrategyManager("default")
         result = sm.render_gamestate(gamestate)
 
-        assert "[FOIL]" in result
-        assert "[Eternal]" in result
+        assert "**FOIL Edition**" in result
+        assert "**Eternal**" in result
 
 
 # =============================================================================
@@ -216,10 +221,8 @@ class TestConsumableEditions:
         sm = StrategyManager("default")
         result = sm.render_gamestate(gamestate)
 
-        print(result)
-
         # NEGATIVE is the only valid edition for consumables in Balatro
-        assert "[NEGATIVE]" in result
+        assert "**NEGATIVE Edition**" in result
         assert "The Fool" in result
 
     @pytest.mark.dev
@@ -233,5 +236,5 @@ class TestConsumableEditions:
         result = sm.render_gamestate(gamestate)
 
         # Should appear in consumables section
-        assert "Consumables (1/2)" in result
+        assert "Consumables count is 1/2" in result
         assert "The Fool" in result
