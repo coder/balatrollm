@@ -1,0 +1,10 @@
+{
+  "name": "Default",
+  "description": "The default BalatroLLM strategy",
+  "author": "BalatroLLM",
+  "version": "1.0.0",
+  "tags": [
+    "conservative",
+    "financial"
+  ]
+}
