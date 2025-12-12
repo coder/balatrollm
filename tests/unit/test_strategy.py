@@ -140,7 +140,7 @@ class TestRenderGamestateProperties:
         result = sm.render_gamestate(gamestate)
 
         for i, card in enumerate(gamestate["hand"]["cards"]):
-            assert f"**{i}**:" in result, f"Card index {i} not found"
+            assert f"- {i}:" in result, f"Card index {i} not found"
             assert card["key"] in result, f"Card key {card['key']} not found"
 
     def test_money_appears_in_output(self) -> None:
@@ -169,7 +169,7 @@ class TestRenderGamestateProperties:
         result = sm.render_gamestate(gamestate)
 
         for i, item in enumerate(gamestate["shop"]["cards"]):
-            assert f"**{i}**:" in result, f"Shop item index {i} not found"
+            assert f"- {i}:" in result, f"Shop item index {i} not found"
             assert item["label"] in result, f"Shop item {item['label']} not found"
 
     def test_blinds_rendered_in_blind_select(self) -> None:
