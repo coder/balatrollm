@@ -51,6 +51,20 @@ def find_proton(steam_path: Path) -> Path | None:
     return None
 
 
+def wait_for_port(host: str, port: int, timeout: float = 30.0) -> bool:
+    """Wait for port to be ready to accept connections."""
+    import socket
+
+    start = time.time()
+    while time.time() - start < timeout:
+        try:
+            with socket.create_connection((host, port), timeout=1):
+                return True
+        except (ConnectionRefusedError, OSError):
+            time.sleep(0.5)
+    return False
+
+
 def kill_port(port: int):
     """Kill processes using the specified port."""
     print(f"Killing processes on port {port}...")
@@ -156,10 +170,12 @@ def start(args):
             stderr=subprocess.STDOUT,
         )
 
-    # Wait and verify process started
-    time.sleep(3)
-    if process.poll() is not None:
-        print(f"ERROR: Balatro failed to start. Check {log_file}")
+    # Wait for port to be ready
+    print(f"Waiting for port {args.port} to be ready...")
+    if not wait_for_port(args.host, args.port, timeout=30):
+        print(f"ERROR: Port {args.port} not ready after 30s. Check {log_file}")
+        if process.poll() is not None:
+            print("Balatro process has exited.")
         sys.exit(1)
 
     print("Balatro started successfully!")
