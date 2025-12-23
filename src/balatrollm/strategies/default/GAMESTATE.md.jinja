@@ -247,12 +247,11 @@ You **MUST** use one of the following tools to perform the intended action:
     - `consumables`: (list) New order of consumables (0-based indices, must include all consumables)
     - `reasoning`: (string) Strategic reasoning for this arrangement
 {% elif G.state == "SHOP" -%}
-- Buy a card, voucher, or pack from the shop
+- Buy a card or voucher from the shop
   - Function: `buy`
   - Parameters (provide exactly one of):
     - `card`: (integer) 0-based index of shop card to buy
     - `voucher`: (integer) 0-based index of voucher to buy
-    - `pack`: (integer) 0-based index of booster pack to buy
     - `reasoning`: (string) Strategic reasoning for this purchase
 - Reroll the shop items
   - Function: `reroll`

@@ -133,7 +133,7 @@
       "type": "function",
       "function": {
         "name": "buy",
-        "description": "Buy a card, voucher, or pack from the shop. Provide exactly one of: card, voucher, or pack.",
+        "description": "Buy a card or voucher from the shop. Provide exactly one of: card or voucher.",
         "parameters": {
           "type": "object",
           "properties": {
@@ -144,10 +144,6 @@
             "voucher": {
               "type": "integer",
               "description": "0-based index of voucher to buy"
-            },
-            "pack": {
-              "type": "integer",
-              "description": "0-based index of pack to buy"
             },
             "reasoning": {
               "type": "string",
