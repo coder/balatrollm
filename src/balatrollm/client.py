@@ -57,7 +57,6 @@ class BalatroClient:
             "params": params or {},
             "id": self._request_id,
         }
-
         response = await self._client.post("/", json=payload)
         data = response.json()
 
