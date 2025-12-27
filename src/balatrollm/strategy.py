@@ -1,7 +1,7 @@
 """Strategy template management for BalatroLLM."""
 
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -48,12 +48,6 @@ class StrategyManifest:
             version=data["version"],
             tags=data["tags"],
         )
-
-    def to_file(self, path: Path) -> None:
-        """Write strategy manifest to JSON file."""
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open("w") as f:
-            json.dump(asdict(self), f, indent=2)
 
 
 class StrategyManager:
