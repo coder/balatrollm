@@ -1,12 +1,59 @@
 """Strategy template management for BalatroLLM."""
 
 import json
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
 from jinja2 import Environment, FileSystemLoader
 
 STRATEGIES_DIR = Path(__file__).parent / "strategies"
+
+
+@dataclass(frozen=True)
+class StrategyManifest:
+    """Strategy metadata from manifest.json."""
+
+    name: str
+    description: str
+    author: str
+    version: str
+    tags: list[str]
+
+    @classmethod
+    def from_file(
+        cls, strategy: str, strategies_dir: Path = STRATEGIES_DIR
+    ) -> "StrategyManifest":
+        """Load strategy metadata from manifest.json."""
+        manifest_path = strategies_dir / strategy / "manifest.json"
+        if not manifest_path.exists():
+            raise FileNotFoundError(
+                f"Manifest not found for strategy '{strategy}': {manifest_path}"
+            )
+
+        with manifest_path.open() as f:
+            data = json.load(f)
+
+        required_fields = {"name", "description", "author", "version", "tags"}
+        missing_fields = required_fields - set(data.keys())
+        if missing_fields:
+            raise ValueError(
+                f"Manifest for strategy '{strategy}' missing fields: {missing_fields}"
+            )
+
+        return cls(
+            name=data["name"],
+            description=data["description"],
+            author=data["author"],
+            version=data["version"],
+            tags=data["tags"],
+        )
+
+    def to_file(self, path: Path) -> None:
+        """Write strategy manifest to JSON file."""
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("w") as f:
+            json.dump(asdict(self), f, indent=2)
 
 
 class StrategyManager:
