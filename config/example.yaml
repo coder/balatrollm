@@ -1,0 +1,85 @@
+################################################################################
+# Example configuration file for balatrollm
+# Usage: balatrollm config/example.yaml
+################################################################################
+
+################################################################################
+# EXECUTION
+################################################################################
+
+# Number of concurrent Balatro instances to run. Forms a worker pool:
+# when a worker finishes a run, it picks up the next task from the queue.
+parallel: 1
+
+################################################################################
+# GAME PARAMETERS
+# Each parameter accepts a list. The cartesian product of all lists generates
+# the task queue (e.g., 2 seeds × 2 decks = 4 runs).
+################################################################################
+
+# Game seed(s) - 7-character strings.
+# Repeat the same seed to run multiple attempts with identical starting conditions.
+seed:
+  - AAAAAAA
+  # - BBBBBBB
+  # - AAAAAAA  # duplicate for multiple runs of same seed
+
+# Deck code(s). Valid values:
+#   RED, BLUE, YELLOW, GREEN, BLACK, MAGIC, NEBULA, GHOST,
+#   ABANDONED, CHECKERED, ZODIAC, PAINTED, ANAGLYPH, PLASMA, ERRATIC
+deck:
+  - RED
+
+# Stake (difficulty) code(s). Valid values (easiest to hardest):
+#   WHITE (1), RED (2), GREEN (3), BLACK (4),
+#   BLUE (5), PURPLE (6), ORANGE (7), GOLD (8)
+stake:
+  - WHITE
+
+################################################################################
+# STRATEGY
+################################################################################
+
+# Strategy name(s) from `src/balatrollm/strategies/`.
+# Each strategy folder contains prompt templates and tool definitions.
+# You can create custom strategies by adding new folders there.
+strategy:
+  - default
+
+################################################################################
+# MODEL
+################################################################################
+
+# LLM model identifier(s). Format depends on your provider:
+#   - OpenAI: "gpt-4o", "gpt-4o-mini"
+#   - OpenRouter: "openai/gpt-4o", "anthropic/claude-3.5-sonnet"
+# Requires BALATROLLM_BASE_URL and BALATROLLM_API_KEY env vars.
+model:
+  - openai/gpt-4o
+
+# Optional OpenAI client parameters passed to chat completions.
+# Common options: seed, temperature, max_tokens, parallel_tool_calls
+# The `extra_body` field passes provider-specific parameters (e.g., OpenRouter).
+model_config:
+  extra_body:
+    reasoning:
+      effort: medium
+    provider:
+      sort: throughput
+
+################################################################################
+# CONNECTION (optional - usually set via environment variables)
+################################################################################
+
+# BalatroBot JSON-RPC server host (default: 127.0.0.1)
+# host: 127.0.0.1
+
+# BalatroBot starting port (default: 12346)
+# For parallel > 1, each worker uses port, port+1, port+2, etc.
+# port: 12346
+
+# LLM API base URL (prefer env var BALATROLLM_BASE_URL)
+# base_url: https://openrouter.ai/api/v1
+
+# LLM API key (prefer env var BALATROLLM_API_KEY)
+# api_key: sk-...
