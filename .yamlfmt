@@ -1,0 +1,13 @@
+include:
+  - config/
+
+exclude:
+  - .venv/
+
+formatter:
+  type: basic
+  indent: 2
+  include_document_start: false
+  retain_line_breaks_single: true
+  trim_trailing_whitespace: true
+  eof_newline: true
