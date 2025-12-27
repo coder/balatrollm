@@ -55,7 +55,7 @@ strategy:
 #   - OpenRouter: "openai/gpt-4o", "anthropic/claude-3.5-sonnet"
 # Requires BALATROLLM_BASE_URL and BALATROLLM_API_KEY env vars.
 model:
-  - openai/gpt-4o
+  - openai/gpt-oss-120b
 
 # Optional OpenAI client parameters passed to chat completions.
 # Common options: seed, temperature, max_tokens, parallel_tool_calls
