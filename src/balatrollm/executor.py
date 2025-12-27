@@ -45,9 +45,18 @@ class Executor:
     async def _start_instances(self, ports: range) -> None:
         """Start Balatro instances."""
         cfg = BalatrobotConfig.from_env()
+
+        # Create all instances
+        instances = []
         for port in ports:
             instance = BalatroInstance(cfg, port=port)
-            await instance.start()
+            instances.append((port, instance))
+
+        # Start all instances in parallel
+        await asyncio.gather(*(instance.start() for _, instance in instances))
+
+        # Register instances in pool
+        for port, instance in instances:
             self._instances[port] = instance
             await self._port_pool.put(port)
 
@@ -71,7 +80,7 @@ class Executor:
             port = await self._port_pool.get()
             try:
                 count += 1
-                print(f"Running {task} ({count}/{total})")
+                print(f"Running {task} ({count:0{len(str(total))}d}/{total})")
                 bot = Bot(task=task, config=self.config, port=port)
                 async with bot:
                     await bot.play(self.runs_dir)
@@ -80,7 +89,7 @@ class Executor:
 
         pending = [asyncio.create_task(run_task(t)) for t in self.tasks]
         try:
-            await asyncio.gather(*pending)
+            await asyncio.gather(*pending, return_exceptions=True)
         except asyncio.CancelledError:
             self._shutdown.set()
             for t in pending:
