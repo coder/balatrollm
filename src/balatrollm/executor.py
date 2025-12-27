@@ -1,0 +1,89 @@
+"""Task execution for BalatroLLM runs."""
+
+import asyncio
+from dataclasses import dataclass, field
+from pathlib import Path
+
+from balatrobot import BalatroInstance
+from balatrobot import Config as BalatrobotConfig
+
+from .bot import Bot
+from .config import Config, Task
+
+
+@dataclass
+class Executor:
+    """Executes tasks with parallelism."""
+
+    config: Config
+    tasks: list[Task]
+    runs_dir: Path = field(default_factory=Path.cwd)
+
+    _instances: dict[int, BalatroInstance] = field(
+        default_factory=dict, init=False, repr=False
+    )
+    _port_pool: asyncio.Queue[int] = field(
+        default_factory=asyncio.Queue, init=False, repr=False
+    )
+    _shutdown: asyncio.Event = field(
+        default_factory=asyncio.Event, init=False, repr=False
+    )
+
+    async def run(self) -> None:
+        """Execute all tasks."""
+        ports = range(self.config.port, self.config.port + self.config.parallel)
+        try:
+            await self._start_instances(ports)
+            await self._execute_tasks()
+        except asyncio.CancelledError:
+            print("\nInterrupted! Cleaning up...")
+            raise
+        finally:
+            await self._stop_instances()
+        print("Done.")
+
+    async def _start_instances(self, ports: range) -> None:
+        """Start Balatro instances."""
+        cfg = BalatrobotConfig.from_env()
+        for port in ports:
+            instance = BalatroInstance(cfg, port=port)
+            await instance.start()
+            self._instances[port] = instance
+            await self._port_pool.put(port)
+
+    async def _stop_instances(self) -> None:
+        """Stop all instances."""
+        await asyncio.gather(
+            *(i.stop() for i in self._instances.values()),
+            return_exceptions=True,
+        )
+        self._instances.clear()
+
+    async def _execute_tasks(self) -> None:
+        """Execute tasks with port pool."""
+        total = len(self.tasks)
+        count = 0
+
+        async def run_task(task: Task) -> None:
+            nonlocal count
+            if self._shutdown.is_set():
+                return
+            port = await self._port_pool.get()
+            try:
+                count += 1
+                print(f"Running {task} ({count}/{total})")
+                bot = Bot(task=task, config=self.config, port=port)
+                async with bot:
+                    await bot.play(self.runs_dir)
+            finally:
+                await self._port_pool.put(port)
+
+        pending = [asyncio.create_task(run_task(t)) for t in self.tasks]
+        try:
+            await asyncio.gather(*pending)
+        except asyncio.CancelledError:
+            self._shutdown.set()
+            for t in pending:
+                t.cancel()
+            await asyncio.gather(*pending, return_exceptions=True)
+            raise
