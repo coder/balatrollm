@@ -1,4 +1,5 @@
 {
+  "$schema": "https://gist.githubusercontent.com/S1M0N38/5dc776cea0afa506ee7a4b20585558c6/raw/d2b92433fcc9d069c26958ff22b1f06777ecb91e/strategy.schema.json",
   "name": "Default",
   "description": "The default BalatroLLM strategy",
   "author": "BalatroLLM",
