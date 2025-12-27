@@ -103,7 +103,7 @@ class ChatCompletionRequestInput:
 class ChatCompletionResponse:
     """OpenAI Batch API response format."""
 
-    request_id: str
+    request_id: str  # str(time.time_ns() // 1_000_000) at request time
     status_code: int
     body: dict[str, Any]
 
@@ -120,7 +120,7 @@ class ChatCompletionError:
 class ChatCompletionRequestOutput:
     """OpenAI Batch API response output format."""
 
-    id: str  # str(time.time_ns() // 1_000_000),
+    id: str  # str(time.time_ns() // 1_000_000) at response time
     custom_id: str  # f"request-{Collector._request_count:05}"
     response: ChatCompletionResponse | None = None
     error: ChatCompletionError | None = None
