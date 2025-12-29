@@ -80,10 +80,11 @@ class Executor:
             port = await self._port_pool.get()
             try:
                 count += 1
-                print(f"Running {task} ({count:0{len(str(total))}d}/{total})")
+                print(f"[{count:0{len(str(total))}d}/{total}] STARTED   | {task}")
                 bot = Bot(task=task, config=self.config, port=port)
                 async with bot:
                     await bot.play(self.runs_dir)
+                print(f"[{count:0{len(str(total))}d}/{total}] COMPLETED | {task}")
             finally:
                 await self._port_pool.put(port)
 
