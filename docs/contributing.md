@@ -10,7 +10,7 @@ This document provides guidelines and instructions for contributing to the proje
 
 2. **Submit Pull Requests**: For code contributions, fork the repository, make your changes, and submit a pull request.
 
-3. **Follow Coding Standards**: We use Ruff for linting and formatting, and pyright/basedpyright for type checking. Make sure your code passes all checks.
+3. **Follow Coding Standards**: We use Ruff for linting and formatting, and ty for type checking. Make sure your code passes all checks.
 
 4. **Write Tests**: For new features or bug fixes, please include tests to validate your changes.
 
@@ -24,23 +24,23 @@ This section describes how to set up the **recommended** development environment
 
 1. Download the repository:
 
-```sh
-git clone https://github.com/S1M0N38/balatrollm.git
-cd balatrollm
-```
+    ```sh
+    git clone https://github.com/S1M0N38/balatrollm.git
+    cd balatrollm
+    ```
 
 2. Create environment:
 
-```sh
-uv sync --all-extras
-```
+    ```sh
+    uv sync --all-extras
+    ```
 
 3. Set up environment variables (if your project uses them):
 
-```sh
-cp .envrc.example .envrc
-# And modify the .envrc file with your settings
-```
+    ```sh
+    cp .envrc.example .envrc
+    # And modify the .envrc file with your settings
+    ```
 
 The environment setup is now ready to use. Every time you are working on the project, you can activate the environment by running:
 
