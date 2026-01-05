@@ -164,7 +164,7 @@ class Task:
     def __str__(self) -> str:
         """Human-readable task description."""
         return (
-            f"{self.strategy} | {self.model} | {self.deck} | {self.stake} | {self.seed}"
+            f"{self.deck} | {self.stake} | {self.seed} | {self.strategy} | {self.model}"
         )
 
 
