@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -e
+
+echo "Runtime: $MUX_RUNTIME"
+echo "Project path: $MUX_PROJECT_PATH"
+echo "Workspace: $PWD"
+
+# Skip SSH runtime (not supported)
+if [ "$MUX_RUNTIME" = "ssh" ]; then
+  echo "SSH runtime not supported"
+  exit 1
+fi
+
+# Copy .envrc from parent project (contains API keys + venv activation)
+# Skip in local mode (workspace IS the project directory)
+if [ "$MUX_RUNTIME" != "local" ]; then
+  if [ -f "../.envrc" ]; then
+    echo "Copying .envrc from parent..."
+    cp "../.envrc" ".envrc"
+  elif [ -n "$MUX_PROJECT_PATH" ] && [ -f "$MUX_PROJECT_PATH/.envrc" ]; then
+    echo "Copying .envrc from project root..."
+    cp "$MUX_PROJECT_PATH/.envrc" ".envrc"
+  fi
+else
+  echo "Local mode: using existing .envrc"
+fi
+
+# Create venv and install dependencies
+echo "Setting up Python environment..."
+uv sync --group dev --group test
+
+# Source .envrc to activate venv and set env vars
+if [ -f ".envrc" ]; then
+  echo "Sourcing .envrc..."
+  source .envrc
+fi
+
+echo "Init complete!"
+

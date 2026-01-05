@@ -1,0 +1,5 @@
+# Sourced before every bash tool call
+# Activate venv and load environment variables
+
+source .venv/bin/activate 2>/dev/null || true
+source .envrc 2>/dev/null || true
