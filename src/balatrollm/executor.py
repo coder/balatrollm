@@ -87,6 +87,8 @@ class Executor:
                 async with bot:
                     await bot.play(self.runs_dir)
                 print(f"[{count:0{len(str(total))}d}/{total}] COMPLETED | {task} | {log_path}")
+            except Exception:
+                print(f"[{count:0{len(str(total))}d}/{total}] ERROR     | {task} | {log_path}")
             finally:
                 await self._port_pool.put(port)
 
