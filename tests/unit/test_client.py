@@ -1,7 +1,7 @@
 """Tests for the BalatroLLM client module."""
 
 import json
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock
 
 import httpx
 import pytest
@@ -71,32 +71,31 @@ class TestBalatroClient:
         assert client.port == 8080
         assert client.timeout == 60.0
 
-    def test_context_manager_creates_client(self) -> None:
-        """Verify __enter__ creates httpx.Client."""
+    async def test_context_manager_creates_client(self) -> None:
+        """Verify __aenter__ creates httpx.AsyncClient."""
         client = BalatroClient()
         assert client._client is None
 
-        with respx.mock:
-            client.__enter__()
-            assert client._client is not None
-            client.__exit__(None, None, None)
+        async with respx.mock:
+            async with client:
+                assert client._client is not None
 
-    def test_context_manager_closes_client(self) -> None:
-        """Verify __exit__ closes the client and sets _client to None."""
+    async def test_context_manager_closes_client(self) -> None:
+        """Verify __aexit__ closes the client and sets _client to None."""
         client = BalatroClient()
-        mock_http_client = MagicMock(spec=httpx.Client)
+        mock_http_client = AsyncMock(spec=httpx.AsyncClient)
         client._client = mock_http_client
 
-        client.__exit__(None, None, None)
+        await client.__aexit__(None, None, None)
 
-        mock_http_client.close.assert_called_once()
+        mock_http_client.aclose.assert_called_once()
         assert client._client is None
 
-    def test_call_without_context_raises_error(self) -> None:
+    async def test_call_without_context_raises_error(self) -> None:
         """Verify calling without context manager raises RuntimeError."""
         client = BalatroClient()
         with pytest.raises(RuntimeError, match="Client not connected"):
-            client.call("test_method")
+            await client.call("test_method")
 
 
 # ============================================================================
@@ -108,20 +107,24 @@ class TestBalatroClient:
 class TestBalatroClientCall:
     """Tests for BalatroClient.call method using respx mocking."""
 
-    def test_call_increments_request_id(self, respx_mock: respx.MockRouter) -> None:
+    async def test_call_increments_request_id(
+        self, respx_mock: respx.MockRouter
+    ) -> None:
         """Each call increments the internal request ID."""
         respx_mock.post("/").mock(
             return_value=Response(200, json={"jsonrpc": "2.0", "result": {}, "id": 1})
         )
 
-        with BalatroClient() as client:
+        async with BalatroClient() as client:
             assert client._request_id == 0
-            client.call("method1")
+            await client.call("method1")
             assert client._request_id == 1
-            client.call("method2")
+            await client.call("method2")
             assert client._request_id == 2
 
-    def test_call_formats_request_correctly(self, respx_mock: respx.MockRouter) -> None:
+    async def test_call_formats_request_correctly(
+        self, respx_mock: respx.MockRouter
+    ) -> None:
         """Verify JSON-RPC 2.0 format with jsonrpc, method, params, id."""
         route = respx_mock.post("/").mock(
             return_value=Response(
@@ -129,8 +132,8 @@ class TestBalatroClientCall:
             )
         )
 
-        with BalatroClient() as client:
-            client.call("test_method")
+        async with BalatroClient() as client:
+            await client.call("test_method")
 
         # Inspect the captured request
         request = route.calls.last.request
@@ -141,7 +144,7 @@ class TestBalatroClientCall:
         assert json_payload["params"] == {}
         assert json_payload["id"] == 1
 
-    def test_call_returns_result(self, respx_mock: respx.MockRouter) -> None:
+    async def test_call_returns_result(self, respx_mock: respx.MockRouter) -> None:
         """Verify the result field is extracted and returned."""
         expected_result = {"state": "SELECTING_HAND", "hand": []}
         respx_mock.post("/").mock(
@@ -150,25 +153,25 @@ class TestBalatroClientCall:
             )
         )
 
-        with BalatroClient() as client:
-            result = client.call("gamestate")
+        async with BalatroClient() as client:
+            result = await client.call("gamestate")
 
         assert result == expected_result
 
-    def test_call_with_params(self, respx_mock: respx.MockRouter) -> None:
+    async def test_call_with_params(self, respx_mock: respx.MockRouter) -> None:
         """Verify params are passed correctly."""
         route = respx_mock.post("/").mock(
             return_value=Response(200, json={"jsonrpc": "2.0", "result": {}, "id": 1})
         )
 
         params = {"deck": "Red Deck", "stake": 1, "seed": "ABC123"}
-        with BalatroClient() as client:
-            client.call("start", params)
+        async with BalatroClient() as client:
+            await client.call("start", params)
 
         json_payload = json.loads(route.calls.last.request.content)
         assert json_payload["params"] == params
 
-    def test_call_raises_balatro_error_on_error_response(
+    async def test_call_raises_balatro_error_on_error_response(
         self, respx_mock: respx.MockRouter
     ) -> None:
         """Verify BalatroError is raised with correct code, message, data."""
@@ -187,16 +190,16 @@ class TestBalatroClientCall:
             )
         )
 
-        with BalatroClient() as client:
+        async with BalatroClient() as client:
             with pytest.raises(BalatroError) as exc_info:
-                client.call("start", params={"deck": "INVALID_DECK"})
+                await client.call("start", params={"deck": "INVALID_DECK"})
 
         error = exc_info.value
         assert error.code == -32001
         assert error.message == "Invalid parameters or protocol error"
         assert error.data == {"name": "BAD_REQUEST"}
 
-    def test_call_raises_invalid_state_error(
+    async def test_call_raises_invalid_state_error(
         self, respx_mock: respx.MockRouter
     ) -> None:
         """Verify INVALID_STATE error is raised correctly."""
@@ -215,16 +218,18 @@ class TestBalatroClientCall:
             )
         )
 
-        with BalatroClient() as client:
+        async with BalatroClient() as client:
             with pytest.raises(BalatroError) as exc_info:
-                client.call("play", params={"cards": [0, 1, 2]})
+                await client.call("play", params={"cards": [0, 1, 2]})
 
         error = exc_info.value
         assert error.code == -32002
         assert error.message == "Action not allowed in current game state"
         assert error.data == {"name": "INVALID_STATE"}
 
-    def test_call_raises_not_allowed_error(self, respx_mock: respx.MockRouter) -> None:
+    async def test_call_raises_not_allowed_error(
+        self, respx_mock: respx.MockRouter
+    ) -> None:
         """Verify NOT_ALLOWED error is raised correctly."""
         respx_mock.post("/").mock(
             return_value=Response(
@@ -241,16 +246,18 @@ class TestBalatroClientCall:
             )
         )
 
-        with BalatroClient() as client:
+        async with BalatroClient() as client:
             with pytest.raises(BalatroError) as exc_info:
-                client.call("reroll")
+                await client.call("reroll")
 
         error = exc_info.value
         assert error.code == -32003
         assert error.message == "Game rules prevent this action"
         assert error.data == {"name": "NOT_ALLOWED"}
 
-    def test_call_raises_internal_error(self, respx_mock: respx.MockRouter) -> None:
+    async def test_call_raises_internal_error(
+        self, respx_mock: respx.MockRouter
+    ) -> None:
         """Verify INTERNAL_ERROR is raised correctly."""
         respx_mock.post("/").mock(
             return_value=Response(
@@ -267,9 +274,9 @@ class TestBalatroClientCall:
             )
         )
 
-        with BalatroClient() as client:
+        async with BalatroClient() as client:
             with pytest.raises(BalatroError) as exc_info:
-                client.call("save", params={"path": "/invalid/path/save.jkr"})
+                await client.call("save", params={"path": "/invalid/path/save.jkr"})
 
         error = exc_info.value
         assert error.code == -32000
