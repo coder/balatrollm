@@ -1,3 +1,6 @@
+permissions:
+  contents: read
+  pull-requests: write
 name: Code Quality
 on:
   push:
@@ -23,10 +26,10 @@ jobs:
         with:
           version: latest
           args: format --check
-  pyright:
-    name: Type Check
+  ty:
+    name: Type Check & Markdown Format
     runs-on: ubuntu-latest
-    needs: ruff # Run after ruff
+    needs: ruff
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -41,8 +44,12 @@ jobs:
       - name: Install dependencies
         run: |
           uv venv
-          uv sync --dev
-      - name: Run pyright
+          uv sync --group dev --group test
+      - name: Check markdown formatting
         run: |
           source .venv/bin/activate
-          basedpyright
+          mdformat --check .
+      - name: Run ty
+        run: |
+          source .venv/bin/activate
+          ty check
