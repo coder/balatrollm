@@ -133,7 +133,7 @@
       "type": "function",
       "function": {
         "name": "buy",
-        "description": "Buy a card or voucher from the shop. Provide exactly one of: card or voucher.",
+        "description": "Buy a card, voucher, or pack from the shop. Provide exactly one of: card, voucher, or pack.",
         "parameters": {
           "type": "object",
           "properties": {
@@ -144,6 +144,10 @@
             "voucher": {
               "type": "integer",
               "description": "0-based index of voucher to buy"
+            },
+            "pack": {
+              "type": "integer",
+              "description": "0-based index of booster pack to buy and open"
             },
             "reasoning": {
               "type": "string",
@@ -299,6 +303,56 @@
             }
           },
           "required": ["reasoning"]
+        }
+      }
+    }
+  ],
+  "SMODS_BOOSTER_OPENED": [
+    {
+      "type": "function",
+      "function": {
+        "name": "pack",
+        "description": "Select a card from the opened booster pack. For Arcana/Spectral packs, cards are used immediately and may require targeting hand cards.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "card": {
+              "type": "integer",
+              "description": "0-based index of card to select from pack"
+            },
+            "targets": {
+              "type": "array",
+              "items": {"type": "integer"},
+              "description": "0-based indices of hand cards to target (required for some Tarot/Spectral cards)"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for this selection"
+            }
+          },
+          "required": ["card", "reasoning"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "pack",
+        "description": "Skip the pack selection without taking any card.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "skip": {
+              "type": "boolean",
+              "const": true,
+              "description": "Set to true to skip the pack"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for skipping"
+            }
+          },
+          "required": ["skip", "reasoning"]
         }
       }
     }
