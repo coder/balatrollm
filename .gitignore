@@ -272,6 +272,13 @@ config
 
 src/balatrollm_old
 
-tests/unit/fixtures/*/*.md
-tests/unit/fixtures/*/*.json
-tests/integration/fixtures/*/*.jkr
+################################################################################
+# Test fixtures
+################################################################################
+
+# Auto-generated integration fixtures (regenerate with pytest --no-caches)
+tests/integration/fixtures/**/*.jkr
+
+# Generated golden files (regenerate with tests/fixtures/generate.py)
+tests/unit/fixtures/**/*.json
+tests/unit/fixtures/**/*.md
