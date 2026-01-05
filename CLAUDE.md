@@ -9,6 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 BalatroLLM is an LLM-powered bot that autonomously plays Balatro using strategic decision-making. It uses the BalatroBot API (a Lua mod exposing JSON-RPC 2.0 endpoints) to control the game while leveraging large language models for gameplay decisions.
 
 **Key capabilities:**
+
 - Autonomous gameplay from start to completion
 - LLM-driven strategic decision-making using OpenAI function calling
 - Configurable strategies via Jinja2 templates
@@ -33,10 +34,10 @@ Available make targets:
 
 1. **Only run make commands when explicitly asked.** Do not proactively run `make quality`, `make lint`, etc.
 2. **Never run bare linting/formatting/typechecking tools.** Always use make targets instead:
-   - Use `make lint` instead of `ruff check`
-   - Use `make format` instead of `ruff format`
-   - Use `make typecheck` instead of `ty check`
-   - Use `make quality` for all checks combined
+    - Use `make lint` instead of `ruff check`
+    - Use `make format` instead of `ruff format`
+    - Use `make typecheck` instead of `ty check`
+    - Use `make quality` for all checks combined
 
 ## Architecture
 
@@ -119,6 +120,7 @@ Template-based system using Jinja2. Templates render strategy guidance, game sta
 Output directory: `runs/v1.0.0/{strategy}/{vendor}/{model}/{timestamp}_{deck}_{stake}_{seed}/`
 
 **Files generated:**
+
 - `requests.jsonl` - LLM requests (OpenAI Batch API format)
 - `responses.jsonl` - LLM responses with timing/token data
 - `gamestates.jsonl` - Game state snapshots after each action
@@ -131,29 +133,29 @@ Output directory: `runs/v1.0.0/{strategy}/{vendor}/{model}/{timestamp}_{deck}_{s
 
 ### Python
 
-| File | Purpose |
-|------|---------|
-| `src/balatrollm/cli.py` | CLI entry point and argument parsing |
-| `src/balatrollm/bot.py` | Core game loop and LLM integration |
-| `src/balatrollm/client.py` | BalatroBot JSON-RPC client |
-| `src/balatrollm/llm.py` | OpenAI client wrapper with retry logic |
-| `src/balatrollm/strategy.py` | Strategy template management |
-| `src/balatrollm/config.py` | Multi-source configuration management |
-| `src/balatrollm/executor.py` | Parallel execution orchestration |
-| `src/balatrollm/collector.py` | Data collection and statistics |
+| File                          | Purpose                                |
+| ----------------------------- | -------------------------------------- |
+| `src/balatrollm/cli.py`       | CLI entry point and argument parsing   |
+| `src/balatrollm/bot.py`       | Core game loop and LLM integration     |
+| `src/balatrollm/client.py`    | BalatroBot JSON-RPC client             |
+| `src/balatrollm/llm.py`       | OpenAI client wrapper with retry logic |
+| `src/balatrollm/strategy.py`  | Strategy template management           |
+| `src/balatrollm/config.py`    | Multi-source configuration management  |
+| `src/balatrollm/executor.py`  | Parallel execution orchestration       |
+| `src/balatrollm/collector.py` | Data collection and statistics         |
 
 ### Configuration
 
-| File | Purpose |
-|------|---------|
-| `pyproject.toml` | Python dependencies and tool configuration |
-| `config/example.yaml` | Example YAML configuration file |
-| `Makefile` | Development commands (lint, format, typecheck) |
+| File                  | Purpose                                        |
+| --------------------- | ---------------------------------------------- |
+| `pyproject.toml`      | Python dependencies and tool configuration     |
+| `config/example.yaml` | Example YAML configuration file                |
+| `Makefile`            | Development commands (lint, format, typecheck) |
 
 ### Strategies
 
-| File | Purpose |
-|------|---------|
+| File                                 | Purpose                    |
+| ------------------------------------ | -------------------------- |
 | `src/balatrollm/strategies/default/` | Default strategy templates |
 
 ## Error Handling
@@ -165,6 +167,7 @@ Tracks consecutive failures (max 3 before aborting). Two failure types: **error 
 Config precedence: environment variables < YAML config file < CLI arguments (highest priority).
 
 **Environment variables** (prefix: `BALATROLLM_`):
+
 - `API_KEY`, `BASE_URL`, `MODEL` - LLM configuration
 - `SEED`, `DECK`, `STAKE`, `STRATEGY` - Game parameters
 - `PARALLEL`, `HOST`, `PORT` - Execution settings
