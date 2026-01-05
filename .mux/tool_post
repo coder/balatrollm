@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Runs after every tool execution
+
+# Run quality checks after Python file edits
+if [[ "$MUX_TOOL" == file_edit_* ]]; then
+  file=$(echo "$MUX_TOOL_INPUT" | jq -r '.file_path')
+
+  if [[ "$file" == *.py ]]; then
+    echo "Running quality checks..." >&2
+    make quality 2>&1 || exit 1
+  fi
+fi
