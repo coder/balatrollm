@@ -82,13 +82,19 @@ class Executor:
                 count += 1
                 instance = self._instances[port]
                 log_path = instance.log_path
-                print(f"[{count:0{len(str(total))}d}/{total}] STARTED   | {task} | {log_path}")
+                print(
+                    f"[{count:0{len(str(total))}d}/{total}] STARTED   | {log_path} | {task}"
+                )
                 bot = Bot(task=task, config=self.config, port=port)
                 async with bot:
                     await bot.play(self.runs_dir)
-                print(f"[{count:0{len(str(total))}d}/{total}] COMPLETED | {task} | {log_path}")
+                print(
+                    f"[{count:0{len(str(total))}d}/{total}] COMPLETED | {log_path} | {task}"
+                )
             except Exception:
-                print(f"[{count:0{len(str(total))}d}/{total}] ERROR     | {task} | {log_path}")
+                print(
+                    f"[{count:0{len(str(total))}d}/{total}] ERROR     | {log_path} | {task}"
+                )
             finally:
                 await self._port_pool.put(port)
 
