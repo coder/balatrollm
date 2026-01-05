@@ -3,6 +3,7 @@
 import json
 import re
 import statistics
+from collections import Counter
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -39,54 +40,41 @@ def _generate_run_dir(task: Task, base_dir: Path) -> Path:
 
 
 @dataclass
-class AggregatedStats:
-    """Aggregated statistics for token usage, costs, and timing."""
-
-    input_tokens: int | float
-    output_tokens: int | float
-    input_cost: float
-    output_cost: float
-    total_cost: float
-    time_ms: float
-
-
-@dataclass
-class CallStats:
-    """Statistics for tool call outcomes."""
-
-    successful: int = 0
-    error: int = 0
-    failed: int = 0
-    total: int = 0
-
-
-@dataclass
 class Stats:
-    """Complete statistics for a game run."""
+    """Complete statistics for a game run (flat structure)."""
 
-    won: bool
-    completed: bool
-    ante_reached: int
+    # Outcome
+    run_won: bool
+    run_completed: bool
+    final_ante: int
     final_round: int
-    providers: list[str]
-    calls: CallStats
-    total: AggregatedStats
-    average: AggregatedStats
-    std_dev: AggregatedStats
 
-    @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "Stats":
-        return cls(
-            won=data["won"],
-            completed=data["completed"],
-            ante_reached=data["ante_reached"],
-            final_round=data["final_round"],
-            providers=data["providers"],
-            calls=CallStats(**data["calls"]),
-            total=AggregatedStats(**data["total"]),
-            average=AggregatedStats(**data["average"]),
-            std_dev=AggregatedStats(**data["std_dev"]),
-        )
+    # Provider distribution
+    providers: dict[str, int]
+
+    # Call statistics
+    calls_total: int
+    calls_success: int
+    calls_error: int
+    calls_failed: int
+
+    # Token statistics
+    tokens_in_total: int
+    tokens_out_total: int
+    tokens_in_avg: float
+    tokens_out_avg: float
+    tokens_in_std: float
+    tokens_out_std: float
+
+    # Timing statistics
+    time_total_ms: int
+    time_avg_ms: float
+    time_std_ms: float
+
+    # Cost statistics
+    cost_total: float
+    cost_avg: float
+    cost_std: float
 
 
 @dataclass
@@ -155,12 +143,25 @@ class Collector:
 
         self.task = task
         self._request_count = 0
-        self.call_stats = CallStats()
 
-        # Write task and strategy for benchmark analysis
+        # Call tracking
+        self._calls_success = 0
+        self._calls_error = 0
+        self._calls_failed = 0
+        self._calls_total = 0
+
+        # Write task with structured model for benchmark analysis
+        vendor, model_name = task.model.split("/", 1)
+        task_data = {
+            "model": {"vendor": vendor, "name": model_name},
+            "seed": task.seed,
+            "deck": task.deck,
+            "stake": task.stake,
+            "strategy": task.strategy,
+        }
         manifest = StrategyManifest.from_file(task.strategy)
         with (self.run_dir / "task.json").open("w") as f:
-            json.dump(asdict(self.task), f, indent=2)
+            json.dump(task_data, f, indent=2)
         with (self.run_dir / "strategy.json").open("w") as f:
             json.dump(asdict(manifest), f, indent=2)
 
@@ -168,14 +169,14 @@ class Collector:
         """Record a call outcome."""
         match outcome:
             case "successful":
-                self.call_stats.successful += 1
+                self._calls_success += 1
             case "error":
-                self.call_stats.error += 1
+                self._calls_error += 1
             case "failed":
-                self.call_stats.failed += 1
+                self._calls_failed += 1
             case _:
                 raise ValueError(f"Invalid call outcome: {outcome}")
-        self.call_stats.total += 1
+        self._calls_total += 1
 
     def write_request(self, body: dict[str, Any]) -> str:
         """Write request to requests.jsonl. Returns custom_id."""
@@ -233,85 +234,60 @@ class Collector:
         assert len(responses) >= 2, "Expected at least two responses"
 
         ################################################################################
-        # Populate list for each stat type
+        # Populate lists for each stat type and count providers
         ################################################################################
 
-        stats: dict[str, list] = {
-            "providers": [],
-            "input_tokens": [],
-            "output_tokens": [],
-            "input_cost": [],
-            "output_cost": [],
-            "total_cost": [],
-            "time_ms": [],
-        }
+        provider_counts: Counter[str] = Counter()
+        input_tokens: list[int] = []
+        output_tokens: list[int] = []
+        total_costs: list[float] = []
+        time_ms_list: list[int] = []
+
         for res in responses:
             if res.response is not None and res.response.status_code == 200:
                 body = res.response.body
                 if "provider" in body:
-                    stats["providers"].append(body["provider"])
+                    provider_counts[body["provider"]] += 1
 
                 usage = body.get("usage", {})
-                stats["input_tokens"].append(usage.get("prompt_tokens", 0))
-                stats["output_tokens"].append(usage.get("completion_tokens", 0))
-
-                cost_details = usage.get("cost_details", {})
-                stats["input_cost"].append(
-                    cost_details.get("upstream_inference_prompt_cost", 0)
-                )
-                stats["output_cost"].append(
-                    cost_details.get("upstream_inference_completions_cost", 0)
-                )
-                stats["total_cost"].append(usage.get("cost", 0))
-                stats["time_ms"].append(int(res.id) - int(res.response.request_id))
+                input_tokens.append(usage.get("prompt_tokens", 0))
+                output_tokens.append(usage.get("completion_tokens", 0))
+                total_costs.append(usage.get("cost", 0))
+                time_ms_list.append(int(res.id) - int(res.response.request_id))
 
         ################################################################################
         # Compute aggregated stats
         ################################################################################
 
-        n = len(stats["input_tokens"])
-
-        total = AggregatedStats(
-            input_tokens=sum(stats["input_tokens"]),
-            output_tokens=sum(stats["output_tokens"]),
-            input_cost=sum(stats["input_cost"]),
-            output_cost=sum(stats["output_cost"]),
-            total_cost=sum(stats["total_cost"]),
-            time_ms=sum(stats["time_ms"]),
-        )
-
-        average = AggregatedStats(
-            input_tokens=total.input_tokens / n,
-            output_tokens=total.output_tokens / n,
-            input_cost=total.input_cost / n,
-            output_cost=total.output_cost / n,
-            total_cost=total.total_cost / n,
-            time_ms=total.time_ms / n,
-        )
-
-        std_dev = AggregatedStats(
-            input_tokens=statistics.stdev(stats["input_tokens"]),
-            output_tokens=statistics.stdev(stats["output_tokens"]),
-            input_cost=statistics.stdev(stats["input_cost"]),
-            output_cost=statistics.stdev(stats["output_cost"]),
-            total_cost=statistics.stdev(stats["total_cost"]),
-            time_ms=statistics.stdev(stats["time_ms"]),
-        )
-
-        ################################################################################
-        # Compute Stats from the final gamestate
-        ################################################################################
-
+        n = len(input_tokens)
         gamestate = gamestates[-1]
 
         return Stats(
-            won=gamestate["won"],
-            completed=gamestate["state"] == "GAME_OVER" or gamestate["won"],
-            ante_reached=gamestate["ante_num"],
+            # Outcome
+            run_won=gamestate["won"],
+            run_completed=gamestate["state"] == "GAME_OVER" or gamestate["won"],
+            final_ante=gamestate["ante_num"],
             final_round=gamestate["round_num"],
-            providers=stats["providers"],
-            calls=self.call_stats,
-            total=total,
-            average=average,
-            std_dev=std_dev,
+            # Provider distribution
+            providers=dict(provider_counts),
+            # Call statistics
+            calls_total=self._calls_total,
+            calls_success=self._calls_success,
+            calls_error=self._calls_error,
+            calls_failed=self._calls_failed,
+            # Token statistics
+            tokens_in_total=sum(input_tokens),
+            tokens_out_total=sum(output_tokens),
+            tokens_in_avg=sum(input_tokens) / n,
+            tokens_out_avg=sum(output_tokens) / n,
+            tokens_in_std=statistics.stdev(input_tokens),
+            tokens_out_std=statistics.stdev(output_tokens),
+            # Timing statistics
+            time_total_ms=sum(time_ms_list),
+            time_avg_ms=sum(time_ms_list) / n,
+            time_std_ms=statistics.stdev(time_ms_list),
+            # Cost statistics
+            cost_total=sum(total_costs),
+            cost_avg=sum(total_costs) / n,
+            cost_std=statistics.stdev(total_costs),
         )
