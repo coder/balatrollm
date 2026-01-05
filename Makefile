@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install lint format typecheck quality all
+.PHONY: help install lint format typecheck quality all test
 
 # Colors (ANSI)
 YELLOW := \033[33m
@@ -21,7 +21,8 @@ help: ## Show this help message
 	@printf "  $(GREEN)%-18s$(RESET) %s\n" "format"    "Run ruff formatter"
 	@printf "  $(GREEN)%-18s$(RESET) %s\n" "typecheck" "Run type checker"
 	@printf "  $(GREEN)%-18s$(RESET) %s\n" "quality"   "Run all code quality checks"
-	@printf "  $(GREEN)%-18s$(RESET) %s\n" "all"       "Run all code quality checks"
+	@printf "  $(GREEN)%-18s$(RESET) %s\n" "all"       "Run all code quality checks and tests"
+	@printf "  $(GREEN)%-18s$(RESET) %s\n" "test"      "Run all tests (unit + integration)"
 
 install: ## Install dependencies
 	@$(PRINT) "$(YELLOW)Installing all dependencies...$(RESET)"
@@ -46,5 +47,11 @@ typecheck: ## Run type checker
 quality: lint typecheck format ## Run all code quality checks
 	@$(PRINT) "$(GREEN)✓ All checks completed$(RESET)"
 
-all: lint format typecheck ## Run all code quality checks
+test: ## Run all tests (unit first, then integration with parallelism)
+	@$(PRINT) "$(YELLOW)Running tests/unit...$(RESET)"
+	uv run pytest tests/unit
+	@$(PRINT) "$(YELLOW)Running tests/integration with $(XDIST_WORKERS) workers...$(RESET)"
+	uv run pytest -n 2 tests/integration
+
+all: lint format typecheck test ## Run all code quality checks and tests
 	@$(PRINT) "$(GREEN)✓ All checks completed$(RESET)"
