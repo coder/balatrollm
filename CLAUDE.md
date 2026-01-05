@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**GitHub Repository**: [`s1m0n38/balatrollm`](https://github.com/s1m0n38/balatrollm)
+**GitHub Repository**: [`coder/balatrollm`](https://github.com/coder/balatrollm)
 
 ## Overview
 
