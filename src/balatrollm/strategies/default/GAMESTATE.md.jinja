@@ -193,15 +193,48 @@ Here are the vouchers that can be redeemed:
 {%- endfor %}
 {% endif %}
 
-{#- Packs purchase not yet supported
 {% if G.packs.cards %}
-Here are the booster packs that can be opened:
+### Booster Packs
+
 {% for pack in G.packs.cards -%}
-- {{ loop.index0 }}: {{ pack.label }}
+- {{ loop.index0 }}: **{{ pack.label }}**
+  - **Effect**: {{ pack.value.effect }}
   - **Cost**: ${{ pack.cost.buy }}
 {% endfor %}
 {% endif %}
--#}
+{%- endif %}
+
+{% if G.state == "SMODS_BOOSTER_OPENED" -%}
+## Pack Selection
+
+You have opened a booster pack. Choose a card or skip.
+
+### Available Cards in Pack
+
+{% for card in G.pack.cards -%}
+{% if card.set == "JOKER" %}
+- {{ loop.index0 }}: **{{ card.label }}** (Joker)
+  - **Effect**: {{ card.value.effect }}
+  - **Rarity**: {{ card.value.rarity|default('Common') }}
+{% elif card.set in ["TAROT", "PLANET", "SPECTRAL"] %}
+- {{ loop.index0 }}: **{{ card.label }}** ({{ card.set|title }})
+  - **Effect**: {{ card.value.effect }}
+{% if card.value.min_highlighted %}  - **Targets**: {{ card.value.min_highlighted }}-{{ card.value.max_highlighted }} hand cards{% endif %}
+{% elif card.set in ["DEFAULT", "ENHANCED"] %}
+- {{ loop.index0 }}: **{{ card.value.rank }} of {{ card.value.suit }}**
+{% if card.set == "ENHANCED" %}  - **Enhancement**: {{ card.value.enhancement }}{% endif %}
+{% if card.value.edition %}  - **Edition**: {{ card.value.edition }}{% endif %}
+{% if card.value.seal %}  - **Seal**: {{ card.value.seal }}{% endif %}
+{% endif %}
+{%- endfor %}
+
+{% if G.hand and G.hand.cards %}
+### Your Hand (for targeting)
+
+{% for card in G.hand.cards -%}
+- {{ loop.index0 }}: {{ card.value.rank }} of {{ card.value.suit }}{% if card.set == "ENHANCED" %} ({{ card.value.enhancement }}){% endif %}
+{% endfor %}
+{% endif %}
 {%- endif %}
 
 {% if G.state == "BLIND_SELECT" -%}
@@ -247,11 +280,12 @@ You **MUST** use one of the following tools to perform the intended action:
     - `consumables`: (list) New order of consumables (0-based indices, must include all consumables)
     - `reasoning`: (string) Strategic reasoning for this arrangement
 {% elif G.state == "SHOP" -%}
-- Buy a card or voucher from the shop
+- Buy a card, voucher, or pack from the shop
   - Function: `buy`
   - Parameters (provide exactly one of):
     - `card`: (integer) 0-based index of shop card to buy
     - `voucher`: (integer) 0-based index of voucher to buy
+    - `pack`: (integer) 0-based index of booster pack to buy and open
     - `reasoning`: (string) Strategic reasoning for this purchase
 - Reroll the shop items
   - Function: `reroll`
@@ -276,6 +310,18 @@ You **MUST** use one of the following tools to perform the intended action:
   - Function: `skip`
   - Parameters:
     - `reasoning`: (string) Strategic reasoning for skipping this blind
+{% elif G.state == "SMODS_BOOSTER_OPENED" -%}
+- Select a card from the pack
+  - Function: `pack`
+  - Parameters:
+    - `card`: (integer) 0-based index of card to select
+    - `targets`: (list, optional) 0-based indices of hand cards to target (for Tarot/Spectral that require selection)
+    - `reasoning`: (string) Strategic reasoning for this selection
+- Skip the pack selection
+  - Function: `pack`
+  - Parameters:
+    - `skip`: (boolean) Set to true to skip
+    - `reasoning`: (string) Strategic reasoning for skipping
 {% endif -%}
 {% if G.state in ["SELECTING_HAND", "SHOP"] -%}
 - Sell a joker or consumable for money

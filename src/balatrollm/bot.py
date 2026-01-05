@@ -178,7 +178,7 @@ class Bot:
             await self._balatro.call("gamestate")
 
             match current_state:
-                case "SELECTING_HAND" | "SHOP":
+                case "SELECTING_HAND" | "SHOP" | "SMODS_BOOSTER_OPENED":
                     response = await self._get_llm_response(gamestate)
                     gamestate = await self._execute_tool_call(response)
                 case "ROUND_EVAL":

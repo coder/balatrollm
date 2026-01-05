@@ -196,10 +196,7 @@ By default, the shop sells:
 
 - 2 random cards (usually Jokers, but occasionally Tarot Cards and Planets)
 - 1 Voucher
-
-{#- Booster Packs not yet supported by BalatroBot API
 - 2 random Booster Packs
--#}
 
 All items in the shop have a buy cost (purchase price) and a sell cost (selling value) for the purchased items. The sell cost item is usually half of it buy cost.
 
@@ -207,13 +204,8 @@ All items in the shop have a buy cost (purchase price) and a sell cost (selling 
 
 The player may pay money to reroll the shop an unlimited number of times, removing any of the remaining random cards and replacing them with 2 new random cards. The reroll cost starts at $5 and increases by $1 each reroll, resetting to $5 upon entering a new shop.
 
-{#- Pack purchase not yet supported by BalatroBot API
 However, rerolling the shop does not restock Booster Packs or the Voucher. Booster packs only restock upon entering a new shop, and the Voucher restocks after defeating the boss blind.
--#}
 
-However, rerolling the shop does not restock the Voucher. The Voucher restocks after defeating the boss blind.
-
-{#- Pack purchase not yet supported by BalatroBot API
 ### Booster Packs
 
 Two Booster Packs are always offered in each Shop, often but not always of two different types. These come in five categories:
@@ -225,7 +217,29 @@ Two Booster Packs are always offered in each Shop, often but not always of two d
 - **Spectral Packs** containing Spectral Cards for immediate use.
 
 A new set of Booster Packs will be offered with each shop. Booster Packs do not refresh when rerolling the Shop.
--#}
+
+#### Booster Pack Strategy
+
+Booster packs provide valuable cards but use them wisely:
+
+**When to Buy Packs:**
+- **Buffoon Packs**: Buy when you have joker slots available and need synergy
+- **Arcana Packs**: Good for card enhancements early game
+- **Celestial Packs**: Buy when you have a dominant hand type to level up
+- **Standard Packs**: Useful for building specific suits/ranks
+- **Spectral Packs**: High risk/reward - can duplicate jokers or destroy cards
+
+**Pack Selection Tips:**
+- For Arcana/Spectral packs, cards are used **immediately**
+- Some cards (like The Magician) require selecting target cards from your hand
+- Consider skipping if no cards benefit your current strategy
+- Buffoon/Standard packs add cards to your collection (not used immediately)
+
+**Targeting for Tarot/Spectral:**
+When a card requires targets:
+- Check the card's effect for how many cards to select
+- Target cards that will benefit most from the enhancement
+- For destructive cards, target low-value or duplicate cards
 
 ## Jokers
 
