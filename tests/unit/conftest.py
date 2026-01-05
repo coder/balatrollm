@@ -37,7 +37,7 @@ def load_unit_fixture(group: str, fixture_name: str) -> dict[str, Any]:
     if not fixture_path.exists():
         raise FileNotFoundError(
             f"Unit fixture not found: {fixture_path}\n"
-            f"Run 'python tests/unit/fixtures/generate.py' with Balatro running to generate fixtures."
+            f"Run 'python tests/fixtures/generate.py' with Balatro running to generate fixtures."
         )
     with open(fixture_path) as f:
         return json.load(f)
@@ -61,6 +61,6 @@ def load_unit_golden(group: str, fixture_name: str, template: str) -> str:
     if not golden_path.exists():
         raise FileNotFoundError(
             f"Golden file not found: {golden_path}\n"
-            f"Run 'python tests/unit/fixtures/generate.py' with Balatro running to generate fixtures."
+            f"Run 'python tests/fixtures/generate.py' with Balatro running to generate fixtures."
         )
     return golden_path.read_text()

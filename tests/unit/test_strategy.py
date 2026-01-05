@@ -190,7 +190,7 @@ class TestRenderMemoryProperties:
     def test_history_actions_appear(self) -> None:
         """Property: all history actions appear in memory output."""
         sm = StrategyManager("default")
-        history = [
+        history: list[dict[str, str | dict[str, list[int]]]] = [
             {"method": "play", "params": {"cards": [0, 1]}, "reasoning": "Test play"},
             {
                 "method": "discard",
@@ -201,8 +201,10 @@ class TestRenderMemoryProperties:
         result = sm.render_memory(history=history)
 
         for entry in history:
-            assert entry["method"] in result
-            assert entry["reasoning"] in result
+            method = str(entry["method"])
+            reasoning = str(entry["reasoning"])
+            assert method in result
+            assert reasoning in result
 
     def test_error_message_appears(self) -> None:
         """Property: error message appears when provided."""
