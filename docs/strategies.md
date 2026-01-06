@@ -10,7 +10,7 @@ The strategy system allows for different playing styles - from conservative, fin
 
 ## Strategy Structure
 
-Each strategy is a directory under `src/balatrollm/strategies/` containing exactly **5 required files**:
+Each strategy is a directory under `src/balatrollm/strategies/` containing exactly 5 **required** files:
 
 ```
 src/balatrollm/strategies/{strategy_name}/
@@ -25,10 +25,10 @@ src/balatrollm/strategies/{strategy_name}/
 
 Strategy names must follow these rules:
 
-- **Lowercase letters and numbers only** (e.g., `aggressive`, `value_based`, `risky2`)
-- **Valid Python identifier** (cannot start with a number)
-- **Underscores allowed, hyphens forbidden** (e.g., `high_risk` ✓, `high-risk` ✗)
-- **No spaces or special characters**
+- Lowercase letters and numbers only (e.g., `aggressive`, `value_based`, `risky2`)
+- Valid Python identifier (cannot start with a number)
+- Underscores allowed, hyphens forbidden (e.g., `high_risk` ✓, `high-risk` ✗)
+- No spaces or special characters
 
 ## manifest.json
 
@@ -66,25 +66,32 @@ Strategies use [Jinja2](https://jinja.palletsprojects.com/) templating to dynami
 
 ### Available Context Variables
 
-All Jinja2 templates have access to:
+Each template receives different context variables:
 
-- **`G`**: The complete game state dictionary containing:
+`STRATEGY.md.jinja` and `GAMESTATE.md.jinja`:
 
-    - Current hand, jokers, consumables
-    - Money, remaining hands/discards
-    - Blind information, ante level
-    - Deck composition, played cards
-    - And more...
+| Variable | Type   | Description                                   |
+| -------- | ------ | --------------------------------------------- |
+| `G`      | `dict` | Full gamestate dictionary from BalatroBot API |
 
-- **`constants`**: Balatro game constants including:
+The `G` dictionary contains all game state information including:
 
-    - `constants.jokers`: All joker definitions
-    - `constants.consumables`: Tarot, Planet, and Spectral cards
-    - `constants.vouchers`: Available vouchers
-    - `constants.tags`: Tag definitions
-    - `constants.editions`: Card editions (Foil, Holographic, Polychrome)
-    - `constants.enhancements`: Card enhancements (Bonus, Mult, Wild, Glass, Steel, Stone, Gold, Lucky)
-    - `constants.seals`: Card seals (Gold, Red, Blue, Purple)
+- Current hand, jokers, consumables
+- Money, remaining hands/discards
+- Blind information, ante level
+- Deck composition, played cards
+- Shop contents (when in SHOP state)
+- And more...
+
+The `G` dictionary is the Game State returned by the [BalatroBot API](https://coder.github.io/balatrobot/api/#gamestate-schema).
+
+`MEMORY.md.jinja`:
+
+| Variable               | Type          | Description                                          |
+| ---------------------- | ------------- | ---------------------------------------------------- |
+| `history`              | `list[dict]`  | Last 10 actions with `method`, `params`, `reasoning` |
+| `last_error_call_msg`  | `str \| None` | Error message from invalid LLM response              |
+| `last_failed_call_msg` | `str \| None` | Error message from failed API call                   |
 
 ### Custom Filters
 
@@ -138,13 +145,13 @@ Example access patterns:
 
 #### MEMORY.md.jinja
 
-Tracks previous responses and errors to provide context for decision-making. This template helps the LLM learn from mistakes and maintain consistency.
+Tracks previous actions and errors to provide context for decision-making. This template helps the LLM learn from mistakes and maintain consistency.
 
-Context variables:
+Context variables (see [Available Context Variables](#available-context-variables) for details):
 
-- `responses`: List of previous LLM responses
-- `last_error_call_msg`: Last error message from failed tool calls
-- `last_failed_call_msg`: Last failed tool call details
+- `history`: List of previous actions (last 10)
+- `last_error_call_msg`: Error from invalid LLM response
+- `last_failed_call_msg`: Error from failed API call
 
 ## TOOLS.json
 
@@ -181,27 +188,38 @@ Defines the function calls available to the LLM during different game phases. Th
 
 ### Available Game States
 
-- **SELECTING_HAND**: During hand selection phase (playing/discarding)
-- **SHOP**: During shop phase (buying, selling, using consumables)
+Tools are organized by game state. The `TOOLS.json` file maps each state to its available tools:
+
+| Game State             | Description           | Available Tools                                           |
+| ---------------------- | --------------------- | --------------------------------------------------------- |
+| `SELECTING_HAND`       | Hand selection phase  | `play`, `discard`, `rearrange`, `sell`, `use`             |
+| `SHOP`                 | Shop phase            | `buy`, `reroll`, `next_round`, `sell`, `use`, `rearrange` |
+| `BLIND_SELECT`         | Blind selection phase | `select`, `skip`                                          |
+| `SMODS_BOOSTER_OPENED` | Pack opening phase    | `pack` (select cards or skip)                             |
 
 ### Common Tools
 
 **SELECTING_HAND phase:**
 
-- `play_hand_or_discard`: Play or discard selected cards
-- `rearrange_hand`: Reorder cards in hand
-- `rearrange_jokers`: Reorder jokers for optimal scoring
-- `sell_joker`: Sell a joker for money
-- `sell_consumable`: Sell a consumable for money
-- `use_consumable`: Use a Tarot/Planet/Spectral card
+- `play`: Play selected cards as a poker hand
+- `discard`: Discard selected cards
+- `rearrange`: Reorder cards in hand or jokers
+- `sell`: Sell a joker or consumable for money
+- `use`: Use a Tarot/Planet/Spectral card
 
 **SHOP phase:**
 
-- `shop`: Perform shop actions (next_round, reroll, buy_card, redeem_voucher)
-- `sell_joker`: Sell a joker
-- `sell_consumable`: Sell a consumable
-- `use_consumable`: Use a Tarot/Planet/Spectral card
-- `rearrange_jokers`: Reorder jokers
+- `buy`: Purchase a card, joker, or pack
+- `reroll`: Reroll the shop
+- `next_round`: Proceed to next round
+- `sell`: Sell a joker or consumable
+- `use`: Use a consumable
+- `rearrange`: Reorder jokers
+
+**BLIND_SELECT phase:**
+
+- `select`: Select a blind to play
+- `skip`: Skip the current blind (if allowed)
 
 ## Strategy Validation
 
@@ -225,10 +243,7 @@ Validation occurs at runtime when a strategy is selected.
 
 ### 1. Study Existing Strategies
 
-Review the built-in strategies to understand structure and best practices:
-
-- `src/balatrollm/strategies/default/`: Conservative approach
-- `src/balatrollm/strategies/aggressive/`: High-risk approach
+Review the built-in default strategy (`src/balatrollm/strategies/default/`) to understand structure and best practices.
 
 ### 2. Create Strategy Directory
 
@@ -280,7 +295,7 @@ Submissions must meet these standards:
 - **Valid**: Templates compile without errors, JSON is well-formed
 - **Documented**: Clear strategy philosophy and decision-making approach
 - **Unique**: Offers meaningfully different gameplay from existing strategies
-- **Tested**: Locally verified to work with at least one complete game
+- **Tested**: Locally verified to work
 
 ### Review Process
 
@@ -309,75 +324,3 @@ Once approved, your strategy will be available to all BalatroLLM users via the `
 - **Explain trade-offs**: Help the LLM understand when to break rules
 - **Provide examples**: Concrete scenarios guide decision-making
 - **Stay consistent**: Maintain the same approach throughout templates
-
-### Debugging
-
-If your strategy produces errors:
-
-1. **Check template syntax**: Ensure valid Jinja2 (matching braces, proper filters)
-2. **Verify manifest.json**: All fields present, valid JSON format
-3. **Test TOOLS.json**: Valid JSON, matches OpenAI function calling format
-4. **Review game logs**: Check `runs/` directory for detailed error messages
-5. **Compare with defaults**: See how built-in strategies handle similar situations
-
-## Examples
-
-### Example manifest.json
-
-```json
-{
-  "name": "Aggressive",
-  "description": "High-risk, high-reward strategy with aggressive spending and bold decisions",
-  "author": "BalatroBench",
-  "version": "0.1.0",
-  "tags": ["aggressive", "high-risk", "bold"]
-}
-```
-
-### Example Jinja2 Template Snippet
-
-```jinja
-## Financial Status
-
-Current money: ${{ G.dollars }}
-Interest rate: $1 per $5 saved (max $5 at $25+)
-
-{% if G.dollars >= 25 %}
-You're earning maximum interest ($5). Consider strategic spending.
-{% elif G.dollars >= 20 %}
-Almost at max interest! Saving ${{ 25 - G.dollars }} more will maximize returns.
-{% else %}
-Focus on immediate power upgrades over interest at this stage.
-{% endif %}
-```
-
-### Example Tool Definition
-
-```json
-{
-  "type": "function",
-  "function": {
-    "name": "shop",
-    "description": "Perform shop actions including buying cards, rerolling, or proceeding to next round",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "action": {
-          "type": "string",
-          "enum": ["next_round", "reroll", "buy_card", "redeem_voucher"],
-          "description": "The shop action to perform"
-        },
-        "index": {
-          "type": "integer",
-          "description": "Index of card to buy (0-indexed) or voucher to redeem"
-        },
-        "reasoning": {
-          "type": "string",
-          "description": "Brief explanation of why you're taking this action"
-        }
-      },
-      "required": ["action"]
-    }
-  }
-}
-```
