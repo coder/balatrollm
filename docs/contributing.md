@@ -187,4 +187,3 @@ If CI fails on your PR, check the workflow logs on GitHub for details. Most issu
 ## Contributing Strategies
 
 See [Strategies](strategies.md) for how to create and contribute custom playing strategies.
-
