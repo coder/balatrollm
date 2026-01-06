@@ -1,12 +1,14 @@
 site_name: BalatroLLM
-site_description: LLM-powered bot that plays Balatro using strategic decision making
-site_author: 'coder'
+site_description: Play Balatro with LLMs
+site_author: 'S1M0N38'
 repo_name: 'coder/balatrollm'
 repo_url: https://github.com/coder/balatrollm
 site_url: https://coder.github.io/balatrollm/
 docs_dir: docs/
 theme:
   name: material
+  favicon: assets/balatrollm.svg
+  logo: assets/balatrollm-white.svg
   icon:
     repo: fontawesome/brands/github
   features:
@@ -33,24 +35,22 @@ plugins:
   - search
   - llmstxt:
       markdown_description: |
-        BalatroLLM is a bot that uses Large Language Models (LLMs) to play [Balatro](https://www.playbalatro.com/), the popular roguelike poker deck-building game.
-        The bot analyzes game states, makes strategic decisions, and executes actions through the [BalatroBot](https://github.com/coder/balatrobot) client.
+        BalatroLLM is a bot that uses Large Language Models (LLMs) to play [Balatro](https://www.playbalatro.com/), the popular roguelike poker deck-building game. The bot analyzes game states, makes strategic decisions, and executes actions through the [BalatroBot](https://github.com/coder/balatrobot) API.
       sections:
         Documentation:
-          - setup.md
-          - usage.md
-          - analysis.md
+          - installation.md
+          - cli.md
           - strategies.md
+          - contributing.md
       full_output: llms-full.txt
       autoclean: true
 nav:
-  - Home: index.md
-  - Setup: setup.md
-  - Usage: usage.md
-  - Analysis: analysis.md
+  - BalatroLLM: index.md
+  - Installation: installation.md
+  - CLI Reference: cli.md
   - Strategies: strategies.md
+  - Contributing: contributing.md
 markdown_extensions:
-  - sane_lists
   - toc:
       toc_depth: 3
   - attr_list
@@ -59,17 +59,12 @@ markdown_extensions:
   - admonition
   - pymdownx.details
   - pymdownx.highlight:
+      anchor_linenums: false
       line_spans: __span
       pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.tabbed:
-      alternate_style: true
+  - pymdownx.superfences
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
