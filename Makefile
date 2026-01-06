@@ -49,9 +49,11 @@ quality: lint typecheck format ## Run all code quality checks
 
 test: ## Run all tests (unit first, then integration with parallelism)
 	@$(PRINT) "$(YELLOW)Running tests/unit...$(RESET)"
-	uv run pytest tests/unit
-	@$(PRINT) "$(YELLOW)Running tests/integration with $(XDIST_WORKERS) workers...$(RESET)"
-	uv run pytest -n 2 tests/integration
+	pytest tests/unit
+	@$(PRINT) "$(YELLOW)Running tests/integration with 2 workers...$(RESET)"
+	BALATROBOT_RENDER_ON_API=0 \
+	BALATROBOT_HEADLESS=1 \
+	pytest -n 2 tests/integration
 
 all: lint format typecheck test ## Run all code quality checks and tests
 	@$(PRINT) "$(GREEN)✓ All checks completed$(RESET)"
