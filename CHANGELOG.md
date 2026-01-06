@@ -1,5 +1,55 @@
 # Changelog
 
+## [1.0.0](https://github.com/coder/balatrollm/compare/v0.16.0...v1.0.0) (2026-01-06)
+
+
+### Features
+
+* add __init__.py to src/balatrollm ([c8d350a](https://github.com/coder/balatrollm/commit/c8d350acc25c135eac80232e9cca7289fc84434e))
+* add executor to start/stop balatro instances and tasks ([3f80e3f](https://github.com/coder/balatrollm/commit/3f80e3f7b6467f312a03d2141e4b230cf41b889c))
+* add llm client ([2c35963](https://github.com/coder/balatrollm/commit/2c359634cc2e567f96c2376e06017719cd78094a))
+* add new config/task structure ([10ab612](https://github.com/coder/balatrollm/commit/10ab612a7e0e520c5f981bb5ef289cde3e4e9b8d))
+* add strategy manifest class to strategy.py ([fb91793](https://github.com/coder/balatrollm/commit/fb91793abcfe5aa7852eafb50ba765f96c5e910c))
+* **cli:** add new CLI entry point for `balatrollm`` ([f87ea11](https://github.com/coder/balatrollm/commit/f87ea11f73e58b01eb20a7b5942ebb8be793cb7d))
+* **client:** add BalatroClient and BalatroError classes ([a3500cb](https://github.com/coder/balatrollm/commit/a3500cbc7773f69b1da729c3a661096cc7d4e5d0))
+* **collector:** flatten the structure of the stats ([2540725](https://github.com/coder/balatrollm/commit/254072565bc27153d62a551a01d7c8867ae2135c))
+* **config:** change default model to gpt-oss-120b in example.yaml ([8d94917](https://github.com/coder/balatrollm/commit/8d94917dd604d0fd806576f6d410d9596559ba83))
+* **config:** remove legacy config and add example config ([76f0e37](https://github.com/coder/balatrollm/commit/76f0e375b61d1653213c16071d885430f089e251))
+* **executor:** add error message if the task fails ([f9ad726](https://github.com/coder/balatrollm/commit/f9ad726ffb80538225b120eab389b250f0333f3e))
+* **executor:** add log path to executor output ([d10e026](https://github.com/coder/balatrollm/commit/d10e026a8677fe95e2e8d06cd806494b6cbc3fb9))
+* **executor:** spawn instances in parallel ([49b03b9](https://github.com/coder/balatrollm/commit/49b03b91816f07fcd997f94403d0070bcee44bc8))
+* **scripts:** add balatro launchers for linux, macos, and windows ([4b770eb](https://github.com/coder/balatrollm/commit/4b770eb26497299ab8500e883e85dea6917e34b1))
+* **strategies:** add `pack` endpoint support ([3b3c487](https://github.com/coder/balatrollm/commit/3b3c4879b5447adf0713f61f68176985063c8cbb))
+* **strategies:** add schema to manifest.json ([36ca7bb](https://github.com/coder/balatrollm/commit/36ca7bb461a50c23f3b84863cf942ef5674141c1))
+* **strategy:** add default strategy ([0a8fb96](https://github.com/coder/balatrollm/commit/0a8fb963c10ef8eff36a619e2df3804989987428))
+* **strategy:** add strategy manager class ([16bcc64](https://github.com/coder/balatrollm/commit/16bcc6496e81cc382c046d3b4d5cd13a79b4b709))
+
+
+### Bug Fixes
+
+* **scripts:** wait for port to be ready in launch script ([3e4fc73](https://github.com/coder/balatrollm/commit/3e4fc7318d21c684c54a2c433950b65dae5bd805))
+* **strategy:** remove booster packs references ([069a2a1](https://github.com/coder/balatrollm/commit/069a2a1760f0b89282c710d5d0edda735fa56527))
+* test target in the Makefile ([a95e78e](https://github.com/coder/balatrollm/commit/a95e78e54c91783e633f1790c097292de86bcb6b))
+
+
+### Documentation
+
+* add comments to collector.py about various ids ([16b3cdb](https://github.com/coder/balatrollm/commit/16b3cdb2704963b40136fb3744802aa4bce52216))
+* **assets:** add balatrollm-white.svg ([a1a80c5](https://github.com/coder/balatrollm/commit/a1a80c59d4643dc62e7e8dfe69b9134211d2db4d))
+* move CONTRIBUTING.md to docs/contributing.md ([bc037b9](https://github.com/coder/balatrollm/commit/bc037b9f86cb684b283018ed828d8e12ae59f3e8))
+* remove order list and use bullets instead ([928712b](https://github.com/coder/balatrollm/commit/928712bf7ccf634baab69df356d75f804bf0137a))
+* update CLAUDE.md to reflect current state of the project ([9bb83f8](https://github.com/coder/balatrollm/commit/9bb83f835478a2f5a5d72a244ed046c07688a60a))
+* update docs index with repos assets ([78e0127](https://github.com/coder/balatrollm/commit/78e01273e561bba213f2511018980969ed5d9e87))
+* update mkdocs.yml following mkdocs from balatrobot ([89eb755](https://github.com/coder/balatrollm/commit/89eb755d6d46da086e9c7dd233257599bf5379c4))
+* update pages in the docs ([26c8d3f](https://github.com/coder/balatrollm/commit/26c8d3f48d2b257a5f89386b2d2495cee2af83db))
+* update repo link in CLAUDE.md ([7301d78](https://github.com/coder/balatrollm/commit/7301d7869d27582f0265aaea734d7e8ffebbac69))
+* update the README following the balatrobot README ([9caa373](https://github.com/coder/balatrollm/commit/9caa37342a2297f1be068e8d41acec9ec60ec0b8))
+
+
+### Miscellaneous Chores
+
+* release balatrollm v1 ([ec2fcb3](https://github.com/coder/balatrollm/commit/ec2fcb3d16a30e46e89adf1f86e313767948bb20))
+
 ## [0.16.0](https://github.com/coder/balatrollm/compare/v0.15.1...v0.16.0) (2025-11-03)
 
 
