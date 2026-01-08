@@ -311,17 +311,13 @@ You **MUST** use one of the following tools to perform the intended action:
   - Parameters:
     - `reasoning`: (string) Strategic reasoning for skipping this blind
 {% elif G.state == "SMODS_BOOSTER_OPENED" -%}
-- Select a card from the pack
+- Select a card from the pack or skip
   - Function: `pack`
   - Parameters:
-    - `card`: (integer) 0-based index of card to select
+    - `card`: (integer, optional) 0-based index of card to select (omit if skipping)
     - `targets`: (list, optional) 0-based indices of hand cards to target (for Tarot/Spectral that require selection)
-    - `reasoning`: (string) Strategic reasoning for this selection
-- Skip the pack selection
-  - Function: `pack`
-  - Parameters:
-    - `skip`: (boolean) Set to true to skip
-    - `reasoning`: (string) Strategic reasoning for skipping
+    - `skip`: (boolean, optional) Set to true to skip the pack without selecting a card
+    - `reasoning`: (string) Strategic reasoning for this selection or skip
 {% endif -%}
 {% if G.state in ["SELECTING_HAND", "SHOP"] -%}
 - Sell a joker or consumable for money

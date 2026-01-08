@@ -312,47 +312,29 @@
       "type": "function",
       "function": {
         "name": "pack",
-        "description": "Select a card from the opened booster pack. For Arcana/Spectral packs, cards are used immediately and may require targeting hand cards.",
+        "description": "Select a card from the opened booster pack, or skip without taking any card. For Arcana/Spectral packs, cards are used immediately and may require targeting hand cards.",
         "parameters": {
           "type": "object",
           "properties": {
             "card": {
               "type": "integer",
-              "description": "0-based index of card to select from pack"
+              "description": "0-based index of card to select from pack (omit if skipping)"
             },
             "targets": {
               "type": "array",
               "items": {"type": "integer"},
               "description": "0-based indices of hand cards to target (required for some Tarot/Spectral cards)"
             },
-            "reasoning": {
-              "type": "string",
-              "description": "Strategic reasoning for this selection"
-            }
-          },
-          "required": ["card", "reasoning"]
-        }
-      }
-    },
-    {
-      "type": "function",
-      "function": {
-        "name": "pack",
-        "description": "Skip the pack selection without taking any card.",
-        "parameters": {
-          "type": "object",
-          "properties": {
             "skip": {
               "type": "boolean",
-              "const": true,
-              "description": "Set to true to skip the pack"
+              "description": "Set to true to skip the pack without selecting a card"
             },
             "reasoning": {
               "type": "string",
-              "description": "Strategic reasoning for skipping"
+              "description": "Strategic reasoning for this selection or skip"
             }
           },
-          "required": ["skip", "reasoning"]
+          "required": ["reasoning"]
         }
       }
     }
