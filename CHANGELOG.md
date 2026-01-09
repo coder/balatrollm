@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/coder/balatrollm/compare/v1.0.0...v1.0.1) (2026-01-09)
+
+
+### Bug Fixes
+
+* **strategies:** unify pack tools into a single function ([6fb0ba0](https://github.com/coder/balatrollm/commit/6fb0ba0d75bf5255b3ee52d09f737eda28a8fefc))
+
 ## [1.0.0](https://github.com/coder/balatrollm/compare/v0.16.0...v1.0.0) (2026-01-06)
 
 
