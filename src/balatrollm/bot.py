@@ -81,12 +81,13 @@ class Bot:
             return
 
         root_logger = logging.getLogger()
+        root_logger.setLevel(logging.DEBUG)
         for handler in root_logger.handlers[:]:
             root_logger.removeHandler(handler)
 
         log_file = self._collector.run_dir / "run.log"
         file_handler = logging.FileHandler(log_file)
-        file_handler.setLevel(logging.INFO)
+        file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(
             logging.Formatter(
                 "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -152,11 +153,15 @@ class Bot:
             logger.error("Game ended due to bot error")
             raise
         except Exception as e:
-            logger.error(f"Unexpected error: {e}")
+            logger.exception("Unexpected error occurred during gameplay")
             raise BotError(f"Unexpected error: {e}") from e
         finally:
-            self._collector.write_stats()
-            logger.info("Stats written")
+            if self._collector:
+                try:
+                    self._collector.write_stats()
+                    logger.info("Stats written")
+                except Exception as e:
+                    logger.debug(f"Could not write stats (normal if run failed early): {e}")
 
         return self._collector._calculate_stats()
 
