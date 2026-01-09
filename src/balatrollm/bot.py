@@ -81,13 +81,13 @@ class Bot:
             return
 
         root_logger = logging.getLogger()
-        root_logger.setLevel(logging.DEBUG)
+        root_logger.setLevel(logging.INFO)
         for handler in root_logger.handlers[:]:
             root_logger.removeHandler(handler)
 
         log_file = self._collector.run_dir / "run.log"
         file_handler = logging.FileHandler(log_file)
-        file_handler.setLevel(logging.DEBUG)
+        file_handler.setLevel(logging.INFO)
         file_handler.setFormatter(
             logging.Formatter(
                 "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -161,7 +161,9 @@ class Bot:
                     self._collector.write_stats()
                     logger.info("Stats written")
                 except Exception as e:
-                    logger.debug(f"Could not write stats (normal if run failed early): {e}")
+                    logger.debug(
+                        f"Could not write stats (normal if run failed early): {e}"
+                    )
 
         return self._collector._calculate_stats()
 
