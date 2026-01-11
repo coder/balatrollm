@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/coder/balatrollm/compare/v1.0.1...v1.0.2) (2026-01-11)
+
+
+### Dependencies
+
+* update balatrobot to 1.3.0 ([b354476](https://github.com/coder/balatrollm/commit/b35447634f353c4011d94723c7726b61c1cf3675))
+
 ## [1.0.1](https://github.com/coder/balatrollm/compare/v1.0.0...v1.0.1) (2026-01-09)
 
 
