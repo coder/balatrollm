@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/coder/balatrollm/compare/v1.0.2...v1.0.3) (2026-01-11)
+
+
+### Bug Fixes
+
+* **pyproject.toml:** update balatrobot to 1.3.1 ([a02e363](https://github.com/coder/balatrollm/commit/a02e36384857cafe81f823f1fe55151615807006))
+
 ## [1.0.2](https://github.com/coder/balatrollm/compare/v1.0.1...v1.0.2) (2026-01-11)
 
 
