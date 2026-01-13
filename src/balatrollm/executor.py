@@ -2,12 +2,14 @@
 
 import asyncio
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 
 from balatrobot import BalatroInstance
 from balatrobot import Config as BalatrobotConfig
 
 from .bot import Bot
+from .client import BalatroClient
 from .config import Config, Task
 
 
@@ -46,10 +48,13 @@ class Executor:
         """Start Balatro instances."""
         cfg = BalatrobotConfig.from_env()
 
-        # Create all instances
+        # Generate single session_id for all instances (prevents split directories)
+        session_id = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+
+        # Create all instances with shared session_id
         instances = []
         for port in ports:
-            instance = BalatroInstance(cfg, port=port)
+            instance = BalatroInstance(cfg, session_id=session_id, port=port)
             instances.append((port, instance))
 
         # Start all instances in parallel
@@ -96,6 +101,15 @@ class Executor:
                     f"[{count:0{len(str(total))}d}/{total}] ERROR     | {log_path} | {task}"
                 )
             finally:
+                # Reset game to menu state before returning port to pool
+                try:
+                    async with BalatroClient(
+                        host=self.config.host, port=port
+                    ) as reset_client:
+                        await reset_client.call("menu")
+                        await asyncio.sleep(0.5)
+                except Exception:
+                    pass  # Best effort - continue even if reset fails
                 await self._port_pool.put(port)
 
         pending = [asyncio.create_task(run_task(t)) for t in self.tasks]
