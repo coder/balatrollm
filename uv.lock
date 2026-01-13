@@ -58,14 +58,14 @@ wheels = [
 
 [[package]]
 name = "balatrobot"
-version = "1.3.3"
+version = "1.3.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8a/56/08cde2ed9658b71d40d6ee3e25509a76f9ced8cd9ff665c98ae213f8d7b1/balatrobot-1.3.3.tar.gz", hash = "sha256:d3c16e482adbf914839e2b8115298f79b6bb4e26d532930d3b88887518c53b50", size = 189290, upload-time = "2026-01-12T12:37:47.651Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/bb/6e/338c4614e1eea197efb329fe43bcf50ccd1dabda9d205b60378bca7ef7a7/balatrobot-1.3.4.tar.gz", hash = "sha256:72c7a00f9ce82d9d528f95f72b9b7c489b7258571a6a51c422697cbcbdfb16f9", size = 189425, upload-time = "2026-01-13T15:18:34.016Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f9/96/d63df1d430a3312098f54c0782fa0b2dc0d0fb8cc86d2a0b5f34731eb6e1/balatrobot-1.3.3-py3-none-any.whl", hash = "sha256:7d87d9cdae0e76c5c8f4203fe583a9f6ee851a71ae2645c858c514ac19f7c032", size = 11903, upload-time = "2026-01-12T12:37:46.834Z" },
+    { url = "https://files.pythonhosted.org/packages/f2/ed/2492b5906c28986ac5ee93c204c5f134ac64014b31577756dec50c9505df/balatrobot-1.3.4-py3-none-any.whl", hash = "sha256:5909cc8f1a2472e9750198f05ca08e86a9b359d0d6f0b1939dbc2d22c8be2c75", size = 11990, upload-time = "2026-01-13T15:18:32.775Z" },
 ]
 
 [[package]]
@@ -106,7 +106,7 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "balatrobot", specifier = ">=1.3.3" },
+    { name = "balatrobot", specifier = ">=1.3.4" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "openai", specifier = ">=2.14.0" },
