@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.5](https://github.com/coder/balatrollm/compare/v1.0.4...v1.0.5) (2026-01-13)
+
+
+### Bug Fixes
+
+* **executor:** reset game to menu state before returning port to pool ([05a468c](https://github.com/coder/balatrollm/commit/05a468cb71dc5dbe67ada1e174286d78f893a4b4))
+
 ## [1.0.4](https://github.com/coder/balatrollm/compare/v1.0.3...v1.0.4) (2026-01-12)
 
 
