@@ -9,7 +9,6 @@ from balatrobot import BalatroInstance
 from balatrobot import Config as BalatrobotConfig
 
 from .bot import Bot
-from .client import BalatroClient
 from .config import Config, Task
 
 
@@ -101,15 +100,7 @@ class Executor:
                     f"[{count:0{len(str(total))}d}/{total}] ERROR     | {log_path} | {task}"
                 )
             finally:
-                # Reset game to menu state before returning port to pool
-                try:
-                    async with BalatroClient(
-                        host=self.config.host, port=port
-                    ) as reset_client:
-                        await reset_client.call("menu")
-                        await asyncio.sleep(0.5)
-                except Exception:
-                    pass  # Best effort - continue even if reset fails
+                await asyncio.sleep(1)
                 await self._port_pool.put(port)
 
         pending = [asyncio.create_task(run_task(t)) for t in self.tasks]
