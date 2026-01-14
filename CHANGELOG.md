@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.8](https://github.com/coder/balatrollm/compare/v1.0.7...v1.0.8) (2026-01-14)
+
+
+### Bug Fixes
+
+* **executor:** revert session_id change ([7419cfc](https://github.com/coder/balatrollm/commit/7419cfc2934f69d958f8be53b2f4537e296474cf))
+
 ## [1.0.7](https://github.com/coder/balatrollm/compare/v1.0.6...v1.0.7) (2026-01-14)
 
 
