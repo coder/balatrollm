@@ -2,7 +2,6 @@
 
 import asyncio
 from dataclasses import dataclass, field
-from datetime import datetime
 from pathlib import Path
 
 from balatrobot import BalatroInstance
@@ -47,13 +46,10 @@ class Executor:
         """Start Balatro instances."""
         cfg = BalatrobotConfig.from_env()
 
-        # Generate single session_id for all instances (prevents split directories)
-        session_id = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-
         # Create all instances with shared session_id
         instances = []
         for port in ports:
-            instance = BalatroInstance(cfg, session_id=session_id, port=port)
+            instance = BalatroInstance(cfg, port=port)
             instances.append((port, instance))
 
         # Start all instances in parallel
