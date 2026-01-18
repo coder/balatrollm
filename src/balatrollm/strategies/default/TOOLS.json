@@ -4,6 +4,7 @@
       "type": "function",
       "function": {
         "name": "play",
+        "strict": false,
         "description": "Play cards from hand as a poker hand to score chips.",
         "parameters": {
           "type": "object",
@@ -26,6 +27,7 @@
       "type": "function",
       "function": {
         "name": "discard",
+        "strict": false,
         "description": "Discard cards from hand to draw new ones.",
         "parameters": {
           "type": "object",
@@ -48,6 +50,7 @@
       "type": "function",
       "function": {
         "name": "rearrange",
+        "strict": false,
         "description": "Rearrange cards in hand, jokers, or consumables. Provide exactly one of: hand, jokers, or consumables.",
         "parameters": {
           "type": "object",
@@ -80,6 +83,7 @@
       "type": "function",
       "function": {
         "name": "sell",
+        "strict": false,
         "description": "Sell a joker or consumable for money. Provide exactly one of: joker or consumable.",
         "parameters": {
           "type": "object",
@@ -105,6 +109,7 @@
       "type": "function",
       "function": {
         "name": "use",
+        "strict": false,
         "description": "Use a consumable card (Tarot, Planet, or Spectral).",
         "parameters": {
           "type": "object",
@@ -133,6 +138,7 @@
       "type": "function",
       "function": {
         "name": "buy",
+        "strict": false,
         "description": "Buy a card, voucher, or pack from the shop. Provide exactly one of: card, voucher, or pack.",
         "parameters": {
           "type": "object",
@@ -162,6 +168,7 @@
       "type": "function",
       "function": {
         "name": "reroll",
+        "strict": false,
         "description": "Reroll the shop items (costs money).",
         "parameters": {
           "type": "object",
@@ -179,6 +186,7 @@
       "type": "function",
       "function": {
         "name": "next_round",
+        "strict": false,
         "description": "Leave the shop and advance to blind selection.",
         "parameters": {
           "type": "object",
@@ -196,6 +204,7 @@
       "type": "function",
       "function": {
         "name": "sell",
+        "strict": false,
         "description": "Sell a joker or consumable for money. Provide exactly one of: joker or consumable.",
         "parameters": {
           "type": "object",
@@ -221,6 +230,7 @@
       "type": "function",
       "function": {
         "name": "use",
+        "strict": false,
         "description": "Use a consumable card (Tarot, Planet, or Spectral).",
         "parameters": {
           "type": "object",
@@ -247,6 +257,7 @@
       "type": "function",
       "function": {
         "name": "rearrange",
+        "strict": false,
         "description": "Rearrange jokers or consumables. Provide exactly one of: jokers or consumables.",
         "parameters": {
           "type": "object",
@@ -276,6 +287,7 @@
       "type": "function",
       "function": {
         "name": "select",
+        "strict": false,
         "description": "Select the current blind to begin the round.",
         "parameters": {
           "type": "object",
@@ -293,6 +305,7 @@
       "type": "function",
       "function": {
         "name": "skip",
+        "strict": false,
         "description": "Skip the current blind (Small or Big only) to receive the tag reward.",
         "parameters": {
           "type": "object",
@@ -312,6 +325,7 @@
       "type": "function",
       "function": {
         "name": "pack",
+        "strict": false,
         "description": "Select a card from the opened booster pack, or skip without taking any card. For Arcana/Spectral packs, cards are used immediately and may require targeting hand cards.",
         "parameters": {
           "type": "object",
