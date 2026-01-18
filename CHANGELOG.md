@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.9](https://github.com/coder/balatrollm/compare/v1.0.8...v1.0.9) (2026-01-18)
+
+
+### Bug Fixes
+
+* **strategies:** set strict to false for all tools schemas ([a313210](https://github.com/coder/balatrollm/commit/a3132102da2cc96a251d519c6448ad8708f6726b))
+
 ## [1.0.8](https://github.com/coder/balatrollm/compare/v1.0.7...v1.0.8) (2026-01-14)
 
 
