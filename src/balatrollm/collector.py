@@ -142,6 +142,7 @@ class Collector:
         self.screenshot_dir.mkdir(parents=True, exist_ok=True)
 
         self.task = task
+        self._base_dir = base_dir
         self._request_count = 0
 
         # Call tracking
@@ -164,6 +165,18 @@ class Collector:
             json.dump(task_data, f, indent=2)
         with (self.run_dir / "strategy.json").open("w") as f:
             json.dump(asdict(manifest), f, indent=2)
+
+        # Write latest.json pointer for overlay
+        runs_dir = self._base_dir / "runs"
+        relative_run_path = self.run_dir.relative_to(runs_dir)
+        with (runs_dir / "latest.json").open("w") as f:
+            json.dump(
+                {
+                    "task": str(relative_run_path / "task.json"),
+                    "responses": str(relative_run_path / "responses.jsonl"),
+                },
+                f,
+            )
 
     def record_call(self, outcome: Literal["successful", "error", "failed"]) -> None:
         """Record a call outcome."""

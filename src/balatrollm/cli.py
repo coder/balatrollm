@@ -41,6 +41,9 @@ def create_parser() -> argparse.ArgumentParser:
 
     # CLI-only
     parser.add_argument("--dry-run", action="store_true", help="Show tasks only")
+    parser.add_argument(
+        "--views", action="store_true", help="Start HTTP server on port 12345 for views"
+    )
 
     return parser
 
@@ -55,6 +58,14 @@ def print_tasks(tasks: list[Task]) -> None:
 async def execute(config: Config, tasks: list[Task]) -> int:
     """Execute all tasks. Returns exit code."""
     from .executor import Executor
+    from .views import ViewsServer
+
+    views_server: ViewsServer | None = None
+    if config.views:
+        # Serve from project root (where views/ and runs/ are located)
+        project_root = Path.cwd()
+        views_server = ViewsServer(root_dir=project_root)
+        views_server.start()
 
     executor = Executor(config=config, tasks=tasks)
 
@@ -67,6 +78,9 @@ async def execute(config: Config, tasks: list[Task]) -> int:
     except Exception as e:
         print(f"Execution failed: {e}")
         return 1
+    finally:
+        if views_server:
+            views_server.stop()
 
 
 def main() -> None:
