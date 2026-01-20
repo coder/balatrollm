@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Overlay</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
+  <div id="overlay" class="text-center p-8">
+    <div id="model" class="text-4xl font-bold mb-2">Loading...</div>
+    <div id="seed" class="text-2xl text-gray-400 font-mono"></div>
+  </div>
+
+  <script>
+    let lastTask = null;
+
+    async function fetchTask() {
+      try {
+        const latestRes = await fetch('../../runs/latest.json?' + Date.now());
+        if (!latestRes.ok) return;
+        const latest = await latestRes.json();
+
+        const taskRes = await fetch('../../runs/' + latest.task + '?' + Date.now());
+        if (!taskRes.ok) return;
+        const task = await taskRes.json();
+
+        const taskKey = task.model.name + task.seed;
+        if (taskKey !== lastTask) {
+          document.getElementById('model').textContent = task.model.name;
+          document.getElementById('seed').textContent = task.seed;
+          lastTask = taskKey;
+        }
+      } catch (e) {
+        // Ignore fetch errors
+      }
+    }
+
+    fetchTask();
+    setInterval(fetchTask, 3000);
+  </script>
+</body>
+</html>

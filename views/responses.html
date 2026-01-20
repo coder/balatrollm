@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responses Overlay</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .reasoning { max-width: 80ch; }
+  </style>
+</head>
+<body class="bg-gray-900 text-white p-6">
+  <div id="responses" class="space-y-4"></div>
+
+  <script>
+    let lastResponseId = null;
+
+    function formatTime(timestampMs) {
+      const d = new Date(parseInt(timestampMs));
+      return d.toLocaleTimeString('en-US', { hour12: false });
+    }
+
+    function renderEntry(entry) {
+      const toolCall = entry.response?.body?.choices?.[0]?.message?.tool_calls?.[0];
+      if (!toolCall) return '';
+
+      const name = toolCall.function.name;
+      let args = {};
+      try {
+        args = JSON.parse(toolCall.function.arguments);
+      } catch (e) {}
+
+      const reasoning = args.reasoning || '';
+      delete args.reasoning;
+
+      const otherArgs = Object.keys(args).length > 0
+        ? JSON.stringify(args)
+        : '';
+
+      return `
+        <div class="pb-4 border-b border-gray-700">
+          <div class="text-gray-400 text-sm mb-2">${formatTime(entry.id)}</div>
+          <div class="reasoning font-mono italic text-gray-500 text-sm mb-3 whitespace-pre-wrap">${reasoning}</div>
+          <div class="font-mono text-white">${name}(${otherArgs})</div>
+        </div>
+      `;
+    }
+
+    async function fetchResponses() {
+      try {
+        const latestRes = await fetch('../../runs/latest.json?' + Date.now());
+        if (!latestRes.ok) return;
+        const latest = await latestRes.json();
+
+        const responsesRes = await fetch('../../runs/' + latest.responses + '?' + Date.now());
+        if (!responsesRes.ok) return;
+        const text = await responsesRes.text();
+
+        const lines = text.trim().split('\n').filter(l => l);
+        const entries = lines.map(l => JSON.parse(l));
+        const last3 = entries.slice(-3);
+
+        const newLastId = last3[last3.length - 1]?.id;
+        if (newLastId === lastResponseId) return;
+        lastResponseId = newLastId;
+
+        document.getElementById('responses').innerHTML = last3.map(renderEntry).join('');
+      } catch (e) {
+        // Ignore fetch errors
+      }
+    }
+
+    fetchResponses();
+    setInterval(fetchResponses, 100);
+  </script>
+</body>
+</html>
