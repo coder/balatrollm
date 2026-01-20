@@ -143,6 +143,7 @@ Output directory: `runs/v1.0.0/{strategy}/{vendor}/{model}/{timestamp}_{deck}_{s
 | `src/balatrollm/config.py`    | Multi-source configuration management  |
 | `src/balatrollm/executor.py`  | Parallel execution orchestration       |
 | `src/balatrollm/collector.py` | Data collection and statistics         |
+| `src/balatrollm/views.py`     | HTTP server for views overlay          |
 
 ### Configuration
 
@@ -171,5 +172,8 @@ Config precedence: environment variables < YAML config file < CLI arguments (hig
 - `API_KEY`, `BASE_URL`, `MODEL` - LLM configuration
 - `SEED`, `DECK`, `STAKE`, `STRATEGY` - Game parameters
 - `PARALLEL`, `HOST`, `PORT` - Execution settings
+- `VIEWS` - Enable HTTP server for views overlay (set to `1`)
 
 **Usage**: `balatrollm config/example.yaml --model openai/gpt-4o --seed AAAAAAA --deck RED --stake WHITE`
+
+**Views overlay**: Use `--views` to start an HTTP server on port 12345 that serves the HTML views (`views/task.html`, `views/responses.html`).
