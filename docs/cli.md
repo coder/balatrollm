@@ -36,6 +36,7 @@ This means CLI flags override config file values, which override environment var
 | `--port PORT`         | `BALATROLLM_PORT`     | `12346`                        | Starting port                |
 | `--base-url URL`      | `BALATROLLM_BASE_URL` | `https://openrouter.ai/api/v1` | LLM API base URL             |
 | `--api-key KEY`       | `BALATROLLM_API_KEY`  | *None*                         | LLM API key                  |
+| `--views`             | `BALATROLLM_VIEWS`    | `False`                        | Enable views HTTP server     |
 | `--dry-run`           | -                     | `False`                        | Show tasks without executing |
 
 !!! note "Multiple Values"
@@ -76,6 +77,12 @@ balatrollm config/example.yaml --dry-run
 
 # Use a custom strategy
 balatrollm --model openai/gpt-4o --strategy my_custom_strategy
+
+# Enable views overlay on port 12345
+balatrollm --model openai/gpt-4o --views
+# Access views at:
+#   http://localhost:12345/views/task.html
+#   http://localhost:12345/views/responses.html
 ```
 
 !!! note "Cartesian Product"
