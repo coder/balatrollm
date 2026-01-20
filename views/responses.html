@@ -7,10 +7,21 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .reasoning { max-width: 80ch; }
+    .fade-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 150px;
+      background: linear-gradient(to bottom, black, transparent);
+      pointer-events: none;
+      z-index: 10;
+    }
   </style>
 </head>
-<body class="bg-gray-900 text-white p-6">
-  <div id="responses" class="space-y-4"></div>
+<body class="bg-black text-white w-[800px] h-[1080px] flex flex-col items-center overflow-hidden">
+  <div class="fade-overlay"></div>
+  <div id="responses" class="flex-1 flex flex-col p-6 space-y-4 overflow-y-auto w-full max-w-[720px]"></div>
 
   <script>
     let lastResponseId = null;
@@ -39,8 +50,7 @@
 
       return `
         <div class="pb-4 border-b border-gray-700">
-          <div class="text-gray-400 text-sm mb-2">${formatTime(entry.id)}</div>
-          <div class="reasoning font-mono italic text-gray-500 text-sm mb-3 whitespace-pre-wrap">${reasoning}</div>
+          <div class="reasoning font-mono text-sm mb-3 whitespace-pre-wrap"><span class="text-gray-400">[${formatTime(entry.id)}]</span> <span class="italic text-gray-500">${reasoning}</span></div>
           <div class="font-mono text-white">${name}(${otherArgs})</div>
         </div>
       `;
@@ -58,13 +68,15 @@
 
         const lines = text.trim().split('\n').filter(l => l);
         const entries = lines.map(l => JSON.parse(l));
-        const last3 = entries.slice(-3);
 
-        const newLastId = last3[last3.length - 1]?.id;
+        const newLastId = entries[entries.length - 1]?.id;
         if (newLastId === lastResponseId) return;
         lastResponseId = newLastId;
 
-        document.getElementById('responses').innerHTML = last3.map(renderEntry).join('');
+        const container = document.getElementById('responses');
+        container.innerHTML = entries.map(renderEntry).join('');
+        // Scroll to the bottom (newest entry)
+        container.scrollTop = container.scrollHeight;
       } catch (e) {
         // Ignore fetch errors
       }

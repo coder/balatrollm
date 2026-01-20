@@ -6,10 +6,12 @@
   <title>Task Overlay</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
-  <div id="overlay" class="text-center p-8">
-    <div id="model" class="text-4xl font-bold mb-2">Loading...</div>
-    <div id="seed" class="text-2xl text-gray-400 font-mono"></div>
+<body class="bg-black text-white w-[1120px] h-[400px] flex items-center">
+  <div id="overlay" class="w-full flex justify-between items-center px-8">
+    <div id="model" class="font-mono text-3xl">
+      <span class="text-gray-500">Loading...</span>
+    </div>
+    <div class="font-mono text-3xl"><span class="text-gray-500">seed </span><span id="seed" class="text-white"></span></div>
   </div>
 
   <script>
@@ -25,9 +27,12 @@
         if (!taskRes.ok) return;
         const task = await taskRes.json();
 
-        const taskKey = task.model.name + task.seed;
+        const taskKey = task.model.vendor + task.model.name + task.seed;
         if (taskKey !== lastTask) {
-          document.getElementById('model').textContent = task.model.name;
+          document.getElementById('model').innerHTML = 
+            `<span class="text-white">${task.model.vendor}</span>` +
+            `<span class="text-gray-500"> / </span>` +
+            `<span class="text-white">${task.model.name}</span>`;
           document.getElementById('seed').textContent = task.seed;
           lastTask = taskKey;
         }
