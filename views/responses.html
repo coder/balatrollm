@@ -13,15 +13,15 @@
       left: 0;
       right: 0;
       height: 150px;
-      background: linear-gradient(to bottom, black, transparent);
+      background: linear-gradient(to bottom, rgb(17 24 39), transparent);
       pointer-events: none;
       z-index: 10;
     }
   </style>
 </head>
-<body class="bg-black text-white w-[800px] h-[1080px] flex flex-col items-center overflow-hidden">
+<body class="bg-gray-900 text-white w-[800px] h-[1080px] flex flex-col items-center overflow-hidden">
   <div class="fade-overlay"></div>
-  <div id="responses" class="flex-1 flex flex-col p-6 space-y-4 overflow-y-auto w-full max-w-[720px]"></div>
+  <div id="responses" class="flex-1 flex flex-col p-6 space-y-4 overflow-y-auto w-full max-w-[720px] border-2 border-gray-600 rounded-lg m-4"></div>
 
   <script>
     let lastResponseId = null;
