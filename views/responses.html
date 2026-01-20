@@ -6,22 +6,21 @@
   <title>Responses Overlay</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .reasoning { max-width: 80ch; }
     .fade-overlay {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      height: 150px;
-      background: linear-gradient(to bottom, rgb(17 24 39), transparent);
+      height: 350px;
+      background: linear-gradient(to bottom, rgb(0 0 0), transparent);
       pointer-events: none;
       z-index: 10;
     }
   </style>
 </head>
-<body class="bg-gray-900 text-white w-[800px] h-[1080px] flex flex-col items-center overflow-hidden">
+<body class="bg-black text-white w-[800px] h-[1080px] flex flex-col items-center overflow-hidden">
   <div class="fade-overlay"></div>
-  <div id="responses" class="flex-1 flex flex-col justify-end p-6 space-y-4 overflow-y-auto w-full max-w-[720px] border-2 border-gray-600 rounded-lg m-4"></div>
+  <div id="responses" class="flex-1 flex flex-col justify-end p-6 space-y-4 overflow-y-auto w-full max-w-[720px]"></div>
 
   <script>
     let lastResponseId = null;
@@ -50,8 +49,8 @@
 
       return `
         <div class="pb-4 border-b border-gray-700">
-          <div class="reasoning font-mono text-sm mb-3 whitespace-pre-wrap"><span class="text-gray-400">[${formatTime(entry.id)}]</span> <span class="italic text-gray-500">${reasoning}</span></div>
-          <div class="font-mono text-white">${name}(${otherArgs})</div>
+          <div class="font-mono text-xl mb-3 whitespace-pre-wrap"><span class="text-gray-400">[${formatTime(entry.id)}]</span> <span class="italic text-gray-500">${reasoning}</span></div>
+          <div class="font-mono text-2xl text-white">${name}(${otherArgs})</div>
         </div>
       `;
     }
