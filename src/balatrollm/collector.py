@@ -16,10 +16,10 @@ from .strategy import StrategyManifest
 
 def _generate_run_dir(task: Task, base_dir: Path) -> Path:
     """Generate unique run directory path."""
-    assert re.match(r"^[a-z0-9.-]+/[a-z0-9:.-]+$", task.model), (
-        f"Invalid vendor/model format: {task.model}"
-    )
-    vendor, model = task.model.split("/", 1)
+    if "/" in task.model:
+        vendor, model = task.model.split("/", 1)
+    else:
+        vendor, model = "other", task.model
     dir_name = "_".join(
         [
             datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3],
@@ -152,7 +152,10 @@ class Collector:
         self._calls_total = 0
 
         # Write task with structured model for benchmark analysis
-        vendor, model_name = task.model.split("/", 1)
+        if "/" in task.model:
+            vendor, model_name = task.model.split("/", 1)
+        else:
+            vendor, model_name = "other", task.model
         task_data = {
             "model": {"vendor": vendor, "name": model_name},
             "seed": task.seed,
