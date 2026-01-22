@@ -62,6 +62,8 @@ model:
 # The `extra_body` field passes provider-specific parameters (e.g., OpenRouter).
 model_config:
   extra_body:
+    usage:
+      include: true
     reasoning:
       effort: medium
     provider:
