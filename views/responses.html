@@ -66,7 +66,9 @@
         const text = await responsesRes.text();
 
         const lines = text.trim().split('\n').filter(l => l);
-        const entries = lines.map(l => JSON.parse(l));
+        // Only parse and display the last 10 responses to reduce memory usage
+        const lastLines = lines.slice(-10);
+        const entries = lastLines.map(l => JSON.parse(l));
 
         const newLastId = entries[entries.length - 1]?.id;
         if (newLastId === lastResponseId) return;
@@ -82,7 +84,7 @@
     }
 
     fetchResponses();
-    setInterval(fetchResponses, 100);
+    setInterval(fetchResponses, 1000);
   </script>
 </body>
 </html>
