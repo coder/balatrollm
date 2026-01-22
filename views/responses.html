@@ -16,11 +16,20 @@
       pointer-events: none;
       z-index: 10;
     }
+
+    .hide-scrollbar {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
   </style>
 </head>
 <body class="bg-black text-white w-[533px] h-[720px] flex flex-col items-center overflow-hidden">
   <div class="fade-overlay"></div>
-  <div id="responses" class="flex-1 flex flex-col justify-end p-4 pb-16 space-y-3 overflow-y-auto w-full max-w-[480px]"></div>
+  <div id="responses" class="hide-scrollbar flex-1 flex flex-col justify-end p-4 pb-16 space-y-3 overflow-y-auto w-full max-w-[480px]"></div>
 
   <script>
     let lastResponseId = null;
