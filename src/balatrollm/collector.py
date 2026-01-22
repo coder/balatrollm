@@ -1,7 +1,6 @@
 """Data collection and statistics for BalatroLLM runs."""
 
 import json
-import re
 import statistics
 from collections import Counter
 from dataclasses import asdict, dataclass, field
