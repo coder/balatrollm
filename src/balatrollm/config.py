@@ -23,9 +23,7 @@ DEFAULT_MODEL_CONFIG: dict[str, bool | int | str | dict] = {
         "HTTP-Referer": "https://github.com/coder/balatrollm",
         "X-Title": "BalatroLLM",
     },
-    "extra_body": {
-        "usage": {"include": True},
-    },
+    "extra_body": {},
 }
 
 ################################################################################
