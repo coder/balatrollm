@@ -63,8 +63,8 @@ class TestGenerateRunDir:
         assert "meta-llama" in str(result)
         assert "llama-3:70b" in str(result)
 
-    def test_invalid_model_format_raises(self, tmp_path: Path) -> None:
-        """Invalid model format should raise AssertionError."""
+    def test_model_without_vendor_defaults_to_other(self, tmp_path: Path) -> None:
+        """Models without vendor should default to 'other'."""
         task = Task(
             model="invalid_model",  # Missing vendor/
             seed="TEST",
@@ -72,8 +72,9 @@ class TestGenerateRunDir:
             stake="WHITE",
             strategy="default",
         )
-        with pytest.raises(AssertionError, match="Invalid vendor/model"):
-            _generate_run_dir(task, tmp_path)
+        result = _generate_run_dir(task, tmp_path)
+        assert "other" in str(result)
+        assert "invalid_model" in str(result)
 
 
 # ============================================================================
