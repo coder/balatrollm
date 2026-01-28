@@ -27,11 +27,11 @@
     </figcaption>
   </figure>
   <figure style="text-align: center; margin: 0;">
-    <a href="...">
+    <a href="https://balatrobench.com/">
       <img src="assets/balatrobench.svg" alt="BalatroBench" width="80">
     </a>
     <figcaption>
-      <a href="...">BalatroBench</a><br>
+      <a href="https://balatrobench.com/">BalatroBench</a><br>
       <small>Benchmark LLMs playing Balatro</small>
     </figcaption>
   </figure>
