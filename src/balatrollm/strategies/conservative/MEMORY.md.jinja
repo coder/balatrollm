@@ -1,0 +1,46 @@
+# Memory & Previous Actions
+
+{% if history %}
+## Recent Decision History
+
+Here is a list of your recent decisions (from oldest to newest):
+{% set max_history = 10 if history|length > 10 else history|length %}
+{% for entry in history[-max_history:] %}
+**{{ loop.index }}.** `{{ entry.method }}({{ entry.params }})` - {{ entry.reasoning }}
+{% endfor %}
+{% endif %}
+
+## Strategic Context
+{% if history %}
+**Conservative Strategy Review:**
+- Are you maintaining $25+ for maximum interest income?
+- Are you avoiding unnecessary risks (Glass cards, selling jokers)?
+- Is your joker order optimized (+Chips → +Mult → xMult)?
+- Are you committed to one primary hand type?
+- Have you avoided skipping blinds in early Antes?
+
+Based on your recent actions, consider:
+- How your decisions are building towards stable, consistent scoring
+- Whether you're maintaining financial discipline
+- If current joker synergies support your primary hand type
+{% else %}
+**Conservative Game Start - Key Priorities:**
+1. Play every blind in Antes 1-3 for maximum cash
+2. Build to $25 balance by end of Ante 2
+3. Pick a primary hand type (Flush or Full House recommended)
+4. Buy only reliable jokers that fit your strategy
+5. Never sell jokers - the value loss is too high
+6. Avoid Glass cards, risky Spectrals, and gambling mechanics
+
+Focus on steady growth, not explosive plays.
+{% endif %}
+
+{% if last_error_call_msg %}
+**NOTE**: **Your last response was invalid**: {{ last_error_call_msg }}
+Please ensure your next response includes a proper tool call with valid function name and JSON arguments.
+{% endif %}
+
+{% if last_failed_call_msg %}
+**NOTE**: **Your last tool call failed**: {{ last_failed_call_msg }}
+The tool call was formatted correctly but execution failed. Please try a different approach.
+{% endif %}
