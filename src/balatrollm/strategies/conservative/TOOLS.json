@@ -1,0 +1,356 @@
+{
+  "SELECTING_HAND": [
+    {
+      "type": "function",
+      "function": {
+        "name": "play",
+        "strict": false,
+        "description": "Play cards from hand as a poker hand to score chips.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "cards": {
+              "type": "array",
+              "items": {"type": "integer"},
+              "description": "0-based indices of cards to play (1-5 cards)"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for playing these cards"
+            }
+          },
+          "required": ["cards", "reasoning"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "discard",
+        "strict": false,
+        "description": "Discard cards from hand to draw new ones.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "cards": {
+              "type": "array",
+              "items": {"type": "integer"},
+              "description": "0-based indices of cards to discard"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for discarding these cards"
+            }
+          },
+          "required": ["cards", "reasoning"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "rearrange",
+        "strict": false,
+        "description": "Rearrange cards in hand, jokers, or consumables. Provide exactly one of: hand, jokers, or consumables.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "hand": {
+              "type": "array",
+              "items": {"type": "integer"},
+              "description": "New order of hand cards (permutation of current indices)"
+            },
+            "jokers": {
+              "type": "array",
+              "items": {"type": "integer"},
+              "description": "New order of jokers"
+            },
+            "consumables": {
+              "type": "array",
+              "items": {"type": "integer"},
+              "description": "New order of consumables"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for this arrangement"
+            }
+          },
+          "required": ["reasoning"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "sell",
+        "strict": false,
+        "description": "Sell a joker or consumable for money. Provide exactly one of: joker or consumable. WARNING: Selling jokers is strongly discouraged in conservative strategy.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "joker": {
+              "type": "integer",
+              "description": "0-based index of joker to sell"
+            },
+            "consumable": {
+              "type": "integer",
+              "description": "0-based index of consumable to sell"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for selling"
+            }
+          },
+          "required": ["reasoning"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "use",
+        "strict": false,
+        "description": "Use a consumable card (Tarot, Planet, or Spectral).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "consumable": {
+              "type": "integer",
+              "description": "0-based index of consumable to use"
+            },
+            "cards": {
+              "type": "array",
+              "items": {"type": "integer"},
+              "description": "0-based indices of target cards (for consumables that require selection)"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for using this consumable"
+            }
+          },
+          "required": ["consumable", "reasoning"]
+        }
+      }
+    }
+  ],
+  "SHOP": [
+    {
+      "type": "function",
+      "function": {
+        "name": "buy",
+        "strict": false,
+        "description": "Buy a card, voucher, or pack from the shop. Provide exactly one of: card, voucher, or pack. Ensure purchase does not drop money below $25 after Ante 2.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "card": {
+              "type": "integer",
+              "description": "0-based index of card to buy"
+            },
+            "voucher": {
+              "type": "integer",
+              "description": "0-based index of voucher to buy"
+            },
+            "pack": {
+              "type": "integer",
+              "description": "0-based index of booster pack to buy and open"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for this purchase"
+            }
+          },
+          "required": ["reasoning"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "reroll",
+        "strict": false,
+        "description": "Reroll the shop items (costs money). Only reroll if you have $30+ to maintain interest threshold.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for rerolling"
+            }
+          },
+          "required": ["reasoning"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "next_round",
+        "strict": false,
+        "description": "Leave the shop and advance to blind selection.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for leaving the shop"
+            }
+          },
+          "required": ["reasoning"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "sell",
+        "strict": false,
+        "description": "Sell a joker or consumable for money. Provide exactly one of: joker or consumable. WARNING: Selling jokers is strongly discouraged in conservative strategy.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "joker": {
+              "type": "integer",
+              "description": "0-based index of joker to sell"
+            },
+            "consumable": {
+              "type": "integer",
+              "description": "0-based index of consumable to sell"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for selling"
+            }
+          },
+          "required": ["reasoning"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "use",
+        "strict": false,
+        "description": "Use a consumable card (Tarot, Planet, or Spectral).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "consumable": {
+              "type": "integer",
+              "description": "0-based index of consumable to use"
+            },
+            "cards": {
+              "type": "array",
+              "items": {"type": "integer"},
+              "description": "0-based indices of target cards (for consumables that require selection)"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for using this consumable"
+            }
+          },
+          "required": ["consumable", "reasoning"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "rearrange",
+        "strict": false,
+        "description": "Rearrange jokers or consumables. Provide exactly one of: jokers or consumables.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "jokers": {
+              "type": "array",
+              "items": {"type": "integer"},
+              "description": "New order of jokers"
+            },
+            "consumables": {
+              "type": "array",
+              "items": {"type": "integer"},
+              "description": "New order of consumables"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for this arrangement"
+            }
+          },
+          "required": ["reasoning"]
+        }
+      }
+    }
+  ],
+  "BLIND_SELECT": [
+    {
+      "type": "function",
+      "function": {
+        "name": "select",
+        "strict": false,
+        "description": "Select the current blind to begin the round. In conservative strategy, always select blinds in Antes 1-3.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for selecting this blind"
+            }
+          },
+          "required": ["reasoning"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "skip",
+        "strict": false,
+        "description": "Skip the current blind (Small or Big only) to receive the tag reward. Only skip in Antes 4+ when you have $25+ and can beat the Boss.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for skipping this blind"
+            }
+          },
+          "required": ["reasoning"]
+        }
+      }
+    }
+  ],
+  "SMODS_BOOSTER_OPENED": [
+    {
+      "type": "function",
+      "function": {
+        "name": "pack",
+        "strict": false,
+        "description": "Select a card from the opened booster pack, or skip without taking any card. For Arcana/Spectral packs, cards are used immediately and may require targeting hand cards. Avoid risky Spectral cards.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "card": {
+              "type": "integer",
+              "description": "0-based index of card to select from pack (omit if skipping)"
+            },
+            "targets": {
+              "type": "array",
+              "items": {"type": "integer"},
+              "description": "0-based indices of hand cards to target (required for some Tarot/Spectral cards)"
+            },
+            "skip": {
+              "type": "boolean",
+              "description": "Set to true to skip the pack without selecting a card"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for this selection or skip"
+            }
+          },
+          "required": ["reasoning"]
+        }
+      }
+    }
+  ]
+}

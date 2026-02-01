@@ -1,0 +1,13 @@
+{
+  "$schema": "https://gist.githubusercontent.com/S1M0N38/5dc776cea0afa506ee7a4b20585558c6/raw/d2b92433fcc9d069c26958ff22b1f06777ecb91e/strategy.schema.json",
+  "name": "Conservative",
+  "description": "Ultra-conservative strategy prioritizing financial stability, risk aversion, and consistent scoring over explosive plays",
+  "author": "BalatroLLM",
+  "version": "1.0.0",
+  "tags": [
+    "conservative",
+    "financial",
+    "stable",
+    "risk-averse"
+  ]
+}
