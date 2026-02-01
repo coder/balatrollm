@@ -22,6 +22,19 @@ This means CLI flags override config file values, which override environment var
 | -------- | -------- | ------------------------------- |
 | `CONFIG` | No       | Path to YAML configuration file |
 
+!!! note "BALATROLLM_CONFIG Environment Variable"
+
+    The configuration file path can also be specified via the `BALATROLLM_CONFIG` environment variable:
+
+    ```bash
+    export BALATROLLM_CONFIG="config/example.yaml"
+    balatrollm --model openai/gpt-5
+    ```
+
+    This is the **only** `BALATROLLM_*` environment variable that does not have a corresponding CLI flag — the user can simply provide the config file path as a positional argument instead.
+
+    **Precedence:** If both the `CONFIG` argument and `BALATROLLM_CONFIG` are provided, the CLI argument takes precedence and `BALATROLLM_CONFIG` is ignored.
+
 ## Options
 
 | CLI Flag              | Environment Variable  | Default                        | Description                  |
@@ -58,6 +71,10 @@ balatrollm --model openai/gpt-5
 
 # Run with configuration file
 balatrollm config/example.yaml
+
+# Run with configuration file via environment variable
+export BALATROLLM_CONFIG="config/example.yaml"
+balatrollm --model openai/gpt-5
 
 # Run with config file and override specific options
 balatrollm config/example.yaml --model openai/gpt-5 --seed BBBBBBB

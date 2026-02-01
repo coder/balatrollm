@@ -2,10 +2,14 @@
 
 import argparse
 import asyncio
+import os
 import sys
 from pathlib import Path
 
 from .config import Config, Task
+
+# Environment variable for config file path (special: no corresponding CLI flag)
+BALATROLLM_CONFIG_ENV = "BALATROLLM_CONFIG"
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -83,14 +87,27 @@ async def execute(config: Config, tasks: list[Task]) -> int:
             views_server.stop()
 
 
+def _resolve_config_path(args_config: Path | None) -> Path | None:
+    """Resolve config path: CLI arg takes precedence over BALATROLLM_CONFIG env var."""
+    if args_config is not None:
+        return args_config
+    env_config = os.environ.get(BALATROLLM_CONFIG_ENV)
+    if env_config:
+        return Path(env_config)
+    return None
+
+
 def main() -> None:
     """Main entry point for balatrollm command."""
     parser = create_parser()
     args = parser.parse_args()
 
+    # Resolve config path: CLI arg > BALATROLLM_CONFIG env var
+    config_path = _resolve_config_path(args.config)
+
     # Build config with precedence: env < yaml < args
     try:
-        config = Config.load(yaml_path=args.config, args=args)
+        config = Config.load(yaml_path=config_path, args=args)
         config.validate()
     except (FileNotFoundError, ValueError) as e:
         parser.error(str(e))
