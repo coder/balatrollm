@@ -1,5 +1,35 @@
 # Changelog
 
+## [1.1.0](https://github.com/coder/balatrollm/compare/v1.0.9...v1.1.0) (2026-02-02)
+
+
+### Features
+
+* **balatrollm:** add views server ([e1ccc05](https://github.com/coder/balatrollm/commit/e1ccc05cfa949126b123adbfd94862d10a587ab0))
+* **cli:** add BALATROLLM_CONFIG env var support ([2fc5f36](https://github.com/coder/balatrollm/commit/2fc5f3641bf59713fdb08b4d9309afe360e07696)), closes [#57](https://github.com/coder/balatrollm/issues/57)
+* **collector:** add support model name without `/` ([cd30b65](https://github.com/coder/balatrollm/commit/cd30b651e5676b39fc751cf64805fd34db2fb6aa))
+* **strategies:** add conservative strategy ([0ae6aae](https://github.com/coder/balatrollm/commit/0ae6aae8573a9c3aa1e243405d3e96627252ad8b))
+* **strategy:** add aggressive multiplier-focused strategy ([fc958ce](https://github.com/coder/balatrollm/commit/fc958cec986e0f6e3c1846983eaaec8526e9b2b6))
+* **views:** add task and responses views - WIP ([446c388](https://github.com/coder/balatrollm/commit/446c3883b3c46e51fed2d3ff707806b50e539ad5))
+
+
+### Bug Fixes
+
+* **balatrollm:** remove hard-coded usage in the DEFAULT_MODEL_CONFIG ([9f23461](https://github.com/coder/balatrollm/commit/9f23461370b3334a477bddc8c5c33dea8ce32f60))
+* **config:** add usage include to config/example.yaml ([bce4c92](https://github.com/coder/balatrollm/commit/bce4c926312c3a5c902183e57f89fb9e38416c84))
+
+
+### Performance Improvements
+
+* **views:** reduce memory usage by only parsing the last 10 responses ([3c8481e](https://github.com/coder/balatrollm/commit/3c8481ec75d404543a4ea6045fce05e94bf74ca5))
+
+
+### Documentation
+
+* **CLAUDE:** add views flag in CLAUDE.md ([428b07f](https://github.com/coder/balatrollm/commit/428b07f6fa5d68c6f1c096126e86da7ad257169c))
+* **cli:** add --views flag ([686d9b3](https://github.com/coder/balatrollm/commit/686d9b35cd96e45fa3eb914bfd67e632ab6aae29))
+* **index:** add BalatroBench link ([3aff5db](https://github.com/coder/balatrollm/commit/3aff5dbf04ca6affc4a20f5c916ff8ba6d2a9aae))
+
 ## [1.0.9](https://github.com/coder/balatrollm/compare/v1.0.8...v1.0.9) (2026-01-18)
 
 
