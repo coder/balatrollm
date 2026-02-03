@@ -1,0 +1,71 @@
+################################################################################
+# .envrc.example
+#
+# Template for direnv (https://direnv.net/).
+#
+# Usage:
+#   cp .envrc.example .envrc
+#   direnv allow
+#
+# Notes:
+# - `.envrc` may contain secrets (API keys) and is gitignored. Never commit it.
+# - This file is safe to commit because it contains only placeholders.
+# - See docs/cli.md for the full reference and default values.
+################################################################################
+
+# Activate project virtual environment.
+# source .venv/bin/activate
+
+################################################################################
+# BalatroLLM (BALATROLLM_*)
+################################################################################
+
+# YAML config file path (alternative to passing CONFIG as a positional arg).
+# export BALATROLLM_CONFIG="config/example.yaml"
+
+# LLM model(s) to use.
+# Required unless set via YAML config or `--model`.
+# export BALATROLLM_MODEL="openai/gpt-4o" # default: (required)
+
+# Game parameters.
+# export BALATROLLM_SEED="AAAAAAA" # default: AAAAAAA
+# export BALATROLLM_DECK="RED" # default: RED
+# export BALATROLLM_STAKE="WHITE" # default: WHITE
+# export BALATROLLM_STRATEGY="default" # default: default
+
+# Execution.
+# export BALATROLLM_PARALLEL=1 # default: 1
+
+# BalatroBot connection settings (used by balatrollm to connect to instances).
+# export BALATROLLM_HOST="127.0.0.1" # default: 127.0.0.1
+# export BALATROLLM_PORT=12346 # default: 12346
+
+# LLM provider settings.
+# export BALATROLLM_BASE_URL="https://openrouter.ai/api/v1" # default: https://openrouter.ai/api/v1
+# export BALATROLLM_API_KEY="sk-..." # default: unset
+
+# Views server toggle (0/1). Set to 1 to enable.
+# export BALATROLLM_VIEWS=0 # default: 0
+
+################################################################################
+# BalatroBot (BALATROBOT_*)
+################################################################################
+
+# Server settings.
+# export BALATROBOT_HOST="127.0.0.1" # default: 127.0.0.1
+# export BALATROBOT_PORT=12346 # default: 12346
+
+# Behavior toggles (0/1).
+# export BALATROBOT_FAST=0 # default: 0 (10x game speed)
+# export BALATROBOT_HEADLESS=0 # default: 0
+# export BALATROBOT_RENDER_ON_API=0 # default: 0
+# export BALATROBOT_AUDIO=0 # default: 0
+# export BALATROBOT_DEBUG=0 # default: 0 (requires DebugPlus mod)
+# export BALATROBOT_NO_SHADERS=0 # default: 0
+
+# Paths / platform (auto-detected if unset).
+# export BALATROBOT_BALATRO_PATH="/path/to/Balatro" # default: auto-detected
+# export BALATROBOT_LOVELY_PATH="/path/to/lovely" # default: auto-detected
+# export BALATROBOT_LOVE_PATH="/path/to/love" # default: auto-detected
+# export BALATROBOT_PLATFORM="darwin" # default: auto-detected (darwin|linux|windows|native)
+# export BALATROBOT_LOGS_PATH="logs" # default: logs
