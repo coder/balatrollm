@@ -19,27 +19,14 @@ We use [direnv](https://direnv.net/) to automatically manage environment variabl
 
     The `.envrc` file may contain API keys. **Never commit this file**.
 
-**Example `.envrc` configuration:**
+Start from the versioned template:
 
 ```bash
-# Load the virtual environment
-source .venv/bin/activate
-
-# Python-specific variables
-export PYTHONUNBUFFERED="1"
-export PYTHONPATH="${PWD}/src:${PYTHONPATH}"
-export PYTHONPATH="${PWD}/tests:${PYTHONPATH}"
-
-# BALATROBOT env vars
-export BALATROBOT_FAST=1
-export BALATROBOT_DEBUG=1
-export BALATROBOT_RENDER_ON_API=0
-export BALATROBOT_HEADLESS=0
-
-# BALATROLLM env vars
-export BALATROLLM_API_KEY="sk-..."
-export BALATROLLM_BASE_URL="https://openrouter.ai/api/v1"
+cp .envrc.example .envrc
+direnv allow
 ```
+
+Then edit `.envrc` and set at minimum `BALATROLLM_API_KEY` (and `BALATROLLM_MODEL` if you aren't providing a YAML config or `--model`).
 
 ## Development Setup
 

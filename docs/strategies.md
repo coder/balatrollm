@@ -188,7 +188,7 @@ Defines the function calls available to the LLM during different game phases. Th
 
 ### Available Game States
 
-Tools are organized by game state. The `TOOLS.json` file maps each state to its available tools:
+Tools are organized by game state. The `TOOLS.json` file maps each state to its available tools.
 
 | Game State             | Description           | Available Tools                                           |
 | ---------------------- | --------------------- | --------------------------------------------------------- |
@@ -196,6 +196,15 @@ Tools are organized by game state. The `TOOLS.json` file maps each state to its 
 | `SHOP`                 | Shop phase            | `buy`, `reroll`, `next_round`, `sell`, `use`, `rearrange` |
 | `BLIND_SELECT`         | Blind selection phase | `select`, `skip`                                          |
 | `SMODS_BOOSTER_OPENED` | Pack opening phase    | `pack` (select cards or skip)                             |
+
+!!! note "BLIND_SELECT and ROUND_EVAL Behavior"
+
+    The current `balatrollm` bot loop does not delegate `BLIND_SELECT` or `ROUND_EVAL` to the LLM (see `src/balatrollm/bot.py`).
+
+    - `ROUND_EVAL` always calls `cash_out`
+    - `BLIND_SELECT` always calls `select` (never `skip`) because Tags are not supported yet by `balatrobot`; skipping blinds would collect Tags the bot can't use
+
+    This "always play the blind" policy is a reasonable baseline for `RED` deck on `WHITE` stake.
 
 ### Common Tools
 
@@ -219,7 +228,7 @@ Tools are organized by game state. The `TOOLS.json` file maps each state to its 
 **BLIND_SELECT phase:**
 
 - `select`: Select a blind to play
-- `skip`: Skip the current blind (if allowed)
+- `skip`: Skip the current blind (if allowed). *(Currently not used by `balatrollm`; Tag handling isn’t supported yet.)*
 
 ## Strategy Validation
 
@@ -281,7 +290,7 @@ Common issues:
 1. Fork the BalatroLLM repository
 2. Create a feature branch: `git checkout -b feat/add-strategy-your_strategy_name`
 3. Add your strategy directory with all required files
-4. Commit following conventional commits: `feat: add [strategy_name] strategy`
+4. Commit following conventional commits: `feat(strategy): add [strategy_name] strategy`
 5. Open a pull request with:
     - Clear title describing your strategy
     - Brief description of the strategy's approach
