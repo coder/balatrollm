@@ -10,7 +10,7 @@
 <div class="project-logos" style="display: flex; justify-content: center; align-items: flex-end; gap: 2rem; flex-wrap: wrap;">
   <figure style="text-align: center; margin: 0;">
     <a href="https://coder.github.io/balatrobot/">
-      <img src="assets/balatrobot.svg" alt="BalatroBot" width="80">
+      <img src="assets/balatrobot.svg" alt="BalatroBot" width="120">
     </a>
     <figcaption>
       <a href="https://coder.github.io/balatrobot/">BalatroBot</a><br>
@@ -22,13 +22,13 @@
       <img src="assets/balatrollm.svg" alt="BalatroLLM" width="120">
     </a>
     <figcaption>
-      <a href="https://coder.github.io/balatrollm/">BalatroLLM</a><br>
+      <a href="https://coder.github.io/balatrollm/"><span style="text-decoration: underline; text-underline-offset: 8px;">BalatroLLM</span></a><br>
       <small>Play Balatro with LLMs</small>
     </figcaption>
   </figure>
   <figure style="text-align: center; margin: 0;">
     <a href="https://balatrobench.com/">
-      <img src="assets/balatrobench.svg" alt="BalatroBench" width="80">
+      <img src="assets/balatrobench.svg" alt="BalatroBench" width="120">
     </a>
     <figcaption>
       <a href="https://balatrobench.com/">BalatroBench</a><br>
@@ -39,7 +39,7 @@
 
 ---
 
-BalatroLLM is a bot that uses Large Language Models (LLMs) to play [Balatro](https://www.playbalatro.com/), the popular roguelike poker deck-building game. The bot analyzes game states, makes strategic decisions, and executes actions through the [BalatroBot](https://github.com/coder/balatrobot) API.
+**BalatroLLM** is a bot that uses Large Language Models (LLMs) to play [Balatro](https://www.playbalatro.com/), the popular roguelike poker deck-building game. The bot analyzes game states, makes strategic decisions, and executes actions through the [BalatroBot](https://github.com/coder/balatrobot) API.
 
 <div class="grid cards" markdown>
 
