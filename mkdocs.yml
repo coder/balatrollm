@@ -1,7 +1,7 @@
 site_name: BalatroLLM
 site_description: Play Balatro with LLMs
-site_author: 'S1M0N38'
-repo_name: 'coder/balatrollm'
+site_author: "S1M0N38"
+repo_name: "coder/balatrollm"
 repo_url: https://github.com/coder/balatrollm
 site_url: https://coder.github.io/balatrollm/
 docs_dir: docs/
@@ -17,14 +17,14 @@ theme:
   palette:
     # Palette toggle for light mode
     - scheme: default
-      accent: black
+      accent: orange
       primary: red
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     # Palette toggle for dark mode
     - scheme: slate
-      accent: white
+      accent: deep orange
       primary: red
       toggle:
         icon: material/brightness-4
