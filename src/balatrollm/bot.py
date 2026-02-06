@@ -218,7 +218,11 @@ class Bot:
             {
                 "role": "user",
                 "content": [
-                    {"type": "text", "text": strategy_content},
+                    {
+                        "type": "text",
+                        "text": strategy_content,
+                        "cache_control": {"type": "ephemeral"},
+                    },
                     {"type": "text", "text": gamestate_content},
                     {"type": "text", "text": memory_content},
                 ],
