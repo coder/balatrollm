@@ -335,6 +335,14 @@ class Bot:
         except BalatroError as e:
             return await self._handle_failed_call(f"BalatroError: {e}")
 
+        except httpx.TransportError as e:
+            logger.warning(f"Game transport error during tool call: {e}")
+            self._collector.record_call("failed")
+            try:
+                return await self._balatro.call("gamestate")
+            except Exception:
+                raise BotError(f"Game unresponsive after transport error: {e}") from e
+
     async def _handle_error_call(self, msg: str) -> dict[str, Any]:
         """Handle invalid LLM response (no valid tool call)."""
         assert self._balatro is not None

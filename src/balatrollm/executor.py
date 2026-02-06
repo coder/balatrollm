@@ -1,6 +1,7 @@
 """Task execution for BalatroLLM runs."""
 
 import asyncio
+import logging
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -9,6 +10,8 @@ from balatrobot import Config as BalatrobotConfig
 
 from .bot import Bot
 from .config import Config, Task
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -92,6 +95,7 @@ class Executor:
                     f"[{count:0{len(str(total))}d}/{total}] COMPLETED | {log_path} | {task}"
                 )
             except Exception:
+                logger.exception(f"Run failed: {task}")
                 print(
                     f"[{count:0{len(str(total))}d}/{total}] ERROR     | {log_path} | {task}"
                 )
