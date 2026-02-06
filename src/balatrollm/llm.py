@@ -1,6 +1,7 @@
 """Async OpenAI client wrapper with retry logic."""
 
 import asyncio
+import json
 import logging
 from dataclasses import dataclass, field
 from typing import Any
@@ -111,6 +112,10 @@ class LLMClient:
 
             except openai.ContentFilterFinishReasonError as e:
                 logger.error(f"LLM content filter error: {e}")
+                last_exception = e
+
+            except json.JSONDecodeError as e:
+                logger.error(f"LLM response parse error (malformed JSON): {e}")
                 last_exception = e
 
             if attempt < self.max_retries - 1:
