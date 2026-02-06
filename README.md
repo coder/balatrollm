@@ -43,5 +43,3 @@ https://coder.github.io/balatrollm/
 <br>
 
 <img width="3338" height="2649" alt="Community BalatroBench" src="https://github.com/user-attachments/assets/a42549e8-ea4b-4100-8e45-2b39e1c53c15" />
-
-
