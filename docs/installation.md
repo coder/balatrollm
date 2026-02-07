@@ -9,6 +9,12 @@ This guide will help you install and configure BalatroLLM.
 - **Uv** (v0.9.21+) - Follow the [installation guide](https://docs.astral.sh/uv/)
 - **LLM API access** - Obtain API key from an OpenAI-compatible provider (e.g., [OpenRouter](https://openrouter.ai/), [OpenAI](https://openai.com/))
 
+!!! warning "Tool Use (Function Calling) Required"
+
+    The LLM model you choose **must support tool use** (also known as function calling). BalatroLLM relies on tool calls to execute game actions — models without this capability will not work.
+
+    Most frontier models (e.g., GPT-4o, Claude, Gemini) support tool use, but smaller or older models may not. Check your provider's documentation to confirm support.
+
 !!! warning "BalatroBot Setup Required"
 
     Setting up Balatro with the BalatroBot mod requires careful configuration. Please follow the [BalatroBot Installation Guide](https://coder.github.io/balatrobot/installation/) step by step.
