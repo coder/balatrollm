@@ -88,6 +88,7 @@ model_config:
 !!! note "How Balatro instances are started"
 
     `balatrollm` starts/stops Balatro instances automatically via `balatrobot`. With `--parallel N`, it spawns instances on ports `--port` through `--port + N - 1` (`port..port+parallel-1`).
+    When using `--parallel N`, N workers are spawned. In order to fully utilize you have to have more tasks than workers. Check out th number of tasks that will be created using the `--dry-run` option.
 
 !!! note "Multiple Values"
 
@@ -97,6 +98,7 @@ The following values can be provided for `deck` and `stake` options:
 
 - **Decks:** `RED`, `BLUE`, `YELLOW`, `GREEN`, `BLACK`, `MAGIC`, `NEBULA`, `GHOST`, `ABANDONED`, `CHECKERED`, `ZODIAC`, `PAINTED`, `ANAGLYPH`, `PLASMA`, `ERRATIC`
 - **Stakes:** `WHITE`, `RED`, `GREEN`, `BLACK`, `BLUE`, `PURPLE`, `ORANGE`, `GOLD`
+- **Seeds:** no strict rules but it is suggested to follow the regex `^[1-9A-Z]{1,8}$` for deterministic results.
 
 ## Examples
 
@@ -123,8 +125,8 @@ balatrollm config/example.yaml --model openai/gpt-5 --seed BBBBBBB
 # Multiple seeds and decks (generates cartesian product of all combinations)
 balatrollm --model openai/gpt-5 --deck RED BLUE --seed AAAAAAA BBBBBBB
 
-# Run multiple game instances concurrently
-balatrollm --model openai/gpt-5 --parallel 4
+# Run multiple game instances concurrently (2 workers, 1 model x 3 seed = 3 tasks)
+balatrollm --model openai/gpt-5 --parallel 2 --seed AAAAAAA BBBBBBB CCCCCCC
 
 # Preview tasks without executing
 balatrollm config/example.yaml --dry-run
