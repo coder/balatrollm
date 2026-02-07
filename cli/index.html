@@ -1,0 +1,1107 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Play Balatro with LLMs">
+      
+      
+        <meta name="author" content="S1M0N38">
+      
+      
+        <link rel="canonical" href="https://coder.github.io/balatrollm/cli/">
+      
+      
+        <link rel="prev" href="../installation/">
+      
+      
+        <link rel="next" href="../strategies/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/balatrollm.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>CLI Reference - BalatroLLM</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#cli-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="BalatroLLM" class="md-header__button md-logo" aria-label="BalatroLLM" data-md-component="logo">
+      
+  <img src="../assets/balatrollm-white.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            BalatroLLM
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              CLI Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="deep-orange"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/coder/balatrollm" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    coder/balatrollm
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="BalatroLLM" class="md-nav__button md-logo" aria-label="BalatroLLM" data-md-component="logo">
+      
+  <img src="../assets/balatrollm-white.svg" alt="logo">
+
+    </a>
+    BalatroLLM
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/coder/balatrollm" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    coder/balatrollm
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BalatroLLM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arguments
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-file-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration file (YAML)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration file (YAML)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#model-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        model (required)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model_config-advanced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        model_config (advanced)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advanced-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-artifacts-outputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run artifacts / outputs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#balatrobot-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BalatroBot Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../strategies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Strategies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arguments
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-file-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration file (YAML)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration file (YAML)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#model-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        model (required)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model_config-advanced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        model_config (advanced)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advanced-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-artifacts-outputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run artifacts / outputs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#balatrobot-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BalatroBot Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="cli-reference">CLI Reference</h1>
+<p>Reference for the <code>balatrollm</code> command-line interface.</p>
+<h2 id="usage">Usage</h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1">balatrollm<span class="w"> </span><span class="o">[</span>CONFIG<span class="o">]</span><span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</span></code></pre></div>
+<p>BalatroLLM can be configured through three methods with the following precedence (lowest to highest):</p>
+<ol>
+<li><strong>Environment variables</strong> - <code>BALATROLLM_*</code> prefixed variables</li>
+<li><strong>Configuration file</strong> - YAML file (see <a href="https://github.com/coder/balatrollm/blob/main/config/example.yaml"><code>config/example.yaml</code></a>)</li>
+<li><strong>CLI flags</strong> - Command-line arguments (highest precedence)</li>
+</ol>
+<p>This means CLI flags override config file values, which override environment variables.</p>
+<h2 id="arguments">Arguments</h2>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CONFIG</code></td>
+<td>No</td>
+<td>Path to YAML configuration file</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">BALATROLLM_CONFIG Environment Variable</p>
+<p>The configuration file path can also be specified via the <code>BALATROLLM_CONFIG</code> environment variable:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><span class="nb">export</span><span class="w"> </span><span class="nv">BALATROLLM_CONFIG</span><span class="o">=</span><span class="s2">&quot;config/example.yaml&quot;</span>
+</span><span id="__span-1-2">balatrollm
+</span></code></pre></div>
+<p>This is the <strong>only</strong> <code>BALATROLLM_*</code> environment variable that does not have a corresponding CLI flag — the user can simply provide the config file path as a positional argument instead.</p>
+<p><strong>Precedence:</strong> If both the <code>CONFIG</code> argument and <code>BALATROLLM_CONFIG</code> are provided, the CLI argument takes precedence and <code>BALATROLLM_CONFIG</code> is ignored.</p>
+</div>
+<h2 id="configuration-file-yaml">Configuration file (YAML)</h2>
+<p>The YAML configuration file uses the same field names as the CLI flags (minus the <code>--</code>), for example:</p>
+<ul>
+<li>CLI <code>--model</code> → YAML <code>model</code></li>
+<li>CLI <code>--base-url</code> → YAML <code>base_url</code></li>
+</ul>
+<p>For a full annotated example, see <a href="https://github.com/coder/balatrollm/blob/main/config/example.yaml"><code>config/example.yaml</code></a>.</p>
+<h3 id="model-required"><code>model</code> (required)</h3>
+<p><code>model</code> is required, but it can come from <strong>any</strong> config source (YAML config, env var, or CLI flag). If you set <code>model:</code> in your YAML file, you do not need to also pass <code>--model</code>.</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><span class="nt">model</span><span class="p">:</span>
+</span><span id="__span-2-2"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openai/gpt-4o</span>
+</span></code></pre></div>
+<h3 id="model_config-advanced"><code>model_config</code> (advanced)</h3>
+<p>The YAML file also supports an optional <code>model_config</code> mapping for advanced provider/model request knobs. BalatroLLM deep-merges your <code>model_config</code> into built-in defaults (including nested fields like <code>extra_headers</code> and <code>extra_body</code>) and then passes the result directly to the OpenAI-compatible chat completions request.</p>
+<p>Common examples include <code>temperature</code>, <code>max_tokens</code>, <code>seed</code>, <code>parallel_tool_calls</code>, <code>tool_choice</code>, plus provider-specific settings via <code>extra_body</code> (e.g., OpenRouter).</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><span class="nt">model_config</span><span class="p">:</span>
+</span><span id="__span-3-2"><span class="w">  </span><span class="nt">temperature</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
+</span><span id="__span-3-3"><span class="w">  </span><span class="nt">max_tokens</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2048</span>
+</span><span id="__span-3-4"><span class="w">  </span><span class="nt">extra_body</span><span class="p">:</span>
+</span><span id="__span-3-5"><span class="w">    </span><span class="nt">reasoning</span><span class="p">:</span>
+</span><span id="__span-3-6"><span class="w">      </span><span class="nt">effort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">medium</span>
+</span></code></pre></div>
+<h2 id="options">Options</h2>
+<table>
+<thead>
+<tr>
+<th>CLI Flag</th>
+<th>Environment Variable</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--model MODEL</code></td>
+<td><code>BALATROLLM_MODEL</code></td>
+<td><em>(required)</em></td>
+<td>LLM model(s) to use (or set <code>model:</code> in YAML)</td>
+</tr>
+<tr>
+<td><code>--seed SEED</code></td>
+<td><code>BALATROLLM_SEED</code></td>
+<td><code>AAAAAAA</code></td>
+<td>Game seed(s)</td>
+</tr>
+<tr>
+<td><code>--deck DECK</code></td>
+<td><code>BALATROLLM_DECK</code></td>
+<td><code>RED</code></td>
+<td>Deck code(s)</td>
+</tr>
+<tr>
+<td><code>--stake STAKE</code></td>
+<td><code>BALATROLLM_STAKE</code></td>
+<td><code>WHITE</code></td>
+<td>Stake code(s)</td>
+</tr>
+<tr>
+<td><code>--strategy STRATEGY</code></td>
+<td><code>BALATROLLM_STRATEGY</code></td>
+<td><code>default</code></td>
+<td>Strategy name(s)</td>
+</tr>
+<tr>
+<td><code>--parallel N</code></td>
+<td><code>BALATROLLM_PARALLEL</code></td>
+<td><code>1</code></td>
+<td>Concurrent game instances</td>
+</tr>
+<tr>
+<td><code>--host HOST</code></td>
+<td><code>BALATROLLM_HOST</code></td>
+<td><code>127.0.0.1</code></td>
+<td>BalatroBot host</td>
+</tr>
+<tr>
+<td><code>--port PORT</code></td>
+<td><code>BALATROLLM_PORT</code></td>
+<td><code>12346</code></td>
+<td>Starting port</td>
+</tr>
+<tr>
+<td><code>--base-url URL</code></td>
+<td><code>BALATROLLM_BASE_URL</code></td>
+<td><code>https://openrouter.ai/api/v1</code></td>
+<td>LLM API base URL</td>
+</tr>
+<tr>
+<td><code>--api-key KEY</code></td>
+<td><code>BALATROLLM_API_KEY</code></td>
+<td><em>None</em></td>
+<td>LLM API key</td>
+</tr>
+<tr>
+<td><code>--views</code></td>
+<td><code>BALATROLLM_VIEWS</code></td>
+<td><code>False</code></td>
+<td>Enable views HTTP server (set <code>BALATROLLM_VIEWS=1</code>)</td>
+</tr>
+<tr>
+<td><code>--dry-run</code></td>
+<td>-</td>
+<td><code>False</code></td>
+<td>Show tasks without executing</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">How Balatro instances are started</p>
+<p><code>balatrollm</code> starts/stops Balatro instances automatically via <code>balatrobot</code>. With <code>--parallel N</code>, it spawns instances on ports <code>--port</code> through <code>--port + N - 1</code> (<code>port..port+parallel-1</code>).
+When using <code>--parallel N</code>, N workers are spawned. In order to fully utilize you have to have more tasks than workers. Check out th number of tasks that will be created using the <code>--dry-run</code> option.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Multiple Values</p>
+<p>Options marked with "model(s)", "seed(s)", etc. accept multiple values. When multiple values are provided, BalatroLLM generates a cartesian product of all combinations as tasks.</p>
+</div>
+<p>The following values can be provided for <code>deck</code> and <code>stake</code> options:</p>
+<ul>
+<li><strong>Decks:</strong> <code>RED</code>, <code>BLUE</code>, <code>YELLOW</code>, <code>GREEN</code>, <code>BLACK</code>, <code>MAGIC</code>, <code>NEBULA</code>, <code>GHOST</code>, <code>ABANDONED</code>, <code>CHECKERED</code>, <code>ZODIAC</code>, <code>PAINTED</code>, <code>ANAGLYPH</code>, <code>PLASMA</code>, <code>ERRATIC</code></li>
+<li><strong>Stakes:</strong> <code>WHITE</code>, <code>RED</code>, <code>GREEN</code>, <code>BLACK</code>, <code>BLUE</code>, <code>PURPLE</code>, <code>ORANGE</code>, <code>GOLD</code></li>
+<li><strong>Seeds:</strong> no strict rules but it is suggested to follow the regex <code>^[1-9A-Z]{1,8}$</code> for deterministic results.</li>
+</ul>
+<h2 id="examples">Examples</h2>
+<h3 id="basic-usage">Basic Usage</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><span class="c1"># Run with specific model (requires BALATROLLM_API_KEY in environment)</span>
+</span><span id="__span-4-2">balatrollm<span class="w"> </span>--model<span class="w"> </span>openai/gpt-5
+</span><span id="__span-4-3">
+</span><span id="__span-4-4"><span class="c1"># Run with configuration file</span>
+</span><span id="__span-4-5">balatrollm<span class="w"> </span>config/example.yaml
+</span><span id="__span-4-6">
+</span><span id="__span-4-7"><span class="c1"># Run with configuration file via environment variable</span>
+</span><span id="__span-4-8"><span class="nb">export</span><span class="w"> </span><span class="nv">BALATROLLM_CONFIG</span><span class="o">=</span><span class="s2">&quot;config/example.yaml&quot;</span>
+</span><span id="__span-4-9">balatrollm
+</span><span id="__span-4-10">
+</span><span id="__span-4-11"><span class="c1"># Run with config file and override specific options</span>
+</span><span id="__span-4-12">balatrollm<span class="w"> </span>config/example.yaml<span class="w"> </span>--model<span class="w"> </span>openai/gpt-5<span class="w"> </span>--seed<span class="w"> </span>BBBBBBB
+</span></code></pre></div>
+<h3 id="advanced-usage">Advanced Usage</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><span class="c1"># Multiple seeds and decks (generates cartesian product of all combinations)</span>
+</span><span id="__span-5-2">balatrollm<span class="w"> </span>--model<span class="w"> </span>openai/gpt-5<span class="w"> </span>--deck<span class="w"> </span>RED<span class="w"> </span>BLUE<span class="w"> </span>--seed<span class="w"> </span>AAAAAAA<span class="w"> </span>BBBBBBB
+</span><span id="__span-5-3">
+</span><span id="__span-5-4"><span class="c1"># Run multiple game instances concurrently (2 workers, 1 model x 3 seed = 3 tasks)</span>
+</span><span id="__span-5-5">balatrollm<span class="w"> </span>--model<span class="w"> </span>openai/gpt-5<span class="w"> </span>--parallel<span class="w"> </span><span class="m">2</span><span class="w"> </span>--seed<span class="w"> </span>AAAAAAA<span class="w"> </span>BBBBBBB<span class="w"> </span>CCCCCCC
+</span><span id="__span-5-6">
+</span><span id="__span-5-7"><span class="c1"># Preview tasks without executing</span>
+</span><span id="__span-5-8">balatrollm<span class="w"> </span>config/example.yaml<span class="w"> </span>--dry-run
+</span><span id="__span-5-9">
+</span><span id="__span-5-10"><span class="c1"># Use a custom strategy</span>
+</span><span id="__span-5-11">balatrollm<span class="w"> </span>--model<span class="w"> </span>openai/gpt-4o<span class="w"> </span>--strategy<span class="w"> </span>my_custom_strategy
+</span><span id="__span-5-12">
+</span><span id="__span-5-13"><span class="c1"># Enable views overlay on port 12345</span>
+</span><span id="__span-5-14">balatrollm<span class="w"> </span>--model<span class="w"> </span>openai/gpt-4o<span class="w"> </span>--views
+</span><span id="__span-5-15">
+</span><span id="__span-5-16"><span class="c1"># Enable views overlay via environment variable (0/1)</span>
+</span><span id="__span-5-17"><span class="nv">BALATROLLM_VIEWS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>balatrollm<span class="w"> </span>--model<span class="w"> </span>openai/gpt-4o
+</span><span id="__span-5-18"><span class="c1"># Access views at:</span>
+</span><span id="__span-5-19"><span class="c1">#   http://localhost:12345/views/task.html</span>
+</span><span id="__span-5-20"><span class="c1">#   http://localhost:12345/views/responses.html</span>
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Cartesian Product</p>
+<p>When specifying multiple values for seeds, decks, stakes, etc., BalatroLLM generates all combinations as separate tasks. For example, <code>--deck RED BLUE --seed AAAAAAA BBBBBBB</code> creates 4 tasks: <code>(RED, AAAAAAA)</code>, <code>(RED, BBBBBBB)</code>, <code>(BLUE, AAAAAAA)</code>, <code>(BLUE, BBBBBBB)</code>. For complex task configurations, use a YAML configuration file.</p>
+</div>
+<p>For more information about strategies, see the <a href="../strategies/">Strategies documentation</a>.</p>
+<h2 id="run-artifacts-outputs">Run artifacts / outputs</h2>
+<p><code>balatrollm</code> writes run artifacts to <code>./runs/</code> (relative to your current working directory).</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1">runs/
+</span><span id="__span-6-2">  latest.json
+</span><span id="__span-6-3">  vX.Y.Z/&lt;strategy&gt;/&lt;vendor&gt;/&lt;model&gt;/&lt;timestamp&gt;_&lt;deck&gt;_&lt;stake&gt;_&lt;seed&gt;/
+</span><span id="__span-6-4">    task.json
+</span><span id="__span-6-5">    strategy.json
+</span><span id="__span-6-6">    run.log
+</span><span id="__span-6-7">    requests.jsonl
+</span><span id="__span-6-8">    responses.jsonl
+</span><span id="__span-6-9">    gamestates.jsonl
+</span><span id="__span-6-10">    stats.json
+</span><span id="__span-6-11">    screenshots/
+</span></code></pre></div>
+<ul>
+<li><code>task.json</code> / <code>strategy.json</code>: resolved task metadata and the strategy manifest used for the run.</li>
+<li><code>requests.jsonl</code> / <code>responses.jsonl</code>: LLM requests and responses (JSONL, one object per line).</li>
+<li><code>gamestates.jsonl</code>: game state snapshots after each action.</li>
+<li><code>stats.json</code>: aggregated statistics for the run.</li>
+<li><code>screenshots/</code>: screenshots captured during the run.</li>
+<li><code>run.log</code>: logs captured during the run.</li>
+<li><code>runs/latest.json</code>: updated each run; used by the <code>--views</code> overlays to locate the latest <code>task.json</code> and <code>responses.jsonl</code>.</li>
+</ul>
+<h2 id="balatrobot-configuration">BalatroBot Configuration</h2>
+<p>BalatroBot instances spawned by BalatroLLM can be configured through <code>BALATROBOT_*</code> environment variables. These settings control how Balatro runs during automated gameplay.</p>
+<table>
+<thead>
+<tr>
+<th>Environment Variable</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>BALATROBOT_HOST</code></td>
+<td><code>127.0.0.1</code></td>
+<td>Server hostname</td>
+</tr>
+<tr>
+<td><code>BALATROBOT_PORT</code></td>
+<td><code>12346</code></td>
+<td>Server port</td>
+</tr>
+<tr>
+<td><code>BALATROBOT_FAST</code></td>
+<td><code>0</code></td>
+<td>Enable fast mode (10x game speed)</td>
+</tr>
+<tr>
+<td><code>BALATROBOT_HEADLESS</code></td>
+<td><code>0</code></td>
+<td>Enable headless mode (minimal rendering)</td>
+</tr>
+<tr>
+<td><code>BALATROBOT_RENDER_ON_API</code></td>
+<td><code>0</code></td>
+<td>Render only on API calls</td>
+</tr>
+<tr>
+<td><code>BALATROBOT_AUDIO</code></td>
+<td><code>0</code></td>
+<td>Enable audio</td>
+</tr>
+<tr>
+<td><code>BALATROBOT_DEBUG</code></td>
+<td><code>0</code></td>
+<td>Enable debug mode (requires DebugPlus mod)</td>
+</tr>
+<tr>
+<td><code>BALATROBOT_NO_SHADERS</code></td>
+<td><code>0</code></td>
+<td>Disable all shaders</td>
+</tr>
+<tr>
+<td><code>BALATROBOT_BALATRO_PATH</code></td>
+<td>auto-detected</td>
+<td>Path to Balatro game directory</td>
+</tr>
+<tr>
+<td><code>BALATROBOT_LOVELY_PATH</code></td>
+<td>auto-detected</td>
+<td>Path to lovely library (dll/so/dylib)</td>
+</tr>
+<tr>
+<td><code>BALATROBOT_LOVE_PATH</code></td>
+<td>auto-detected</td>
+<td>Path to LOVE executable (native only)</td>
+</tr>
+<tr>
+<td><code>BALATROBOT_PLATFORM</code></td>
+<td>auto-detected</td>
+<td>Platform: darwin, linux, windows, native</td>
+</tr>
+<tr>
+<td><code>BALATROBOT_LOGS_PATH</code></td>
+<td><code>logs</code></td>
+<td>Directory for log files</td>
+</tr>
+</tbody>
+</table>
+<p>For detailed information about platform-specific behavior and configuration, see the <a href="https://coder.github.io/balatrobot/cli/#platform-specific-details">BalatroBot Platform-Specific Details</a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.copy", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
