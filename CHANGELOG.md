@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.1.1](https://github.com/coder/balatrollm/compare/v1.1.0...v1.1.1) (2026-02-12)
+
+
+### Bug Fixes
+
+* **bot:** add cache_control to strategy message ([068ff87](https://github.com/coder/balatrollm/commit/068ff87dc2e44359ec6a500f2f99bbb05ff1d6e0))
+* improve game resilience and error diagnostics ([2c7b48f](https://github.com/coder/balatrollm/commit/2c7b48f68b93df38d7bba8a90b565ee77b4ae280))
+* **llm:** catch JSONDecodeError in LLM retry loop ([0a17bfa](https://github.com/coder/balatrollm/commit/0a17bfa17332c07734d5b230fa39ed579f07997c))
+
+
+### Dependencies
+
+* update balatrobot to 1.4.1 ([a05daa6](https://github.com/coder/balatrollm/commit/a05daa6f1ec8bf7c8bb8471b4faee1e314d010bb))
+
+
+### Documentation
+
+* **cli:** add note about tasks vs workers and seed regex ([ebfe844](https://github.com/coder/balatrollm/commit/ebfe8446bcf6357fcb3453c46cc343b4c6163095))
+* **envrc:** add .envrc.example ([ca44aef](https://github.com/coder/balatrollm/commit/ca44aef52b0edbd0e67bcad60271728c27bf1969))
+* improve docs and fix inconsistencies ([60363e3](https://github.com/coder/balatrollm/commit/60363e3dd622aeda982337ef0e81837e46530259)), closes [#62](https://github.com/coder/balatrollm/issues/62)
+* **index:** update logos to have same size and add underline ([a127565](https://github.com/coder/balatrollm/commit/a127565385adc0857d568968f3c291aeaa761977))
+* **installation:** add tool use warning ([4b8acf9](https://github.com/coder/balatrollm/commit/4b8acf94190d5b9edd8144045c621a94f439882a))
+* **mkdocs:** change accent color to shades of orange ([06d85b7](https://github.com/coder/balatrollm/commit/06d85b74aca9bc5639235ca2d6c75842f08ba537))
+* **readme:** add screenshots ([2d7280c](https://github.com/coder/balatrollm/commit/2d7280c1b1c5d0ac2c0e028d0bf687e4ba27d048))
+
 ## [1.1.0](https://github.com/coder/balatrollm/compare/v1.0.9...v1.1.0) (2026-02-02)
 
 
