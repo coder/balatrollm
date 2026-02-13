@@ -265,6 +265,10 @@ runs
 # configs
 config
 !config/example.yaml
+!config/community.yaml
+
+# external repos for research
+repos
 
 ################################################################################
 # Legacy files
