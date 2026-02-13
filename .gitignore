@@ -263,7 +263,7 @@ balatro
 runs
 
 # configs
-config
+config/*
 !config/example.yaml
 !config/community.yaml
 
