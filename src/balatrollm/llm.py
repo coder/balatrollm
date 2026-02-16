@@ -88,6 +88,11 @@ class LLMClient:
             try:
                 response = await self._client.chat.completions.create(**request_data)
                 self._consecutive_timeouts = 0
+
+                # Guard against API returning empty/None choices
+                if not response.choices:
+                    raise LLMClientError("API returned empty response (no choices)")
+
                 return response
 
             except openai.APITimeoutError as e:
