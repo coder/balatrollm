@@ -15,6 +15,7 @@ from .collector import (
     ChatCompletionError,
     ChatCompletionResponse,
     Collector,
+    FinishReason,
     Stats,
 )
 from .config import Config, Task, get_model_config
@@ -44,11 +45,15 @@ class Bot:
         self._llm: LLMClient | None = None
         self._collector: Collector | None = None
 
-        self._consecutive_failures: int = 0
-        self._max_consecutive_failures: int = 3
         self._last_error_msg: str | None = None
         self._last_failed_msg: str | None = None
         self._history: list[dict[str, Any]] = []
+
+        # Finish reason tracking
+        self._finish_reason: FinishReason | None = None
+        # Separate counters for error calls vs failed calls
+        self._consecutive_errors: int = 0
+        self._consecutive_faileds: int = 0
 
     async def __aenter__(self) -> "Bot":
         """Initialize all clients."""
@@ -111,6 +116,7 @@ class Bot:
                 logger.debug(f"Gamestate check failed: {e}")
             await asyncio.sleep(0.5)
 
+        self._finish_reason = "connection_abort"
         raise BotError(f"Timeout waiting for MENU state after {timeout}s")
 
     async def play(self, runs_dir: Path = Path.cwd()) -> Stats:
@@ -124,11 +130,13 @@ class Bot:
         try:
             await self._balatro.call("gamestate")
         except (httpx.ConnectError, httpx.TimeoutException) as e:
+            self._finish_reason = "connection_abort"
             raise BotError(
                 f"Cannot connect to Balatro on {self.config.host}:{self.port}. "
                 "Make sure Balatro instance started correctly."
             ) from e
         except Exception as e:
+            self._finish_reason = "connection_abort"
             raise BotError(f"Failed to connect to Balatro: {e}") from e
 
         self._collector = Collector(self.task, runs_dir)
@@ -153,19 +161,23 @@ class Bot:
             logger.error("Game ended due to bot error")
             raise
         except Exception as e:
+            self._finish_reason = "unexpected_error"
             logger.exception("Unexpected error occurred during gameplay")
             raise BotError(f"Unexpected error: {e}") from e
         finally:
             if self._collector:
                 try:
-                    self._collector.write_stats()
+                    reason: FinishReason = self._finish_reason or "unexpected_error"
+                    self._collector.write_stats(reason)
                     logger.info("Stats written")
                 except Exception as e:
                     logger.debug(
                         f"Could not write stats (normal if run failed early): {e}"
                     )
 
-        return self._collector._calculate_stats()
+        return self._collector._calculate_stats(
+            self._finish_reason or "unexpected_error"
+        )
 
     async def _run_game_loop(self, gamestate: dict[str, Any]) -> None:
         """Main game loop."""
@@ -175,6 +187,7 @@ class Bot:
 
         while True:
             if gamestate.get("won", False):
+                self._finish_reason = "won"
                 logger.info("Game won! Waiting for GAME_OVER state...")
                 break
 
@@ -194,6 +207,7 @@ class Bot:
                     # NOTE: This bot always selects and never skips blinds
                     gamestate = await self._balatro.call("select")
                 case "GAME_OVER":
+                    self._finish_reason = "lost"
                     logger.info("Game over!")
                     break
                 case _:
@@ -275,6 +289,7 @@ class Bot:
                 custom_id=custom_id,
                 error=ChatCompletionError(code="timeout", message=str(e)),
             )
+            self._finish_reason = "llm_abort"
             raise BotError("3 consecutive LLM timeouts") from e
 
         except LLMClientError as e:
@@ -283,6 +298,7 @@ class Bot:
                 custom_id=custom_id,
                 error=ChatCompletionError(code="error", message=str(e)),
             )
+            self._finish_reason = "llm_abort"
             raise BotError(f"LLM error: {e}") from e
 
     async def _execute_tool_call(self, response: ChatCompletion) -> dict[str, Any]:
@@ -327,7 +343,10 @@ class Bot:
             logger.info(f"Executing: {fn_name}({fn_args})")
             gamestate = await self._balatro.call(fn_name, fn_args)
 
-            self._consecutive_failures = 0
+            self._collector.reset_failures()
+            # Reset both consecutive counters on success
+            self._consecutive_errors = 0
+            self._consecutive_faileds = 0
             self._last_error_msg = None
             self._last_failed_msg = None
             self._collector.record_call("successful")
@@ -345,6 +364,7 @@ class Bot:
             try:
                 return await self._balatro.call("gamestate")
             except Exception:
+                self._finish_reason = "connection_abort"
                 raise BotError(f"Game unresponsive after transport error: {e}") from e
 
     async def _handle_error_call(self, msg: str) -> dict[str, Any]:
@@ -354,11 +374,16 @@ class Bot:
 
         logger.warning(f"Error call: {msg}")
         self._last_error_msg = msg
-        self._consecutive_failures += 1
+        self._collector.record_failure()
         self._collector.record_call("error")
 
-        if self._consecutive_failures >= self._max_consecutive_failures:
-            raise BotError("Too many consecutive error/failed calls")
+        # Track consecutive error calls separately
+        self._consecutive_errors += 1
+        self._consecutive_faileds = 0
+
+        if self._consecutive_errors >= Collector.MAX_CONSECUTIVE_FAILURES:
+            self._finish_reason = "consecutive_error_calls"
+            raise BotError("Too many consecutive error calls")
 
         return await self._balatro.call("gamestate")
 
@@ -369,10 +394,15 @@ class Bot:
 
         logger.warning(f"Failed call: {msg}")
         self._last_failed_msg = msg
-        self._consecutive_failures += 1
+        self._collector.record_failure()
         self._collector.record_call("failed")
 
-        if self._consecutive_failures >= self._max_consecutive_failures:
-            raise BotError("Too many consecutive error/failed calls")
+        # Track consecutive failed calls separately
+        self._consecutive_faileds += 1
+        self._consecutive_errors = 0
+
+        if self._consecutive_faileds >= Collector.MAX_CONSECUTIVE_FAILURES:
+            self._finish_reason = "consecutive_failed_calls"
+            raise BotError("Too many consecutive failed calls")
 
         return await self._balatro.call("gamestate")

@@ -12,6 +12,22 @@ from . import __version__
 from .config import Task
 from .strategy import StrategyManifest
 
+# Type alias for run finish reasons
+FinishReason = Literal[
+    # Normal exits
+    "won",  # Game was won
+    "lost",  # Game over (GAME_OVER state)
+    # Abnormal exits - LLM issues
+    "llm_abort",  # LLM timeout or LLM client error
+    # Abnormal exits - Connection issues
+    "connection_abort",  # Menu timeout, connection error, or transport error
+    # Abnormal exits - Consecutive failures (separate)
+    "consecutive_error_calls",  # 3 consecutive invalid LLM responses
+    "consecutive_failed_calls",  # 3 consecutive failed tool calls
+    # Abnormal exits - Other
+    "unexpected_error",  # Any unexpected exception
+]
+
 
 def _generate_run_dir(task: Task, base_dir: Path) -> Path:
     """Generate unique run directory path."""
@@ -47,6 +63,7 @@ class Stats:
     run_completed: bool
     final_ante: int
     final_round: int
+    finish_reason: FinishReason
 
     # Provider distribution
     providers: dict[str, int]
@@ -133,6 +150,9 @@ class ChatCompletionRequestOutput:
 class Collector:
     """Manages run data collection."""
 
+    # Class constant for max failures (used by views overlay)
+    MAX_CONSECUTIVE_FAILURES = 3
+
     def __init__(self, task: Task, base_dir: Path) -> None:
         # Create save directories
         self.run_dir = _generate_run_dir(task, base_dir)
@@ -149,6 +169,16 @@ class Collector:
         self._calls_error = 0
         self._calls_failed = 0
         self._calls_total = 0
+
+        # Consecutive failure tracking
+        self._consecutive_failures: int = 0
+
+        # Finish reason tracking
+        self._finish_reason: FinishReason | None = None
+
+        # Token/cost tracking for batch.json
+        self._total_tokens: int = 0
+        self._total_cost: float = 0.0
 
         # Write task with structured model for benchmark analysis
         if "/" in task.model:
@@ -169,16 +199,7 @@ class Collector:
             json.dump(asdict(manifest), f, indent=2)
 
         # Write latest.json pointer for overlay
-        runs_dir = self._base_dir / "runs"
-        relative_run_path = self.run_dir.relative_to(runs_dir)
-        with (runs_dir / "latest.json").open("w") as f:
-            json.dump(
-                {
-                    "task": str(relative_run_path / "task.json"),
-                    "responses": str(relative_run_path / "responses.jsonl"),
-                },
-                f,
-            )
+        self._write_latest_json()
 
     def record_call(self, outcome: Literal["successful", "error", "failed"]) -> None:
         """Record a call outcome."""
@@ -192,6 +213,39 @@ class Collector:
             case _:
                 raise ValueError(f"Invalid call outcome: {outcome}")
         self._calls_total += 1
+
+    def record_failure(self) -> None:
+        """Increment consecutive failure count and update latest.json."""
+        self._consecutive_failures += 1
+        self._write_latest_json()
+
+    def reset_failures(self) -> None:
+        """Reset consecutive failure count and update latest.json."""
+        self._consecutive_failures = 0
+        self._write_latest_json()
+
+    def set_finish_reason(self, reason: FinishReason) -> None:
+        """Set finish reason and update latest.json."""
+        self._finish_reason = reason
+        self._write_latest_json()
+
+    def _write_latest_json(self) -> None:
+        """Write latest.json pointer for overlay."""
+        runs_dir = self._base_dir / "runs"
+        relative_run_path = self.run_dir.relative_to(runs_dir)
+        with (runs_dir / "latest.json").open("w") as f:
+            json.dump(
+                {
+                    "task": str(relative_run_path / "task.json"),
+                    "responses": str(relative_run_path / "responses.jsonl"),
+                    "requests": str(relative_run_path / "requests.jsonl"),
+                    "gamestates": str(relative_run_path / "gamestates.jsonl"),
+                    "consecutive_failures": self._consecutive_failures,
+                    "max_failures": self.MAX_CONSECUTIVE_FAILURES,
+                    "finish_reason": self._finish_reason,
+                },
+                f,
+            )
 
     def write_request(self, body: dict[str, Any]) -> str:
         """Write request to requests.jsonl. Returns custom_id."""
@@ -219,18 +273,108 @@ class Collector:
         with (self.run_dir / "responses.jsonl").open("a") as f:
             f.write(json.dumps(asdict(res)) + "\n")
 
+        # Track tokens and cost for batch.json
+        if response is not None and response.status_code == 200:
+            usage = response.body.get("usage", {})
+            self._total_tokens += (usage.get("prompt_tokens", 0) or 0) + (
+                usage.get("completion_tokens", 0) or 0
+            )
+            self._total_cost += usage.get("cost", 0) or 0
+
     def write_gamestate(self, gamestate: dict[str, Any]) -> None:
         """Write gamestate to gamestates.jsonl."""
         with (self.run_dir / "gamestates.jsonl").open("a") as f:
             f.write(json.dumps(gamestate) + "\n")
 
-    def write_stats(self) -> None:
+    def write_stats(self, finish_reason: FinishReason) -> None:
         """Calculate and write final statistics to stats.json."""
-        stats = self._calculate_stats()
+        stats = self._calculate_stats(finish_reason)
         with (self.run_dir / "stats.json").open("w") as f:
             json.dump(asdict(stats), f, indent=2)
+        # Update batch.json with best run info
+        self._update_batch_json(stats.final_ante, stats.final_round, finish_reason)
+        # Write previous.json for the overlay
+        self._write_previous(finish_reason, stats.final_ante, stats.final_round)
+        # Update latest.json with finish reason
+        self.set_finish_reason(finish_reason)
 
-    def _calculate_stats(self) -> Stats:
+    def _update_batch_json(
+        self, final_ante: int, final_round: int, finish_reason: FinishReason
+    ) -> None:
+        """Update batch.json with best run info."""
+        batch_path = self._base_dir / "runs" / "batch.json"
+
+        # Load existing or create new
+        if batch_path.exists():
+            batch: dict[str, Any] = json.loads(batch_path.read_text())
+        else:
+            batch = {
+                "best_ante": 0,
+                "best_round": 0,
+                "best_vendor": "",
+                "best_model": "",
+                "best_seed": "",
+                "best_deck": "",
+                "best_stake": "",
+                "best_tokens": 0,
+                "best_cost": 0.0,
+                "best_finish_reason": "",
+                "runs_completed": 0,
+            }
+
+        # Get current best values with explicit type casting
+        best_ante = int(batch.get("best_ante", 0))
+        best_round = int(batch.get("best_round", 0))
+        runs_completed = int(batch.get("runs_completed", 0))
+
+        # Update if this run is better
+        if final_ante > best_ante or (
+            final_ante == best_ante and final_round > best_round
+        ):
+            if "/" in self.task.model:
+                vendor, model = self.task.model.split("/", 1)
+            else:
+                vendor, model = "other", self.task.model
+            batch["best_ante"] = final_ante
+            batch["best_round"] = final_round
+            batch["best_vendor"] = vendor
+            batch["best_model"] = model
+            batch["best_seed"] = self.task.seed
+            batch["best_deck"] = self.task.deck
+            batch["best_stake"] = self.task.stake
+            batch["best_tokens"] = self._total_tokens
+            batch["best_cost"] = self._total_cost
+            batch["best_finish_reason"] = finish_reason
+
+        batch["runs_completed"] = runs_completed + 1
+        batch_path.write_text(json.dumps(batch, indent=2))
+
+    def _write_previous(
+        self, finish_reason: FinishReason, final_ante: int, final_round: int
+    ) -> None:
+        """Write previous.json for the completed run."""
+        if "/" in self.task.model:
+            vendor, model = self.task.model.split("/", 1)
+        else:
+            vendor, model = "other", self.task.model
+
+        previous = {
+            "vendor": vendor,
+            "model": model,
+            "seed": self.task.seed,
+            "deck": self.task.deck,
+            "stake": self.task.stake,
+            "ante": final_ante,
+            "round": final_round,
+            "tokens": self._total_tokens,
+            "cost": self._total_cost,
+            "finish_reason": finish_reason,
+        }
+        (self._base_dir / "runs" / "previous.json").write_text(
+            json.dumps(previous, indent=2)
+        )
+
+    def _calculate_stats(self, finish_reason: FinishReason) -> Stats:
         """Calculate statistics from collected data."""
 
         ################################################################################
@@ -283,6 +427,7 @@ class Collector:
             run_completed=gamestate["state"] == "GAME_OVER" or gamestate["won"],
             final_ante=gamestate["ante_num"],
             final_round=gamestate["round_num"],
+            finish_reason=finish_reason,
             # Provider distribution
             providers=dict(provider_counts),
             # Call statistics

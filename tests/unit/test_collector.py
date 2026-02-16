@@ -471,6 +471,7 @@ class TestStats:
             run_completed=True,
             final_ante=8,
             final_round=24,
+            finish_reason="won",
             providers={"anthropic": 10, "openai": 5},
             calls_total=15,
             calls_success=14,
@@ -492,6 +493,7 @@ class TestStats:
 
         assert stats.run_won is True
         assert stats.final_ante == 8
+        assert stats.finish_reason == "won"
         assert stats.providers == {"anthropic": 10, "openai": 5}
         assert stats.calls_total == 15
         assert stats.tokens_in_total == 10000
