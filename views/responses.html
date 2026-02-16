@@ -25,14 +25,26 @@
     .hide-scrollbar::-webkit-scrollbar {
       display: none;
     }
+
   </style>
 </head>
 <body class="bg-black text-white w-[533px] h-[720px] flex flex-col items-center overflow-hidden">
   <div class="fade-overlay"></div>
-  <div id="responses" class="hide-scrollbar flex-1 flex flex-col justify-end p-4 pb-16 space-y-3 overflow-y-auto w-full max-w-[480px]"></div>
+  <div id="responses" class="hide-scrollbar flex-1 flex flex-col justify-end p-4 space-y-3 overflow-y-auto w-full max-w-[480px]"></div>
 
   <script>
     let lastResponseId = null;
+    let dotsState = 0;
+    const dotsCycle = ['', '.', '..', '...'];
+
+    // Animate ellipsis dots
+    setInterval(() => {
+      dotsState = (dotsState + 1) % dotsCycle.length;
+      const dotsEl = document.getElementById('dots');
+      if (dotsEl) {
+        dotsEl.textContent = dotsCycle[dotsState];
+      }
+    }, 500); // 500ms per dot = 2s full cycle
 
     function formatTime(timestampMs) {
       const d = new Date(parseInt(timestampMs));
@@ -64,11 +76,62 @@
       `;
     }
 
+    async function countLines(url) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) return 0;
+        const text = await res.text();
+        return text.trim().split('\n').filter(l => l).length;
+      } catch (e) {
+        return 0;
+      }
+    }
+
+    function formatFinishReason(reason) {
+      const mapping = {
+        'won': { text: 'Won!', colorClass: 'text-green-400' },
+        'lost': { text: 'Lost', colorClass: 'text-red-400' },
+        'llm_abort': { text: 'LLM Abort', colorClass: 'text-red-400' },
+        'consecutive_error_calls': { text: 'Error Calls', colorClass: 'text-red-400' },
+        'consecutive_failed_calls': { text: 'Failed Calls', colorClass: 'text-red-400' },
+        'connection_abort': { text: 'Connection Lost', colorClass: 'text-yellow-400' },
+        'unexpected_error': { text: 'Error', colorClass: 'text-red-400' },
+      };
+      return mapping[reason] || { text: reason, colorClass: 'text-gray-400' };
+    }
+
     async function fetchResponses() {
       try {
         const latestRes = await fetch('../../runs/latest.json?' + Date.now());
         if (!latestRes.ok) return;
         const latest = await latestRes.json();
+
+        // Determine status state
+        let statusState = null;
+        let failures = 0;
+        let maxFailures = 3;
+        let finishReason = null;
+
+        if (latest.requests && latest.responses && latest.gamestates) {
+          const requestCount = await countLines('../../runs/' + latest.requests);
+          const responseCount = await countLines('../../runs/' + latest.responses);
+          const gamestateCount = await countLines('../../runs/' + latest.gamestates);
+
+          // Check if run has finished
+          finishReason = latest.finish_reason || null;
+
+          if (finishReason === null) {
+            // Run is still in progress
+            if (requestCount > responseCount) {
+              statusState = 'thinking';
+            } else if (responseCount > gamestateCount) {
+              statusState = 'executing';
+            }
+          }
+
+          failures = latest.consecutive_failures || 0;
+          maxFailures = latest.max_failures || 3;
+        }
 
         const responsesRes = await fetch('../../runs/' + latest.responses + '?' + Date.now());
         if (!responsesRes.ok) return;
@@ -80,11 +143,42 @@
         const entries = lastLines.map(l => JSON.parse(l));
 
         const newLastId = entries[entries.length - 1]?.id;
-        if (newLastId === lastResponseId) return;
+        if (newLastId === lastResponseId && statusState === null) return;
         lastResponseId = newLastId;
 
+        // Build entries HTML
+        let html = entries.map(renderEntry).join('');
+
+        // Add status indicator
+        if (finishReason) {
+          // Run has finished - show finish reason
+          const { text, colorClass } = formatFinishReason(finishReason);
+          html += `
+            <div id="status" class="font-mono text-base">
+              <span class="${colorClass}">${text}</span>
+            </div>
+          `;
+        } else if (statusState) {
+          // Run in progress - show throbber
+          const text = statusState === 'thinking' ? 'Thinking' : 'Executing';
+          const failuresHtml = failures > 0
+            ? `<span class="float-right text-red-400">&#9888; <span>${failures}/${maxFailures}</span></span>`
+            : '';
+          html += `
+            <div id="status" class="font-mono text-base">
+              <span class="text-yellow-400">${text}<span id="dots"></span></span>
+              ${failuresHtml}
+            </div>
+          `;
+        }
+
         const container = document.getElementById('responses');
-        container.innerHTML = entries.map(renderEntry).join('');
+        container.innerHTML = html;
+        // Sync dots to current animation state
+        const dotsEl = document.getElementById('dots');
+        if (dotsEl) {
+          dotsEl.textContent = dotsCycle[dotsState];
+        }
         // Scroll to the bottom (newest entry)
         container.scrollTop = container.scrollHeight;
       } catch (e) {

@@ -7,19 +7,99 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-black text-white w-[747px] h-[267px] flex items-center">
-  <div id="overlay" class="w-full h-full flex flex-col justify-center pl-16">
-    <div id="model" class="font-mono text-3xl mb-6">
-      <span class="text-gray-500">Loading...</span>
+  <div id="overlay" class="w-full h-full flex flex-col justify-center pl-12 pr-8">
+    <!-- Current Section -->
+    <div class="font-mono text-xs text-gray-500 text-right mb-1 uppercase">Current</div>
+    <div id="current-line1" class="font-mono text-xs text-gray-400 mb-1">
+      <span>Model: <span id="current-model" class="text-white">Loading...</span></span>
+      <span class="mx-2">|</span>
+      <span>Tok: <span id="current-tokens" class="text-white">0</span></span>
+      <span class="mx-2">|</span>
+      <span>Cost: <span id="current-cost" class="text-white">$0.00</span></span>
     </div>
-    <div class="space-y-3">
-      <div class="font-mono text-2xl"><span class="text-gray-500">seed&nbsp; </span><span id="seed" class="text-white"></span></div>
-      <div class="font-mono text-2xl"><span class="text-gray-500">deck&nbsp; </span><span id="deck" class="text-white"></span></div>
-      <div class="font-mono text-2xl"><span class="text-gray-500">stake </span><span id="stake" class="text-white"></span></div>
+    <div class="font-mono text-xs text-gray-400 mb-3">
+      <span>Seed: <span id="current-seed" class="text-white">--</span></span>
+      <span class="mx-2">|</span>
+      <span>Deck: <span id="current-deck" class="text-white">--</span></span>
+      <span class="mx-2">|</span>
+      <span>Stake: <span id="current-stake" class="text-white">--</span></span>
+    </div>
+
+    <!-- Divider -->
+    <div class="border-b border-gray-700 mb-3"></div>
+
+    <!-- Previous Section -->
+    <div id="previous-section" class="hidden mb-3">
+      <div class="font-mono text-xs text-gray-500 text-right mb-1 uppercase">Previous</div>
+      <div class="font-mono text-xs text-gray-400 mb-1">
+        <span>Model: <span id="previous-model" class="text-white">--</span></span>
+        <span class="mx-2">|</span>
+        <span>Tok: <span id="previous-tokens" class="text-white">0</span></span>
+        <span class="mx-2">|</span>
+        <span>Cost: <span id="previous-cost" class="text-white">$0.00</span></span>
+      </div>
+      <div class="font-mono text-xs text-gray-400 mb-1">
+        <span>Seed: <span id="previous-seed" class="text-white">--</span></span>
+        <span class="mx-2">|</span>
+        <span>Deck: <span id="previous-deck" class="text-white">--</span></span>
+        <span class="mx-2">|</span>
+        <span>Stake: <span id="previous-stake" class="text-white">--</span></span>
+        <span class="mx-2">|</span>
+        <span>Ante: <span id="previous-ante" class="text-white">--</span></span>
+        <span class="mx-2">|</span>
+        <span>Round: <span id="previous-round" class="text-white">--</span></span>
+      </div>
+      <div class="font-mono text-xs text-gray-400">
+        <span>Finish Reason: <span id="previous-end" class="text-white">--</span></span>
+      </div>
+    </div>
+
+    <!-- Divider (only shown if previous exists) -->
+    <div id="previous-divider" class="hidden border-b border-gray-700 mb-3"></div>
+
+    <!-- Best of the Batch Section -->
+    <div id="batch-section" class="hidden">
+      <div class="font-mono text-xs text-gray-500 text-right mb-1 uppercase">Best of the Batch</div>
+      <div class="font-mono text-xs text-gray-400 mb-1">
+        <span>Model: <span id="best-model" class="text-white">--</span></span>
+        <span class="mx-2">|</span>
+        <span>Tok: <span id="best-tokens" class="text-white">0</span></span>
+        <span class="mx-2">|</span>
+        <span>Cost: <span id="best-cost" class="text-white">$0.00</span></span>
+      </div>
+      <div class="font-mono text-xs text-gray-400 mb-1">
+        <span>Seed: <span id="best-seed" class="text-white">--</span></span>
+        <span class="mx-2">|</span>
+        <span>Deck: <span id="best-deck" class="text-white">--</span></span>
+        <span class="mx-2">|</span>
+        <span>Stake: <span id="best-stake" class="text-white">--</span></span>
+        <span class="mx-2">|</span>
+        <span>Ante: <span id="best-ante" class="text-white">--</span></span>
+        <span class="mx-2">|</span>
+        <span>Round: <span id="best-round" class="text-white">--</span></span>
+      </div>
+      <div class="font-mono text-xs text-gray-400">
+        <span>Finish Reason: <span id="best-end" class="text-white">--</span></span>
+      </div>
     </div>
   </div>
 
   <script>
     let lastTask = null;
+
+    function formatTokens(n) {
+      if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+      if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
+      return n.toString();
+    }
+
+    function formatCost(n) {
+      return '$' + n.toFixed(2);
+    }
+
+    function formatModel(vendor, model) {
+      return `<span class="text-white">${vendor}</span><span class="text-gray-500"> / </span><span class="text-white">${model}</span>`;
+    }
 
     async function fetchTask() {
       try {
@@ -33,14 +113,67 @@
 
         const taskKey = task.model.vendor + task.model.name + task.seed + task.deck + task.stake;
         if (taskKey !== lastTask) {
-          document.getElementById('model').innerHTML = 
-            `<span class="text-white">${task.model.vendor}</span>` +
-            `<span class="text-gray-500"> / </span>` +
-            `<span class="text-white">${task.model.name}</span>`;
-          document.getElementById('seed').textContent = task.seed;
-          document.getElementById('deck').textContent = task.deck;
-          document.getElementById('stake').textContent = task.stake;
+          document.getElementById('current-model').innerHTML = formatModel(task.model.vendor, task.model.name);
+          document.getElementById('current-seed').textContent = task.seed;
+          document.getElementById('current-deck').textContent = task.deck;
+          document.getElementById('current-stake').textContent = task.stake;
           lastTask = taskKey;
+        }
+
+        // Fetch responses for tokens/cost
+        if (latest.responses) {
+          const responsesRes = await fetch('../../runs/' + latest.responses + '?' + Date.now());
+          if (responsesRes.ok) {
+            const text = await responsesRes.text();
+            const lines = text.trim().split('\n').filter(l => l);
+            let totalIn = 0, totalOut = 0, totalCost = 0;
+            for (const line of lines) {
+              try {
+                const entry = JSON.parse(line);
+                const usage = entry.response?.body?.usage || {};
+                totalIn += usage.prompt_tokens || 0;
+                totalOut += usage.completion_tokens || 0;
+                totalCost += usage.cost || 0;
+              } catch (e) {}
+            }
+            document.getElementById('current-tokens').textContent = formatTokens(totalIn + totalOut);
+            document.getElementById('current-cost').textContent = formatCost(totalCost);
+          }
+        }
+
+        // Fetch previous.json for the previous run
+        const previousRes = await fetch('../../runs/previous.json?' + Date.now());
+        if (previousRes.ok) {
+          const previous = await previousRes.json();
+          document.getElementById('previous-section').classList.remove('hidden');
+          document.getElementById('previous-divider').classList.remove('hidden');
+          document.getElementById('previous-model').innerHTML = formatModel(previous.vendor, previous.model);
+          document.getElementById('previous-seed').textContent = previous.seed;
+          document.getElementById('previous-deck').textContent = previous.deck;
+          document.getElementById('previous-stake').textContent = previous.stake;
+          document.getElementById('previous-ante').textContent = previous.ante;
+          document.getElementById('previous-round').textContent = previous.round;
+          document.getElementById('previous-tokens').textContent = formatTokens(previous.tokens);
+          document.getElementById('previous-cost').textContent = formatCost(previous.cost);
+          document.getElementById('previous-end').textContent = previous.finish_reason;
+        }
+
+        // Fetch batch.json for best run
+        const batchRes = await fetch('../../runs/batch.json?' + Date.now());
+        if (batchRes.ok) {
+          const batch = await batchRes.json();
+          if (batch.runs_completed > 0 && batch.best_ante > 0) {
+            document.getElementById('batch-section').classList.remove('hidden');
+            document.getElementById('best-model').innerHTML = formatModel(batch.best_vendor || '', batch.best_model || '');
+            document.getElementById('best-seed').textContent = batch.best_seed || '--';
+            document.getElementById('best-deck').textContent = batch.best_deck || '--';
+            document.getElementById('best-stake').textContent = batch.best_stake || '--';
+            document.getElementById('best-ante').textContent = batch.best_ante || '--';
+            document.getElementById('best-round').textContent = batch.best_round || '--';
+            document.getElementById('best-tokens').textContent = formatTokens(batch.best_tokens || 0);
+            document.getElementById('best-cost').textContent = formatCost(batch.best_cost || 0);
+            document.getElementById('best-end').textContent = batch.best_finish_reason || '--';
+          }
         }
       } catch (e) {
         // Ignore fetch errors
