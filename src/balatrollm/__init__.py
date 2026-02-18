@@ -1,6 +1,6 @@
 """BalatroLLM - LLM-powered Balatro bot."""
 
-__version__ = "1.1.1"
+__version__ = "1.2.0"
 
 from .bot import Bot, BotError
 from .client import BalatroClient, BalatroError
