@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.2.0](https://github.com/coder/balatrollm/compare/v1.1.1...v1.2.0) (2026-02-18)
+
+
+### Features
+
+* **bot:** add finish reason tracking and separate error/failed counters ([5b0d95c](https://github.com/coder/balatrollm/commit/5b0d95c43bb2e1feb84d8222e728b1821f77e272))
+* **views:** add current/previous/best run display and status indicators ([1d54796](https://github.com/coder/balatrollm/commit/1d54796b5d438d098ca684cb49d27b62b270aeb2))
+
+
+### Bug Fixes
+
+* **llm:** guard against empty/None choices ([01f18c6](https://github.com/coder/balatrollm/commit/01f18c6fd3d0d83e6971350463f970dee51a3d20))
+
+
+### Documentation
+
+* **config:** add community config example ([a245a0c](https://github.com/coder/balatrollm/commit/a245a0c2b960b91262cc16581e6ef509930f1d77))
+* update commit command with workflow and scope definitions ([20282ff](https://github.com/coder/balatrollm/commit/20282ffcd867d8dcca4f04193f1b58d311f19426))
+
 ## [1.1.1](https://github.com/coder/balatrollm/compare/v1.1.0...v1.1.1) (2026-02-12)
 
 
