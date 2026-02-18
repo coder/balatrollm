@@ -1,0 +1,14 @@
+# BalatroLLM
+
+> Play Balatro with LLMs
+
+BalatroLLM is a bot that uses Large Language Models (LLMs) to play [Balatro](https://www.playbalatro.com/), the popular roguelike poker deck-building game. The bot analyzes game states, makes strategic decisions, and executes actions through the [BalatroBot](https://github.com/coder/balatrobot) API.
+
+
+## Documentation
+
+- [Installation](https://coder.github.io/balatrollm/installation/index.md)
+- [CLI Reference](https://coder.github.io/balatrollm/cli/index.md)
+- [Strategies](https://coder.github.io/balatrollm/strategies/index.md)
+- [Contributing](https://coder.github.io/balatrollm/contributing/index.md)
+

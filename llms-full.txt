@@ -1,0 +1,792 @@
+# BalatroLLM
+
+> Play Balatro with LLMs
+
+BalatroLLM is a bot that uses Large Language Models (LLMs) to play [Balatro](https://www.playbalatro.com/), the popular roguelike poker deck-building game. The bot analyzes game states, makes strategic decisions, and executes actions through the [BalatroBot](https://github.com/coder/balatrobot) API.
+
+
+# Documentation
+
+# Installation
+
+This guide will help you install and configure BalatroLLM.
+
+## Prerequisites
+
+- **Balatro** (v1.0.1+) - Purchase from [Steam](https://store.steampowered.com/app/2379780/Balatro/)
+- **BalatroBot** (latest) - Follow the [installation guide](https://coder.github.io/balatrobot/installation/)
+- **Uv** (v0.9.21+) - Follow the [installation guide](https://docs.astral.sh/uv/)
+- **LLM API access** - Obtain API key from an OpenAI-compatible provider (e.g., [OpenRouter](https://openrouter.ai/), [OpenAI](https://openai.com/))
+
+Tool Use (Function Calling) Required
+
+The LLM model you choose **must support tool use** (also known as function calling). BalatroLLM relies on tool calls to execute game actions — models without this capability will not work.
+
+Most frontier models (e.g., GPT-4o, Claude, Gemini) support tool use, but smaller or older models may not. Check your provider's documentation to confirm support.
+
+BalatroBot Setup Required
+
+Setting up Balatro with the BalatroBot mod requires careful configuration. Please follow the [BalatroBot Installation Guide](https://coder.github.io/balatrobot/installation/) step by step.
+
+Ensure BalatroBot is installed and working before proceeding with BalatroLLM installation.
+
+## Installation
+
+### 1. Clone the Repository
+
+```bash
+git clone --depth 1 https://github.com/coder/balatrollm.git
+cd balatrollm
+```
+
+### 2. Create Environment and Install Dependencies
+
+```bash
+uv sync --no-dev
+```
+
+When running `uv sync`, uv automatically downloads the required Python version, creates a new environment at `.venv`, and installs the project dependencies.
+
+### 3. Activate Environment
+
+```bash
+source .venv/bin/activate
+```
+
+### 4. Verify Installation
+
+```bash
+balatrollm --help
+```
+
+Auto venv activation
+
+You can use [direnv](https://direnv.net/) to automatically activate the environment when you enter the project directory. See the `.envrc.example` file for an example configuration.
+
+## Provider Configuration
+
+Configure your LLM provider through environment variables. We recommend using `.envrc` (see `.envrc.example`):
+
+```bash
+export BALATROLLM_BASE_URL="https://openrouter.ai/api/v1"
+export BALATROLLM_API_KEY="sk-..."
+```
+
+| Variable              | Description                             |
+| --------------------- | --------------------------------------- |
+| `BALATROLLM_BASE_URL` | API base URL (e.g., OpenRouter, OpenAI) |
+| `BALATROLLM_API_KEY`  | API key for your LLM provider           |
+
+For full CLI reference, see [CLI Reference](https://coder.github.io/balatrollm/cli/index.md).
+
+# CLI Reference
+
+Reference for the `balatrollm` command-line interface.
+
+## Usage
+
+```bash
+balatrollm [CONFIG] [OPTIONS]
+```
+
+BalatroLLM can be configured through three methods with the following precedence (lowest to highest):
+
+1. **Environment variables** - `BALATROLLM_*` prefixed variables
+1. **Configuration file** - YAML file (see [`config/example.yaml`](https://github.com/coder/balatrollm/blob/main/config/example.yaml))
+1. **CLI flags** - Command-line arguments (highest precedence)
+
+This means CLI flags override config file values, which override environment variables.
+
+## Arguments
+
+| Argument | Required | Description                     |
+| -------- | -------- | ------------------------------- |
+| `CONFIG` | No       | Path to YAML configuration file |
+
+BALATROLLM_CONFIG Environment Variable
+
+The configuration file path can also be specified via the `BALATROLLM_CONFIG` environment variable:
+
+```bash
+export BALATROLLM_CONFIG="config/example.yaml"
+balatrollm
+```
+
+This is the **only** `BALATROLLM_*` environment variable that does not have a corresponding CLI flag — the user can simply provide the config file path as a positional argument instead.
+
+**Precedence:** If both the `CONFIG` argument and `BALATROLLM_CONFIG` are provided, the CLI argument takes precedence and `BALATROLLM_CONFIG` is ignored.
+
+## Configuration file (YAML)
+
+The YAML configuration file uses the same field names as the CLI flags (minus the `--`), for example:
+
+- CLI `--model` → YAML `model`
+- CLI `--base-url` → YAML `base_url`
+
+For a full annotated example, see [`config/example.yaml`](https://github.com/coder/balatrollm/blob/main/config/example.yaml).
+
+### `model` (required)
+
+`model` is required, but it can come from **any** config source (YAML config, env var, or CLI flag). If you set `model:` in your YAML file, you do not need to also pass `--model`.
+
+```yaml
+model:
+  - openai/gpt-4o
+```
+
+### `model_config` (advanced)
+
+The YAML file also supports an optional `model_config` mapping for advanced provider/model request knobs. BalatroLLM deep-merges your `model_config` into built-in defaults (including nested fields like `extra_headers` and `extra_body`) and then passes the result directly to the OpenAI-compatible chat completions request.
+
+Common examples include `temperature`, `max_tokens`, `seed`, `parallel_tool_calls`, `tool_choice`, plus provider-specific settings via `extra_body` (e.g., OpenRouter).
+
+```yaml
+model_config:
+  temperature: 0.2
+  max_tokens: 2048
+  extra_body:
+    reasoning:
+      effort: medium
+```
+
+## Options
+
+| CLI Flag              | Environment Variable  | Default                        | Description                                         |
+| --------------------- | --------------------- | ------------------------------ | --------------------------------------------------- |
+| `--model MODEL`       | `BALATROLLM_MODEL`    | *(required)*                   | LLM model(s) to use (or set `model:` in YAML)       |
+| `--seed SEED`         | `BALATROLLM_SEED`     | `AAAAAAA`                      | Game seed(s)                                        |
+| `--deck DECK`         | `BALATROLLM_DECK`     | `RED`                          | Deck code(s)                                        |
+| `--stake STAKE`       | `BALATROLLM_STAKE`    | `WHITE`                        | Stake code(s)                                       |
+| `--strategy STRATEGY` | `BALATROLLM_STRATEGY` | `default`                      | Strategy name(s)                                    |
+| `--parallel N`        | `BALATROLLM_PARALLEL` | `1`                            | Concurrent game instances                           |
+| `--host HOST`         | `BALATROLLM_HOST`     | `127.0.0.1`                    | BalatroBot host                                     |
+| `--port PORT`         | `BALATROLLM_PORT`     | `12346`                        | Starting port                                       |
+| `--base-url URL`      | `BALATROLLM_BASE_URL` | `https://openrouter.ai/api/v1` | LLM API base URL                                    |
+| `--api-key KEY`       | `BALATROLLM_API_KEY`  | *None*                         | LLM API key                                         |
+| `--views`             | `BALATROLLM_VIEWS`    | `False`                        | Enable views HTTP server (set `BALATROLLM_VIEWS=1`) |
+| `--dry-run`           | -                     | `False`                        | Show tasks without executing                        |
+
+How Balatro instances are started
+
+`balatrollm` starts/stops Balatro instances automatically via `balatrobot`. With `--parallel N`, it spawns instances on ports `--port` through `--port + N - 1` (`port..port+parallel-1`). When using `--parallel N`, N workers are spawned. In order to fully utilize you have to have more tasks than workers. Check out th number of tasks that will be created using the `--dry-run` option.
+
+Multiple Values
+
+Options marked with "model(s)", "seed(s)", etc. accept multiple values. When multiple values are provided, BalatroLLM generates a cartesian product of all combinations as tasks.
+
+The following values can be provided for `deck` and `stake` options:
+
+- **Decks:** `RED`, `BLUE`, `YELLOW`, `GREEN`, `BLACK`, `MAGIC`, `NEBULA`, `GHOST`, `ABANDONED`, `CHECKERED`, `ZODIAC`, `PAINTED`, `ANAGLYPH`, `PLASMA`, `ERRATIC`
+- **Stakes:** `WHITE`, `RED`, `GREEN`, `BLACK`, `BLUE`, `PURPLE`, `ORANGE`, `GOLD`
+- **Seeds:** no strict rules but it is suggested to follow the regex `^[1-9A-Z]{1,8}$` for deterministic results.
+
+## Examples
+
+### Basic Usage
+
+```bash
+# Run with specific model (requires BALATROLLM_API_KEY in environment)
+balatrollm --model openai/gpt-5
+
+# Run with configuration file
+balatrollm config/example.yaml
+
+# Run with configuration file via environment variable
+export BALATROLLM_CONFIG="config/example.yaml"
+balatrollm
+
+# Run with config file and override specific options
+balatrollm config/example.yaml --model openai/gpt-5 --seed BBBBBBB
+```
+
+### Advanced Usage
+
+```bash
+# Multiple seeds and decks (generates cartesian product of all combinations)
+balatrollm --model openai/gpt-5 --deck RED BLUE --seed AAAAAAA BBBBBBB
+
+# Run multiple game instances concurrently (2 workers, 1 model x 3 seed = 3 tasks)
+balatrollm --model openai/gpt-5 --parallel 2 --seed AAAAAAA BBBBBBB CCCCCCC
+
+# Preview tasks without executing
+balatrollm config/example.yaml --dry-run
+
+# Use a custom strategy
+balatrollm --model openai/gpt-4o --strategy my_custom_strategy
+
+# Enable views overlay on port 12345
+balatrollm --model openai/gpt-4o --views
+
+# Enable views overlay via environment variable (0/1)
+BALATROLLM_VIEWS=1 balatrollm --model openai/gpt-4o
+# Access views at:
+#   http://localhost:12345/views/task.html
+#   http://localhost:12345/views/responses.html
+```
+
+Cartesian Product
+
+When specifying multiple values for seeds, decks, stakes, etc., BalatroLLM generates all combinations as separate tasks. For example, `--deck RED BLUE --seed AAAAAAA BBBBBBB` creates 4 tasks: `(RED, AAAAAAA)`, `(RED, BBBBBBB)`, `(BLUE, AAAAAAA)`, `(BLUE, BBBBBBB)`. For complex task configurations, use a YAML configuration file.
+
+For more information about strategies, see the [Strategies documentation](https://coder.github.io/balatrollm/strategies/index.md).
+
+## Run artifacts / outputs
+
+`balatrollm` writes run artifacts to `./runs/` (relative to your current working directory).
+
+```text
+runs/
+  latest.json
+  vX.Y.Z/<strategy>/<vendor>/<model>/<timestamp>_<deck>_<stake>_<seed>/
+    task.json
+    strategy.json
+    run.log
+    requests.jsonl
+    responses.jsonl
+    gamestates.jsonl
+    stats.json
+    screenshots/
+```
+
+- `task.json` / `strategy.json`: resolved task metadata and the strategy manifest used for the run.
+- `requests.jsonl` / `responses.jsonl`: LLM requests and responses (JSONL, one object per line).
+- `gamestates.jsonl`: game state snapshots after each action.
+- `stats.json`: aggregated statistics for the run.
+- `screenshots/`: screenshots captured during the run.
+- `run.log`: logs captured during the run.
+- `runs/latest.json`: updated each run; used by the `--views` overlays to locate the latest `task.json` and `responses.jsonl`.
+
+## BalatroBot Configuration
+
+BalatroBot instances spawned by BalatroLLM can be configured through `BALATROBOT_*` environment variables. These settings control how Balatro runs during automated gameplay.
+
+| Environment Variable       | Default       | Description                                |
+| -------------------------- | ------------- | ------------------------------------------ |
+| `BALATROBOT_HOST`          | `127.0.0.1`   | Server hostname                            |
+| `BALATROBOT_PORT`          | `12346`       | Server port                                |
+| `BALATROBOT_FAST`          | `0`           | Enable fast mode (10x game speed)          |
+| `BALATROBOT_HEADLESS`      | `0`           | Enable headless mode (minimal rendering)   |
+| `BALATROBOT_RENDER_ON_API` | `0`           | Render only on API calls                   |
+| `BALATROBOT_AUDIO`         | `0`           | Enable audio                               |
+| `BALATROBOT_DEBUG`         | `0`           | Enable debug mode (requires DebugPlus mod) |
+| `BALATROBOT_NO_SHADERS`    | `0`           | Disable all shaders                        |
+| `BALATROBOT_BALATRO_PATH`  | auto-detected | Path to Balatro game directory             |
+| `BALATROBOT_LOVELY_PATH`   | auto-detected | Path to lovely library (dll/so/dylib)      |
+| `BALATROBOT_LOVE_PATH`     | auto-detected | Path to LOVE executable (native only)      |
+| `BALATROBOT_PLATFORM`      | auto-detected | Platform: darwin, linux, windows, native   |
+| `BALATROBOT_LOGS_PATH`     | `logs`        | Directory for log files                    |
+
+For detailed information about platform-specific behavior and configuration, see the [BalatroBot Platform-Specific Details](https://coder.github.io/balatrobot/cli/#platform-specific-details)
+
+# Strategies
+
+Learn how strategies work in BalatroLLM, including their structure, implementation using Jinja2 templates, and how to contribute your own.
+
+## Overview
+
+Strategies in BalatroLLM define how the LLM bot approaches decision-making during gameplay. Each strategy consists of Jinja2 templates that generate the prompts sent to the language model, along with metadata and configuration files.
+
+The strategy system allows for different playing styles - from conservative, financially-disciplined approaches to aggressive, high-risk strategies - by modifying the context, guidance, and available tools provided to the LLM.
+
+## Strategy Structure
+
+Each strategy is a directory under `src/balatrollm/strategies/` containing exactly 5 **required** files:
+
+```text
+src/balatrollm/strategies/{strategy_name}/
+├── manifest.json          # Strategy metadata
+├── STRATEGY.md.jinja      # Strategy-specific guide and approach
+├── GAMESTATE.md.jinja     # Game state representation template
+├── MEMORY.md.jinja        # Response history tracking template
+└── TOOLS.json             # Strategy-specific function definitions
+```
+
+### Strategy Naming Requirements
+
+Strategy names must follow these rules:
+
+- Lowercase letters and numbers only (e.g., `aggressive`, `value_based`, `risky2`)
+- Valid Python identifier (cannot start with a number)
+- Underscores allowed, hyphens forbidden (e.g., `high_risk` ✓, `high-risk` ✗)
+- No spaces or special characters
+
+## manifest.json
+
+The `manifest.json` file defines strategy metadata with **5 required fields**:
+
+```json
+{
+  "name": "Default",
+  "description": "Conservative, financially disciplined approach to Balatro",
+  "author": "BalatroBench",
+  "version": "0.1.0",
+  "tags": ["conservative", "financial"]
+}
+```
+
+### Required Fields
+
+- **name** (string): Human-readable strategy name displayed to users
+- **description** (string): Brief description of the strategy's approach and philosophy
+- **author** (string): Author identifier or organization name
+- **version** (string): Strategy version in semantic versioning format (e.g., "0.1.0")
+- **tags** (array of strings): Categorization tags for filtering and organization
+
+### Versioning
+
+Strategy versions are **independent** from BalatroLLM versions. Increment the strategy version when making changes:
+
+- **Patch** (0.1.0 → 0.1.1): Bug fixes, typo corrections
+- **Minor** (0.1.0 → 0.2.0): New features, significant prompt improvements
+- **Major** (0.1.0 → 1.0.0): Complete strategy overhaul, breaking changes
+
+## Jinja2 Templates
+
+Strategies use [Jinja2](https://jinja.palletsprojects.com/) templating to dynamically generate prompts based on the current game state. Templates are compiled at runtime when the bot makes decisions.
+
+### Available Context Variables
+
+Each template receives different context variables:
+
+`STRATEGY.md.jinja` and `GAMESTATE.md.jinja`:
+
+| Variable | Type   | Description                                   |
+| -------- | ------ | --------------------------------------------- |
+| `G`      | `dict` | Full gamestate dictionary from BalatroBot API |
+
+The `G` dictionary contains all game state information including:
+
+- Current hand, jokers, consumables
+- Money, remaining hands/discards
+- Blind information, ante level
+- Deck composition, played cards
+- Shop contents (when in SHOP state)
+- And more...
+
+The `G` dictionary is the Game State returned by the [BalatroBot API](https://coder.github.io/balatrobot/api/#gamestate-schema).
+
+`MEMORY.md.jinja`:
+
+| Variable               | Type          | Description                                          |
+| ---------------------- | ------------- | ---------------------------------------------------- |
+| `history`              | `list[dict]`  | Last 10 actions with `method`, `params`, `reasoning` |
+| `last_error_call_msg`  | `str \| None` | Error message from invalid LLM response              |
+| `last_failed_call_msg` | `str \| None` | Error message from failed API call                   |
+
+### Custom Filters
+
+The template environment includes a custom `from_json` filter for parsing JSON strings within templates:
+
+```jinja
+{{ some_json_string | from_json }}
+```
+
+### Template Files
+
+#### STRATEGY.md.jinja
+
+Defines the strategy's core philosophy and decision-making approach. This template provides high-level guidance to the LLM about how to play the game.
+
+Example structure:
+
+```jinja
+You are an expert Balatro player. Analyze the game state and make strategic decisions...
+
+# Strategy Philosophy
+
+Your approach is [conservative/aggressive/balanced]...
+
+# Decision-Making Priorities
+
+1. [Priority 1]
+2. [Priority 2]
+...
+```
+
+#### GAMESTATE.md.jinja
+
+Presents the current game state in a format optimized for LLM comprehension. This template formats all relevant game information.
+
+Example access patterns:
+
+```jinja
+## Current Situation
+
+- Money: ${{ G.dollars }}
+- Hands remaining: {{ G.hands }}
+- Current score: {{ G.chips }} / {{ G.blind.chips }}
+
+## Your Hand
+
+{% for card in G.hand %}
+- {{ card.rank }} of {{ card.suit }}
+{% endfor %}
+```
+
+#### MEMORY.md.jinja
+
+Tracks previous actions and errors to provide context for decision-making. This template helps the LLM learn from mistakes and maintain consistency.
+
+Context variables (see [Available Context Variables](#available-context-variables) for details):
+
+- `history`: List of previous actions (last 10)
+- `last_error_call_msg`: Error from invalid LLM response
+- `last_failed_call_msg`: Error from failed API call
+
+## TOOLS.json
+
+Defines the function calls available to the LLM during different game phases. The structure maps game states to available tools:
+
+```json
+{
+  "SELECTING_HAND": [
+    {
+      "type": "function",
+      "function": {
+        "name": "play_hand_or_discard",
+        "description": "Play cards as a poker hand or discard them",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": ["play_hand", "discard"]
+            },
+            "cards": {
+              "type": "array",
+              "items": {"type": "integer"}
+            }
+          },
+          "required": ["action", "cards"]
+        }
+      }
+    }
+  ],
+  "SHOP": [...]
+}
+```
+
+### Available Game States
+
+Tools are organized by game state. The `TOOLS.json` file maps each state to its available tools.
+
+| Game State             | Description           | Available Tools                                           |
+| ---------------------- | --------------------- | --------------------------------------------------------- |
+| `SELECTING_HAND`       | Hand selection phase  | `play`, `discard`, `rearrange`, `sell`, `use`             |
+| `SHOP`                 | Shop phase            | `buy`, `reroll`, `next_round`, `sell`, `use`, `rearrange` |
+| `BLIND_SELECT`         | Blind selection phase | `select`, `skip`                                          |
+| `SMODS_BOOSTER_OPENED` | Pack opening phase    | `pack` (select cards or skip)                             |
+
+BLIND_SELECT and ROUND_EVAL Behavior
+
+The current `balatrollm` bot loop does not delegate `BLIND_SELECT` or `ROUND_EVAL` to the LLM (see `src/balatrollm/bot.py`).
+
+- `ROUND_EVAL` always calls `cash_out`
+- `BLIND_SELECT` always calls `select` (never `skip`) because Tags are not supported yet by `balatrobot`; skipping blinds would collect Tags the bot can't use
+
+This "always play the blind" policy is a reasonable baseline for `RED` deck on `WHITE` stake.
+
+### Common Tools
+
+**SELECTING_HAND phase:**
+
+- `play`: Play selected cards as a poker hand
+- `discard`: Discard selected cards
+- `rearrange`: Reorder cards in hand or jokers
+- `sell`: Sell a joker or consumable for money
+- `use`: Use a Tarot/Planet/Spectral card
+
+**SHOP phase:**
+
+- `buy`: Purchase a card, joker, or pack
+- `reroll`: Reroll the shop
+- `next_round`: Proceed to next round
+- `sell`: Sell a joker or consumable
+- `use`: Use a consumable
+- `rearrange`: Reorder jokers
+
+**BLIND_SELECT phase:**
+
+- `select`: Select a blind to play
+- `skip`: Skip the current blind (if allowed). *(Currently not used by `balatrollm`; Tag handling isn’t supported yet.)*
+
+## Strategy Validation
+
+BalatroLLM performs **two-stage validation** when loading strategies:
+
+1. **Template Validation** (via `StrategyManager`):
+
+   - Verifies all 4 template files exist (STRATEGY.md.jinja, GAMESTATE.md.jinja, MEMORY.md.jinja, TOOLS.json)
+   - Raises `FileNotFoundError` if any template file is missing
+
+1. **Metadata Validation** (via `StrategyManifest`):
+
+   - Verifies manifest.json exists
+   - Validates all 5 required fields are present
+   - Raises `FileNotFoundError` if manifest.json is missing
+   - Raises `ValueError` if required fields are missing
+
+Validation occurs at runtime when a strategy is selected.
+
+## Contributing Your Own Strategy
+
+### 1. Study Existing Strategies
+
+Review the built-in default strategy (`src/balatrollm/strategies/default/`) to understand structure and best practices.
+
+### 2. Create Strategy Directory
+
+```bash
+mkdir src/balatrollm/strategies/your_strategy_name
+```
+
+### 3. Create Required Files
+
+Create all 5 required files using existing strategies as templates:
+
+1. **manifest.json**: Define metadata
+1. **STRATEGY.md.jinja**: Define strategy philosophy and approach
+1. **GAMESTATE.md.jinja**: Format game state presentation
+1. **MEMORY.md.jinja**: Format response history
+1. **TOOLS.json**: Define available functions (usually copied from existing strategies)
+
+### 4. Test Locally
+
+Test your strategy to ensure it works correctly:
+
+```bash
+balatrollm --strategy your_strategy_name
+```
+
+Common issues:
+
+- Jinja2 syntax errors in templates
+- Missing required fields in manifest.json
+- Invalid JSON in TOOLS.json
+- File naming mismatches
+
+### 5. Submit Pull Request
+
+1. Fork the BalatroLLM repository
+1. Create a feature branch: `git checkout -b feat/add-strategy-your_strategy_name`
+1. Add your strategy directory with all required files
+1. Commit following conventional commits: `feat(strategy): add [strategy_name] strategy`
+1. Open a pull request with:
+   - Clear title describing your strategy
+   - Brief description of the strategy's approach
+   - Any notable differences from existing strategies
+
+### Quality Standards
+
+Submissions must meet these standards:
+
+- **Complete**: All 5 files present and functional
+- **Valid**: Templates compile without errors, JSON is well-formed
+- **Documented**: Clear strategy philosophy and decision-making approach
+- **Unique**: Offers meaningfully different gameplay from existing strategies
+- **Tested**: Locally verified to work
+
+### Review Process
+
+Strategy contributions are reviewed for:
+
+- Compliance with naming and structure requirements
+- Template functionality and Jinja2 compatibility
+- Manifest.json completeness and validity
+- Strategy uniqueness and gameplay value
+- Code quality and documentation clarity
+
+Once approved, your strategy will be available to all BalatroLLM users via the `--strategy` flag.
+
+## Best Practices
+
+### Template Design
+
+- **Be concise**: LLMs work better with clear, focused prompts
+- **Provide context**: Include relevant game information without overwhelming
+- **Use formatting**: Headers, lists, and emphasis help LLM comprehension
+- **Test iteratively**: Run games and refine based on bot behavior
+
+### Strategy Philosophy
+
+- **Define clear priorities**: What matters most? (economy, joker synergies, risk management)
+- **Explain trade-offs**: Help the LLM understand when to break rules
+- **Provide examples**: Concrete scenarios guide decision-making
+- **Stay consistent**: Maintain the same approach throughout templates
+
+# Contributing
+
+Guide for contributing to BalatroLLM development.
+
+## Prerequisites
+
+- **Balatro** (v1.0.1+) - Purchase from [Steam](https://store.steampowered.com/app/2379780/Balatro/)
+- **BalatroBot** (latest) - Follow the [installation guide](https://coder.github.io/balatrobot/installation/)
+- **Uv** (v0.9.21+) - Follow the [installation guide](https://docs.astral.sh/uv/)
+- **LLM API access** - Obtain API key from an OpenAI-compatible provider (e.g., [OpenRouter](https://openrouter.ai/), [OpenAI](https://openai.com/))
+
+## Development Environment Setup
+
+### direnv (Recommended)
+
+We use [direnv](https://direnv.net/) to automatically manage environment variables and virtual environment activation. When you `cd` into the project directory, direnv automatically loads settings from `.envrc`.
+
+Contains Secrets
+
+The `.envrc` file may contain API keys. **Never commit this file**.
+
+Start from the versioned template:
+
+```bash
+cp .envrc.example .envrc
+direnv allow
+```
+
+Then edit `.envrc` and set at minimum `BALATROLLM_API_KEY` (and `BALATROLLM_MODEL` if you aren't providing a YAML config or `--model`).
+
+## Development Setup
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/coder/balatrollm.git
+cd balatrollm
+```
+
+### 2. Install Dependencies
+
+```bash
+make install
+```
+
+### 3. Activate Virtual Environment
+
+```bash
+source .venv/bin/activate
+```
+
+## Available Make Commands
+
+The project includes a Makefile with convenient targets for common development tasks:
+
+```bash
+make help      # Show all available commands
+make install   # Install dependencies
+make lint      # Run ruff linter
+make format    # Format code (Python, Markdown)
+make typecheck # Run type checker (ty)
+make quality   # Run all code quality checks
+make test      # Run all tests (unit + integration)
+make all       # Run quality checks and tests
+```
+
+## Running Tests
+
+Tests use Python + pytest to verify bot functionality. You don't need to have BalatroBot running—the tests automatically start the required Balatro instances.
+
+Separate Unit and Integration Test Suites
+
+The unit and integration test suites are run in sequence. Unit tests run first without Balatro, followed by integration tests that spawn Balatro instances.
+
+```bash
+# Install all dependencies
+make install
+
+# Run all tests (unit + integration in sequence)
+make test
+
+# Run unit tests only (no Balatro required)
+pytest tests/unit
+
+# Run integration tests (starts Balatro instances)
+# Runs with 2 workers in parallel
+BALATROBOT_RENDER_ON_API=0 BALATROBOT_HEADLESS=1 pytest -n 2 tests/integration
+
+# Run specific test file
+pytest tests/unit/test_config.py -v
+
+# Run tests with dev marker only
+pytest tests/unit -m dev
+
+# Run only integration tests
+pytest tests/integration -m integration
+
+# Run tests that do not require Balatro instance
+pytest tests/unit -m "not integration"
+```
+
+**Test markers:**
+
+- `@pytest.mark.dev`: Run only tests under development with `-m dev`
+- `@pytest.mark.integration`: Tests that start Balatro (skip with `-m "not integration"`)
+
+## Code Structure
+
+```text
+src/balatrollm/
+├── cli.py           # CLI entry point and argument parsing
+├── bot.py           # Core game loop with LLM decision-making
+├── client.py        # BalatroBot JSON-RPC client
+├── llm.py           # OpenAI client wrapper with retry logic
+├── strategy.py      # Strategy template management
+├── config.py        # Multi-source configuration management
+├── executor.py      # Parallel execution orchestration
+├── collector.py     # Data collection and statistics
+└── strategies/      # Strategy templates
+    └── default/
+        ├── manifest.json         # Strategy metadata
+        ├── STRATEGY.md.jinja     # Game rules and tactics
+        ├── GAMESTATE.md.jinja    # Current state template
+        ├── MEMORY.md.jinja       # Action history template
+        └── TOOLS.json            # Function calling tools
+```
+
+## Code Quality
+
+Before committing, always run:
+
+```bash
+make quality  # Runs lint, typecheck, and format
+```
+
+This ensures your code meets the project's quality standards:
+
+- **Linting**: `ruff check` for Python code style
+- **Formatting**: `ruff format` for Python, `mdformat` for Markdown
+- **Type checking**: `ty check` for static type analysis
+
+## Pull Request Guidelines
+
+1. **One feature per PR** - Keep changes focused
+1. **Add tests** - New functionality needs test coverage
+1. **Update docs** - Update documentation for user-facing changes
+1. **Run code quality checks** - Execute `make quality` before committing
+1. **Test locally** - Ensure both unit and integration tests pass
+1. **Use Conventional Commits** - Follow [Conventional Commits](https://www.conventionalcommits.org/) for automated changelog generation
+
+## CI/CD Pipeline
+
+The project uses GitHub Actions for continuous integration and deployment.
+
+### Workflows
+
+- **code-quality.yml**: Runs linting, type checking, and formatting on every PR (equivalent to `make quality`)
+- **deploy-docs.yml**: Deploys documentation to GitHub Pages when changes are pushed to main
+- **release-please.yml**: Automated version management and changelog generation
+- **release-pypi.yml**: Publishes the package to PyPI when a release tag is created
+- **commit_lint.yml**: Validates commit messages follow Conventional Commits format
+- **update-balatrobot-dependency.yml**: Automatically updates BalatroBot dependency
+
+### For Contributors
+
+You don't need to worry about most CI/CD workflows—just ensure your PR passes the **code quality checks**:
+
+```bash
+make quality  # Run this before pushing
+```
+
+If CI fails on your PR, check the workflow logs on GitHub for details. Most issues can be fixed by running `make quality` locally.
+
+## Contributing Strategies
+
+See [Strategies](https://coder.github.io/balatrollm/strategies/index.md) for how to create and contribute custom playing strategies.
