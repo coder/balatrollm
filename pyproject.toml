@@ -10,7 +10,7 @@ dependencies = [
   "openai>=2.14.0",
   "pyyaml>=6.0.3",
   "httpx>=0.28.1",
-  "balatrobot>=1.4.1",
+  "balatrobot",
 ]
 classifiers = [
   "License :: OSI Approved :: MIT License",
@@ -36,8 +36,8 @@ exclude = [".venv", "balatrobot", "balatro"]
 lint.extend-select = ["I"]
 lint.task-tags = ["FIX", "TODO", "HACK", "WARN", "PERF", "NOTE", "TEST"]
 
-# [tool.uv.sources]
-# balatrobot = { git = "https://github.com/coder/balatrobot.git", rev = "main" }
+[tool.uv.sources]
+balatrobot = { git = "https://github.com/coder/balatrobot.git", rev = "dev" }
 # Or use local balatrobot for local development
 # balatrobot = { path = "../balatrobot", editable = true }
 

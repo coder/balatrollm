@@ -68,14 +68,10 @@ wheels = [
 [[package]]
 name = "balatrobot"
 version = "1.4.1"
-source = { registry = "https://pypi.org/simple" }
+source = { git = "https://github.com/coder/balatrobot.git?rev=dev#d40d645bfe2afad80d9c86f50d9cc61aed55901e" }
 dependencies = [
     { name = "httpx" },
     { name = "typer" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/2f/fb/265a4f9a662a69789dfcc52d8c104a50b1d56da318ad3850d7cfd4965c94/balatrobot-1.4.1.tar.gz", hash = "sha256:1f7eac8f49b6126772384b4d1c1752f5b6c4930dc7f641ed4a6a053d28f0f3f4", size = 203741, upload-time = "2026-02-12T14:41:09.781Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/81/9c/6837ea393398c6e1f447dd06ac90cf93ce1089d46ba274bdfa417f7e3c10/balatrobot-1.4.1-py3-none-any.whl", hash = "sha256:99c7a92ffdd7d08476c3f4581c5e464140c39d2bd388f15aa9838485511ef352", size = 14586, upload-time = "2026-02-12T14:41:08.225Z" },
 ]
 
 [[package]]
@@ -116,7 +112,7 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "balatrobot", specifier = ">=1.4.1" },
+    { name = "balatrobot", git = "https://github.com/coder/balatrobot.git?rev=dev" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "openai", specifier = ">=2.14.0" },
