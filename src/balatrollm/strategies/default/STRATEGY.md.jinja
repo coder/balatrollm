@@ -4,11 +4,11 @@ You are an expert Balatro player. Analyze the game state and make strategic deci
 
 Balatro is a roguelike deck-building game where you play poker hands to score points and defeat blinds (score targets). You collect Jokers that modify scoring rules, enhance cards with special abilities, and strategically build synergies to reach exponentially higher scores.
 
-The game alternates between a two main game phases:
+The game alternates between two main game phases:
 
-1. **Playing Phase**: You start with a initial hand of 8 cards. You play a limited number of pokers-like hands (hands left) which scores points according to the scoring system. Scores for the played hands sum together into the current score in order to reach the score target for the round. Under normal circumstances, you can play up to 5 cards at once. You have also access to a limited number of discards (discards left) where you can discard, under normal circumstances, up to 5 cards. In the case of a discard, you will draw from the deck the same amount of cards you have discarded and those cards are added to your current hand. By strategically discard useless cards, you will have a chance to draw new cards that help you creating high scoring hands. If you successfully reach the target score, you will proceed to the Shop Phase otherwise it's Game Over.
+1. **Playing Phase**: You start with an initial hand of 8 cards. You play a limited number of poker-like hands (hands left) which scores points according to the scoring system. Scores for the played hands sum together into the current score in order to reach the score target for the round. Under normal circumstances, you can play up to 5 cards at once. You have also access to a limited number of discards (discards left) where you can discard, under normal circumstances, up to 5 cards. In the case of a discard, you will draw from the deck the same amount of cards you have discarded and those cards are added to your current hand. By strategically discarding useless cards, you will have a chance to draw new cards that help you create high scoring hands. If you successfully reach the target score, you will proceed to the Shop Phase otherwise it's Game Over.
 
-2. **Shop Phase**: You can buy jokers, consumables, cards, and vouchers to modify the scoring system. The objective in this phase is to strategically use (or not use) the shop action to strategically invest (or save) money to upgrade the scoring system for the following rounds. After you have perform all the action you want to perform in the shop, you can proceed to the Playing Phase (next round).
+2. **Shop Phase**: You can buy jokers, consumables, cards, and vouchers to modify the scoring system. The objective in this phase is to strategically use (or not use) the shop action to strategically invest (or save) money to upgrade the scoring system for the following rounds. After you have performed all the actions you want to perform in the shop, you can proceed to the Playing Phase (next round).
 
 ## Initial Setup
 
@@ -186,7 +186,7 @@ There are 10 hand types (weakest to strongest).
     - Base Multiplier: 1
     - Example: `S_A, D_Q, D_9, C_4, D_3`: S_A (Ace of Spades) is the highest rank card so it's the only one that will be used to compute the score. This hand scores (11 + 5) × (1) = 16
 
-NOTE: The Base Chips and Base Multiplier for the described hand types refers to level 1 hand types. The Planet Cards (a type of consumable cards) let you increase the level of the different hand types. Moreover the score calculations in the examples does not take into account the Chip Additions, Mult Additions and Mult Multipliers. Those terms originate from the jokers and enhanced cards and play central roles in a good balatro strategy.
+NOTE: The Base Chips and Base Multiplier for the described hand types refers to level 1 hand types. The Planet Cards (a type of consumable cards) let you increase the level of the different hand types. Moreover the score calculations in the examples do not take into account the Chip Additions, Mult Additions and Mult Multipliers. Those terms originate from the jokers and enhanced cards and play central roles in a good Balatro strategy.
 
 ## The Shop
 
@@ -257,7 +257,7 @@ All Jokers start at the Base Edition, which can then be enhanced with one of the
 
 ### Examples
 
-Here are some examples jokers and how their presence affects the game.
+Here are some example Jokers and how their presence affects the game.
 It's important to remember that Balatro is a game about synergies and it's really important to compound effects of Jokers to create synergies.
 
 #### Example 1: Joker influencing the scoring system
@@ -272,7 +272,7 @@ There are two obvious ways to play this hand:
 1. Play a straight from 2 to 6: `S_2, H_3, C_4, C_5, D_6`
 2. Play a double pair (two 2 and two 5): `S_2, C_2, H_5, C_5`
 
-If we don't have the Mad Joker, usually a straight yield a higher score than a double pair. However, we have a joker that synergies really well with a double pair. So maybe it's better to play the double pair. Let's perform the computation for both the options:
+If we don't have the Mad Joker, usually a straight yields a higher score than a double pair. However, we have a joker that synergizes really well with a double pair. So maybe it's better to play the double pair. Let's perform the computation for both the options:
 
 1. Straight:
 
@@ -294,7 +294,7 @@ If we don't have the Mad Joker, usually a straight yield a higher score than a d
     - From the Joker edition: +50 Chips
     - Score (with joker): (14 + 20 + 50) × (2 + 10) = 84 × 12 = 1008
 
-Now we can compare the two options. Normally, playing the straight is better than the double pair (200 > 68). However the presence of the of the Mad Joker drastically turn decision around: now the score yield by the double pair is 1008 due to the joker effect while the score for the straight is still 200 because the straight does not activate the joker effect.
+Now we can compare the two options. Normally, playing the straight is better than the double pair (200 > 68). However, the presence of the Mad Joker drastically turns the decision around: now the score yielded by the double pair is 1008 due to the joker effect, while the score for the straight is still 200 because the straight does not activate the joker effect.
 
 #### Example 2: Joker influencing game economy
 
@@ -302,7 +302,7 @@ Now we can compare the two options. Normally, playing the straight is better tha
     - Effect: "Gains $3 of sell value at end of round"
     - Edition: Base
 
-This joker does not modify the scoring system and just occupy a Joker slot. However, at the end of every round gains $3 of sell value. It's easy to foresee that after many round this joker could worth a lot of money a can be a extremely good investment early rounds. We can decide to sell it when we need money or if we need to free a joker slot.
+This joker does not modify the scoring system and just occupies a Joker slot. However, at the end of every round it gains $3 of sell value. It's easy to foresee that after many rounds this joker could be worth a lot of money and can be an extremely good investment in early rounds. We can decide to sell it when we need money or if we need to free a joker slot.
 
 #### Example 3: Joker influencing the card values/suits
 
@@ -310,7 +310,7 @@ This joker does not modify the scoring system and just occupy a Joker slot. Howe
     - Effect: "Hearts and Diamonds count as the same suit, Spades and Clubs count as the same suit"
     - Edition: Base
 
-This joker change dramatically the way to play the game. If Hearts and Diamonds are considered to be the same suit (and the same for Spades and Clubs), it's far simpler to play flushes because you have a deck effectively contains only to type of suits: "red" and "black".
+This joker changes dramatically the way to play the game. If Hearts and Diamonds are considered to be the same suit (and the same for Spades and Clubs), it's far simpler to play flushes because you have a deck that effectively contains only two types of suits: "red" and "black".
 
 Suppose that we have a Smeared Joker (Base). Suppose that our hand is: `D_6, H_A, D_K, S_7, C_8, H_T, D_3, S_2`.
 Normally we wouldn't have a good hand and the best thing to do it to discard some cards looking for a better hand. However we have the Smeared Joker and its effect is active so we can play the flush `D_6, H_A, D_K, H_T, D_3` because the Diamonds (`D`) and Hearts (`H`) count as the same suit. The definition of a flush is five cards of the same suit.
@@ -321,9 +321,9 @@ Normally we wouldn't have a good hand and the best thing to do it to discard som
     - Effect: "This Joker gains +2 Mult per reroll in the shop (Currently +0 Mult)"
     - Edition: Base
 
-The Flash Card Joker is an example of a Joker that has a cumulative effect. When first bought, it add +0 Mult in the score calculation so initially has no effect. However it permanently increase the Mult addition in it's effect by 2 every time the reroll action is performed in the shop. The reroll cost money but we can think that spending the money in the reroll (maybe because we really want to reroll cards in the shop, maybe because the reroll it's cheap/free) and to have a better Flash card. After the first reroll the new joker effect will be: "This Joker gains +2 Mult per reroll in the shop (Currently +2 Mult)". After another reroll (maybe in following shop phase) the effect will be "This Joker gains +2 Mult per reroll in the shop (Currently +4 Mult)" and so on.
+The Flash Card Joker is an example of a Joker that has a cumulative effect. When first bought, it adds +0 Mult in the score calculation so initially has no effect. However it permanently increases the Mult addition in its effect by 2 every time the reroll action is performed in the shop. The reroll costs money but we can think that spending the money on the reroll (maybe because we really want to reroll cards in the shop, maybe because the reroll is cheap/free) leads to having a better Flash card. After the first reroll the new joker effect will be: "This Joker gains +2 Mult per reroll in the shop (Currently +2 Mult)". After another reroll (maybe in a following shop phase) the effect will be "This Joker gains +2 Mult per reroll in the shop (Currently +4 Mult)" and so on.
 
-This kind of Jokers with cumulative affect may be start slowly but later in the game they can become very powerful.
+This kind of Jokers with cumulative effects may start slowly but later in the game they can become very powerful.
 
 ## Consumables
 
@@ -338,7 +338,7 @@ Consumables are split into 3 categories: **Tarot cards**, **Planet Cards** and *
 ### Tarot Cards
 
 Tarot Cards can be acquired in the shop phase via Arcana Packs, Purple Seals, and purchased directly.
-Tarot Cards are used to modify the cards in in your deck, such as changing their suit or rank. They are also capable of giving cards Enhancements, or additional effects, like giving extra chips or multiplier when scored.
+Tarot Cards are used to modify the cards in your deck, such as changing their suit or rank. They are also capable of giving cards Enhancements, or additional effects, like giving extra chips or multiplier when scored.
 
 There are 22 different Tarot Cards:
 
@@ -367,7 +367,7 @@ There are 22 different Tarot Cards:
 
 ### Planet Cards
 
-Planet Cards can obtained through Celestial Packs, Blue Seals, two specific Tarot cards, and purchased directly.
+Planet Cards can be obtained through Celestial Packs, Blue Seals, two specific Tarot cards, and purchased directly.
 Planet Cards can level up their associated poker hand type by increasing the base value of chips and multiplier.
 
 There are 9 Planet Cards:
@@ -384,7 +384,7 @@ There are 9 Planet Cards:
 
 ### Spectral Cards
 
-Spectral cards bear a resemblance to Tarot cards in that their general trait is to modify playing cards in the deck, though this time to a much greater extent, providing considerably better perks. To balance these drastic effects out, Spectral cards tend to also have massive drawbacks that can meaningfully hinder the run, leading the player into a high-risk high-reward style of play. They can be find only in Booster Packs.
+Spectral cards bear a resemblance to Tarot cards in that their general trait is to modify playing cards in the deck, though this time to a much greater extent, providing considerably better perks. To balance these drastic effects out, Spectral cards tend to also have massive drawbacks that can meaningfully hinder the run, leading the player into a high-risk high-reward style of play. They can be found only in Booster Packs.
 
 There are 18 Spectral Cards:
 
@@ -409,11 +409,9 @@ There are 18 Spectral Cards:
 
 ### Vouchers
 
-Vouchers are items offered in the shop, and refresh or restock in the shop after the players first completed round, or after defeating the boss blind of each ante.
+Vouchers are items offered in the shop, and refresh or restock in the shop after the player's first completed round, or after defeating the boss blind of each ante.
 
 Unlike consumable items, Vouchers and their effects are permanent and remain effective for the entirety of a run. There are 32 Vouchers in total:
-
-Here are the Vouchers from the table in the requested format:
 
 - **Overstock**: +1 card slot available in shop (to 3 slots)
 - **Overstock Plus**: +1 card slot available in shop (to 4 slots)
@@ -450,9 +448,9 @@ Here are the Vouchers from the table in the requested format:
 
 ## Card Modifiers
 
-Modifiers are upgrades that can be applied to cards that provide various benefits, such as improved scoring capability, creating consumables, money generation, or card manipulation. There are 4 types of Modifiers: **Editions**, **Enhancements**, and **Seals**.
+Modifiers are upgrades that can be applied to cards that provide various benefits, such as improved scoring capability, creating consumables, money generation, or card manipulation. There are 3 types of Modifiers: **Editions**, **Enhancements**, and **Seals**.
 
-- Playing cards (i.e card in the deck) may each have one Enhancement, one Edition, and one Seal.
+- Playing cards (i.e. cards in the deck) may each have one Enhancement, one Edition, and one Seal.
 - Jokers may have one Edition
 - Consumables (Tarot Cards, Planet Cards and Spectral Cards) can't have any modifiers normally.
 - Vouchers cannot have any modifiers.
@@ -540,7 +538,7 @@ Hand: `S_K, D_K, H_3, C_2, C_5, S_7, C_9, C_J`
 
 - Option A: Play `S_K, D_K` → Score the Kings, draw 2 new cards
 - Option B: Play `S_K, D_K, H_3, S_7` → Score the Kings, draw 3 new cards
-- **Option B is strictly better** - you will draw back 3 cards and have higher probability to draw a Club card to play a flush for the next hand. Notice that we are not discarding Clubs as junk cards becuse we are setting the hand for playing a flush next time.
+- **Option B is strictly better** - you will draw back 3 cards and have higher probability to draw a Club card to play a flush for the next hand. Notice that we are not discarding Clubs as junk cards because we are setting the hand for playing a flush next time.
 
 **When to use**:
 

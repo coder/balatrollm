@@ -36,11 +36,11 @@ Focus on steady growth, not explosive plays.
 {% endif %}
 
 {% if last_error_call_msg %}
-**NOTE**: **Your last response was invalid**: {{ last_error_call_msg }}
+**NOTE:** Your last response was invalid: {{ last_error_call_msg }}
 Please ensure your next response includes a proper tool call with valid function name and JSON arguments.
 {% endif %}
 
 {% if last_failed_call_msg %}
-**NOTE**: **Your last tool call failed**: {{ last_failed_call_msg }}
+**NOTE:** Your last tool call failed: {{ last_failed_call_msg }}
 The tool call was formatted correctly but execution failed. Please try a different approach.
 {% endif %}

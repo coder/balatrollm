@@ -28,7 +28,7 @@
 
 ## Jokers
 
-The current Jokers count is {{ G.jokers.count }}/{{ G.jokers.limit }}.
+The current Joker count is {{ G.jokers.count }}/{{ G.jokers.limit }}.
 {% for j in G.jokers.cards -%}
 {% if not j.state.hidden %}
 - {{ loop.index0 }}: {{ j.label }} ({{ j.value.effect }})
@@ -55,7 +55,7 @@ The current Jokers count is {{ G.jokers.count }}/{{ G.jokers.limit }}.
 
 ## Consumables
 
-The current Consumables count is {{ G.consumables.count }}/{{ G.consumables.limit }}.
+The current Consumable count is {{ G.consumables.count }}/{{ G.consumables.limit }}.
 {% for c in G.consumables.cards -%}
 {% if not c.state.hidden %}
 - {{ loop.index0 }}: {{ c.label }} ({{ c.value.effect }})
