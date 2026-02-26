@@ -351,6 +351,28 @@
           "required": ["reasoning"]
         }
       }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "sell",
+        "strict": false,
+        "description": "Sell a joker to make room when selecting from a Buffoon pack. Only jokers can be sold (not consumables). Only available when a Buffoon pack is open. WARNING: Selling jokers is strongly discouraged in conservative strategy. Only sell to make room for a significantly better joker.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "joker": {
+              "type": "integer",
+              "description": "0-based index of joker to sell"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Strategic reasoning for selling"
+            }
+          },
+          "required": ["joker", "reasoning"]
+        }
+      }
     }
   ]
 }

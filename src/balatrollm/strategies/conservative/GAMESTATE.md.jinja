@@ -323,6 +323,12 @@ You **MUST** use one of the following tools to perform the intended action:
     - `targets`: (list, optional) 0-based indices of hand cards to target (for Tarot/Spectral that require selection)
     - `skip`: (boolean, optional) Set to true to skip the pack without selecting a card
     - `reasoning`: (string) Strategic reasoning for this selection or skip
+- Sell a joker to make room for a new joker from the pack
+  - Function: `sell`
+  - **CONSERVATIVE WARNING**: Only sell if necessary to make room for a significantly better joker
+  - Parameters:
+    - `joker`: (integer, required) 0-based index of joker to sell (only jokers can be sold in this state)
+    - `reasoning`: (string) Strategic reasoning for selling
 {% endif -%}
 {% if G.state in ["SELECTING_HAND", "SHOP"] -%}
 - Sell a joker or consumable for money
