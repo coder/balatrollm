@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.2.0](https://github.com/coder/balatrollm/compare/v1.1.1...v1.2.0) (2026-04-19)
+
+
+### Features
+
+* **bot:** add finish reason tracking and separate error/failed counters ([5b0d95c](https://github.com/coder/balatrollm/commit/5b0d95c43bb2e1feb84d8222e728b1821f77e272))
+* **views:** add current/previous/best run display and status indicators ([1d54796](https://github.com/coder/balatrollm/commit/1d54796b5d438d098ca684cb49d27b62b270aeb2))
+
+
+### Bug Fixes
+
+* **llm:** guard against empty/None choices ([01f18c6](https://github.com/coder/balatrollm/commit/01f18c6fd3d0d83e6971350463f970dee51a3d20))
+* remove seed from DEFAULT_MODEL_CONFIG ([d642f7d](https://github.com/coder/balatrollm/commit/d642f7da434f10e584710e601785e515dc6adb7e))
+
+
+### Documentation
+
+* **config:** add community config example ([a245a0c](https://github.com/coder/balatrollm/commit/a245a0c2b960b91262cc16581e6ef509930f1d77))
+* **config:** note that model seed is not universally supported ([6269c59](https://github.com/coder/balatrollm/commit/6269c592ac4d4534934701f42773256342457b69))
+* update commit command with workflow and scope definitions ([20282ff](https://github.com/coder/balatrollm/commit/20282ffcd867d8dcca4f04193f1b58d311f19426))
+
 ## [1.1.1](https://github.com/coder/balatrollm/compare/v1.1.0...v1.1.1) (2026-02-12)
 
 
