@@ -1,6 +1,7 @@
 """Core LLM-powered Balatro bot implementation."""
 
 import asyncio
+import base64
 import json
 import logging
 import time
@@ -23,6 +24,23 @@ from .llm import LLMClient, LLMClientError, LLMTimeoutError
 from .strategy import StrategyManager
 
 logger = logging.getLogger(__name__)
+
+
+def _to_wine_path(path: Path) -> str:
+    """Convert a Linux path under Wine's drive_c to a Windows-style path.
+
+    Balatro (via BalatroBot Lua mod) runs inside Wine/Proton and can only write
+    to Windows-style paths. This converts e.g.:
+        /home/user/.../drive_c/users/foo/bar.png
+        -> C:\\users\\foo\\bar.png
+    Falls back to the original string if drive_c is not in the path.
+    """
+    parts = path.parts
+    try:
+        idx = next(i for i, p in enumerate(parts) if p == "drive_c")
+        return "C:\\" + "\\".join(parts[idx + 1 :])
+    except StopIteration:
+        return str(path)
 
 
 class BotError(Exception):
@@ -66,6 +84,7 @@ class Bot:
         self._llm = LLMClient(
             base_url=self.config.base_url,
             api_key=self.config.api_key or "",
+            vision=self.config.vision,
         )
         await self._llm.__aenter__()
 
@@ -198,14 +217,11 @@ class Bot:
             await self._balatro.call("gamestate")
 
             match current_state:
-                case "SELECTING_HAND" | "SHOP" | "SMODS_BOOSTER_OPENED":
+                case "SELECTING_HAND" | "SHOP" | "SMODS_BOOSTER_OPENED" | "BLIND_SELECT":
                     response = await self._get_llm_response(gamestate)
                     gamestate = await self._execute_tool_call(response)
                 case "ROUND_EVAL":
                     gamestate = await self._balatro.call("cash_out")
-                case "BLIND_SELECT":
-                    # NOTE: This bot always selects and never skips blinds
-                    gamestate = await self._balatro.call("select")
                 case "GAME_OVER":
                     self._finish_reason = "lost"
                     logger.info("Game over!")
@@ -220,6 +236,20 @@ class Bot:
         assert self._llm is not None
         assert self._collector is not None
 
+        # Take screenshot BEFORE building the request so it can be included in the prompt
+        next_custom_id = self._collector.peek_next_custom_id()
+        screenshot_path = self._collector.screenshot_dir / f"{next_custom_id}.png"
+        screenshot_b64: str | None = None
+        try:
+            await self._balatro.call(
+                "screenshot", {"path": _to_wine_path(screenshot_path)}
+            )
+            screenshot_b64 = base64.b64encode(screenshot_path.read_bytes()).decode()
+        except BalatroError as e:
+            logger.warning(f"Screenshot failed: {e}")
+        except Exception as e:
+            logger.warning(f"Screenshot read failed: {e}")
+
         strategy_content = self.strategy.render_strategy(gamestate)
         gamestate_content = self.strategy.render_gamestate(gamestate)
         memory_content = self.strategy.render_memory(
@@ -228,20 +258,28 @@ class Bot:
             last_failure=self._last_failed_msg,
         )
 
-        messages = [
+        content: list[dict[str, Any]] = [
             {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": strategy_content,
-                        "cache_control": {"type": "ephemeral"},
-                    },
-                    {"type": "text", "text": gamestate_content},
-                    {"type": "text", "text": memory_content},
-                ],
-            }
+                "type": "text",
+                "text": strategy_content,
+                "cache_control": {"type": "ephemeral"},
+            },
         ]
+        if screenshot_b64:
+            content.append(
+                {
+                    "type": "image_url",
+                    "image_url": {"url": f"data:image/png;base64,{screenshot_b64}"},
+                }
+            )
+        content.extend(
+            [
+                {"type": "text", "text": gamestate_content},
+                {"type": "text", "text": memory_content},
+            ]
+        )
+
+        messages = [{"role": "user", "content": content}]
 
         tools = self.strategy.get_tools(gamestate["state"])
 
@@ -262,14 +300,6 @@ class Bot:
                 tools=tools,
                 model_config=self.model_config,
             )
-
-            try:
-                await self._balatro.call(
-                    "screenshot",
-                    {"path": str(self._collector.screenshot_dir / f"{custom_id}.png")},
-                )
-            except BalatroError as e:
-                logger.warning(f"Screenshot failed: {e}")
 
             self._collector.write_response(
                 id=str(time.time_ns() // 1_000_000),

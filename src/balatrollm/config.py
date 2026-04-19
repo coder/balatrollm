@@ -41,13 +41,14 @@ ENV_MAP: dict[str, str] = {
     "base_url": "BALATROLLM_BASE_URL",
     "api_key": "BALATROLLM_API_KEY",
     "views": "BALATROLLM_VIEWS",
+    "vision": "BALATROLLM_VISION",
 }
 
 ################################################################################
 # Types for config conversion
 ################################################################################
 
-BOOL_FIELDS: frozenset[str] = frozenset({"views"})
+BOOL_FIELDS: frozenset[str] = frozenset({"views", "vision"})
 LIST_FIELDS: frozenset[str] = frozenset({"model", "seed", "deck", "stake", "strategy"})
 STRING_FIELDS: frozenset[str] = frozenset({"host", "base_url", "api_key"})
 INT_FIELDS: frozenset[str] = frozenset({"parallel", "port"})
@@ -149,6 +150,8 @@ def _load_from_args(args: Namespace) -> dict[str, Any]:
     for field_name in BOOL_FIELDS:
         if getattr(args, field_name, False):
             result[field_name] = True
+    if getattr(args, "vision", None) is False:
+        result["vision"] = False
     return result
 
 
@@ -183,6 +186,7 @@ class Config:
     # Execution
     parallel: int = 1
     views: bool = False
+    vision: bool = True
 
     # Connection
     host: str = "127.0.0.1"

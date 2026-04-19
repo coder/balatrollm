@@ -187,7 +187,7 @@
       "function": {
         "name": "next_round",
         "strict": false,
-        "description": "Leave the shop and advance to blind selection.",
+        "description": "Exit the shop and advance to blind selection. You MUST invoke this as a function tool call — never output raw JSON. This is the only valid way to leave the shop; omitting the call or describing it in text will be treated as an error.",
         "parameters": {
           "type": "object",
           "properties": {

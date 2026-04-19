@@ -247,6 +247,10 @@ class Collector:
                 f,
             )
 
+    def peek_next_custom_id(self) -> str:
+        """Return the custom_id that the next write_request call will use, without advancing the counter."""
+        return f"request-{self._request_count + 1:05}"
+
     def write_request(self, body: dict[str, Any]) -> str:
         """Write request to requests.jsonl. Returns custom_id."""
         self._request_count += 1

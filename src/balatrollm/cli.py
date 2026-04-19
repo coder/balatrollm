@@ -48,6 +48,10 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--views", action="store_true", help="Start HTTP server on port 12345 for views"
     )
+    parser.add_argument(
+        "--no-vision", dest="vision", action="store_false", default=None,
+        help="Disable screenshots (required for non-vision models via Ollama)",
+    )
 
     return parser
 
