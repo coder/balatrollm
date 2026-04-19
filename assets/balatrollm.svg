@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 90">
+  <defs>
+    <mask id="network-mask" maskContentUnits="userSpaceOnUse">
+      <!-- 1. White base (Reveal everything) -->
+      <rect x="-1000" y="-1000" width="3000" height="3000" fill="white" />
+
+      <!-- 2. Black shapes (Hide/Cutout) -->
+      <g fill="black" stroke="black" stroke-width="22" stroke-linecap="butt">
+        <line x1="190" y1="340" x2="360" y2="250" />
+      <line x1="190" y1="340" x2="360" y2="440" />
+      <line x1="190" y1="340" x2="360" y2="630" />
+      <line x1="190" y1="540" x2="360" y2="250" />
+      <line x1="190" y1="540" x2="360" y2="440" />
+      <line x1="190" y1="540" x2="360" y2="630" />
+      <line x1="360" y1="250" x2="530" y2="440" />
+      <line x1="360" y1="440" x2="530" y2="440" />
+      <line x1="360" y1="630" x2="530" y2="440" />
+      <circle cx="190" cy="340" r="32" />
+      <circle cx="190" cy="540" r="32" />
+      <circle cx="360" cy="250" r="32" />
+      <circle cx="360" cy="440" r="32" />
+      <circle cx="360" cy="630" r="32" />
+      <circle cx="530" cy="440" r="32" />
+      </g>
+    </mask>
+  </defs>
+
+  <style>
+    /* Light mode - dark cards */
+    .cards {
+      fill: #27272a;
+    }
+
+    /* Dark mode - light cards */
+    @media (prefers-color-scheme: dark) {
+      .cards {
+        fill: #fafafa;
+      }
+    }
+  </style>
+
+  <g class="cards" transform="translate(0, 90) scale(0.1, -0.1)">
+    <!-- Front card with masked neural network symbol -->
+    <path d="M110 790 c-19 -19 -20 -33 -20 -340 0 -307 1 -321 20 -340 19 -19 33 -20 250 -20 217 0 231 1 250 20 19 19 20 33 20 340 0 307 -1 321 -20 340 -19 19 -33 20 -250 20 -217 0 -231 -1 -250 -20z" mask="url(#network-mask)"/>
+
+    <!-- Back card (offset) -->
+    <path d="M688 459 c2 -281 0 -336 -13 -361 -19 -39 -19 -38 9 -38 50 0 59 28 110 359 47 300 48 312 31 331 -10 11 -34 22 -54 25 -20 4 -47 8 -61 11 l-25 5 3 -332z"/>
+  </g>
+</svg>
