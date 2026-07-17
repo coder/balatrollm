@@ -208,7 +208,7 @@ Here are the vouchers that can be redeemed:
 {% if G.state == "SMODS_BOOSTER_OPENED" -%}
 ## Pack Selection
 
-You have opened a booster pack. Choose a card or skip.
+You have opened a booster pack. The purchase cost is already spent — skipping does not refund money. Prefer selecting a card with any upside unless you have a skip-payoff joker (e.g. Red Card) or every option is actively harmful.
 
 ### Available Cards in Pack
 
@@ -223,9 +223,9 @@ You have opened a booster pack. Choose a card or skip.
 {% if card.value.min_highlighted %}  - **Targets**: {{ card.value.min_highlighted }}-{{ card.value.max_highlighted }} hand cards{% endif %}
 {% elif card.set in ["DEFAULT", "ENHANCED"] %}
 - {{ loop.index0 }}: **{{ card.value.rank }} of {{ card.value.suit }}**
-{% if card.set == "ENHANCED" %}  - **Enhancement**: {{ card.value.enhancement }}{% if card.value.enhancement == "GLASS" %} ⚠️ RISKY{% endif %}{% endif %}
-{% if card.value.edition %}  - **Edition**: {{ card.value.edition }}{% endif %}
-{% if card.value.seal %}  - **Seal**: {{ card.value.seal }}{% endif %}
+{% if card.modifier.edition %}  - **{{ card.modifier.edition }} Edition**{% endif %}
+{% if card.modifier.enhancement %}  - **{{ card.modifier.enhancement }} Enhancement**{% if card.modifier.enhancement == "GLASS" %} ⚠️ RISKY{% endif %}{% endif %}
+{% if card.modifier.seal %}  - **{{ card.modifier.seal }} Seal**{% endif %}
 {% endif %}
 {%- endfor %}
 
@@ -233,7 +233,7 @@ You have opened a booster pack. Choose a card or skip.
 ### Your Hand (for targeting)
 
 {% for card in G.hand.cards -%}
-- {{ loop.index0 }}: {{ card.value.rank }} of {{ card.value.suit }}{% if card.set == "ENHANCED" %} ({{ card.value.enhancement }}){% endif %}
+- {{ loop.index0 }}: {{ card.value.rank }} of {{ card.value.suit }}{% if card.modifier.enhancement %} ({{ card.modifier.enhancement }}){% endif %}
 {% endfor %}
 {% endif %}
 {%- endif %}

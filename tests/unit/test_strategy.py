@@ -1,9 +1,78 @@
 """Unit tests for the StrategyManager module."""
 
+from typing import Any
+
 import pytest
 
 from balatrollm.strategy import StrategyManager
 from tests.unit.conftest import load_unit_fixture, load_unit_golden
+
+
+def get_mock_pack_playing_card(
+    overrides: dict[str, object] | None = None,
+) -> dict[str, Any]:
+    """Factory for a pack playing card shaped like BalatroBot gamestate."""
+    base: dict[str, Any] = {
+        "id": 1,
+        "key": "D_6",
+        "set": "ENHANCED",
+        "label": "Glass Card",
+        "value": {
+            "rank": "6",
+            "suit": "D",
+            "effect": "+6 chips X2 Mult 1 in 4 chance to destroy card",
+        },
+        "modifier": {
+            "enhancement": "GLASS",
+            "edition": "FOIL",
+            "seal": "RED",
+        },
+        "state": {},
+        "cost": {"buy": 1, "sell": 1},
+    }
+    return {**base, **(overrides or {})}
+
+
+def get_mock_pack_opened_gamestate(
+    overrides: dict[str, object] | None = None,
+) -> dict[str, Any]:
+    """Factory for SMODS_BOOSTER_OPENED gamestate with pack playing cards."""
+    base: dict[str, Any] = {
+        "state": "SMODS_BOOSTER_OPENED",
+        "money": 10,
+        "ante_num": 1,
+        "round_num": 1,
+        "deck": "RED",
+        "stake": "WHITE",
+        "seed": "AAAAAAA",
+        "won": False,
+        "round": {
+            "hands_left": 4,
+            "discards_left": 3,
+            "hands_played": 0,
+            "discards_used": 0,
+            "chips": 0,
+            "reroll_cost": 5,
+        },
+        "jokers": {"count": 0, "limit": 5, "cards": []},
+        "consumables": {"count": 0, "limit": 2, "cards": []},
+        "hand": {"count": 0, "limit": 8, "cards": [], "highlighted_limit": 5},
+        "shop": {"count": 0, "limit": 2, "cards": []},
+        "packs": {"count": 0, "limit": 2, "cards": []},
+        "vouchers": {"count": 0, "limit": 1, "cards": []},
+        "pack": {
+            "count": 1,
+            "limit": 3,
+            "cards": [get_mock_pack_playing_card()],
+        },
+        "hands": {},
+        "blinds": {
+            "small": {"name": "Small Blind", "score": 300, "status": "Upcoming"},
+            "big": {"name": "Big Blind", "score": 450, "status": "Upcoming"},
+            "boss": {"name": "The Hook", "score": 600, "status": "Upcoming"},
+        },
+    }
+    return {**base, **(overrides or {})}
 
 
 class TestStrategyManagerInit:
@@ -182,6 +251,86 @@ class TestRenderGamestateProperties:
             blind = gamestate["blinds"][blind_type]
             assert blind["name"] in result, f"{blind_type} blind name not found"
             assert str(blind["score"]) in result, f"{blind_type} blind score not found"
+
+
+class TestPackOpenSunkCostGuidance:
+    """Opened packs already spent money; skip is not a refund."""
+
+    @pytest.mark.parametrize("strategy", ["default", "conservative", "aggressive"])
+    def test_strategy_teaches_pack_skip_does_not_refund(self, strategy: str) -> None:
+        """Strategy text must state pack cost is sunk and skip does not refund."""
+        gamestate = get_mock_pack_opened_gamestate()
+        sm = StrategyManager(strategy)
+        result = sm.render_strategy(gamestate)
+
+        assert "already spent" in result.lower()
+        assert "does not refund" in result.lower()
+
+    @pytest.mark.parametrize("strategy", ["default", "conservative", "aggressive"])
+    def test_pack_opened_gamestate_teaches_sunk_cost(self, strategy: str) -> None:
+        """Pack-open gamestate must remind the LLM money is already spent."""
+        gamestate = get_mock_pack_opened_gamestate()
+        sm = StrategyManager(strategy)
+        result = sm.render_gamestate(gamestate)
+
+        assert "already spent" in result.lower()
+        assert "does not refund" in result.lower()
+
+    @pytest.mark.parametrize("strategy", ["default", "conservative", "aggressive"])
+    def test_pack_tool_describes_skip_as_no_refund(self, strategy: str) -> None:
+        """Pack tool description must say skipping does not refund the purchase."""
+        sm = StrategyManager(strategy)
+        tools = sm.get_tools("SMODS_BOOSTER_OPENED")
+        pack_tool = next(t for t in tools if t["function"]["name"] == "pack")
+        description = pack_tool["function"]["description"].lower()
+
+        assert "does not refund" in description
+
+
+class TestRenderPackPlayingCardModifiers:
+    """Pack playing cards must render modifier fields from card.modifier."""
+
+    @pytest.mark.parametrize("strategy", ["default", "conservative", "aggressive"])
+    def test_pack_card_renders_enhancement_edition_and_seal(
+        self, strategy: str
+    ) -> None:
+        """Opened Standard pack cards expose enhancement/edition/seal to the LLM."""
+        gamestate = get_mock_pack_opened_gamestate()
+        sm = StrategyManager(strategy)
+        result = sm.render_gamestate(gamestate)
+
+        assert "**GLASS Enhancement**" in result
+        assert "**FOIL Edition**" in result
+        assert "**RED Seal**" in result
+
+    @pytest.mark.parametrize("strategy", ["default", "conservative", "aggressive"])
+    def test_pack_hand_targeting_renders_enhancement(self, strategy: str) -> None:
+        """Hand cards shown during pack targeting include enhancement."""
+        hand_card = get_mock_pack_playing_card(
+            {
+                "id": 2,
+                "key": "H_A",
+                "set": "ENHANCED",
+                "label": "Steel Card",
+                "value": {"rank": "A", "suit": "H", "effect": "X1.5 Mult"},
+                "modifier": {"enhancement": "STEEL"},
+            }
+        )
+        gamestate = get_mock_pack_opened_gamestate(
+            {
+                "hand": {
+                    "count": 1,
+                    "limit": 8,
+                    "cards": [hand_card],
+                    "highlighted_limit": 5,
+                }
+            }
+        )
+        sm = StrategyManager(strategy)
+        result = sm.render_gamestate(gamestate)
+
+        assert "Your Hand (for targeting)" in result
+        assert "(STEEL)" in result
 
 
 class TestRenderMemoryProperties:

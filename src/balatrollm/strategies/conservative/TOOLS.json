@@ -326,7 +326,7 @@
       "function": {
         "name": "pack",
         "strict": false,
-        "description": "Select a card from the opened booster pack, or skip without taking any card. For Arcana/Spectral packs, cards are used immediately and may require targeting hand cards. Avoid risky Spectral cards.",
+        "description": "Select a card from the opened booster pack, or skip without taking any card. The pack cost is already spent — skipping does not refund money. Prefer taking a useful card unless you have a skip-payoff joker or every option is harmful. For Arcana/Spectral packs, cards are used immediately and may require targeting hand cards. Avoid risky Spectral cards.",
         "parameters": {
           "type": "object",
           "properties": {
