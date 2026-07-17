@@ -81,6 +81,10 @@ Data collection and statistics. Output: `runs/v1.0.0/{strategy}/{vendor}/{model}
 
 Template-based system using Jinja2. Templates render strategy guidance, game state, and action history into LLM prompts. At each decision point: render templates → send to LLM with tools → execute tool call. Custom strategies: create folder in `src/balatrollm/strategies/` with required template files.
 
+**Gotcha — pack card modifiers:** BalatroBot puts enhancement/edition/seal on `card.modifier.*`, never on `card.value.*` (`value` is only `suit`/`rank`/`effect`). In `GAMESTATE.md.jinja` pack sections (`SMODS_BOOSTER_OPENED`), always use `card.modifier.enhancement` / `edition` / `seal` (same as hand/shop). Reading `card.value.enhancement` renders blank lines and hides Standard-pack modifiers from the LLM.
+
+**Gotcha — pack skip is not a refund:** Buying a booster spends money immediately. In `SMODS_BOOSTER_OPENED`, skipping takes no card and does not refund the purchase. Strategy/GAMESTATE/TOOLS guidance must say the cost is already spent and prefer taking upside unless there is a skip-payoff joker (e.g. Red Card) or every option is actively harmful. Do not imply that skipping after purchase saves money.
+
 ### Relationship with BalatroBot
 
 **BalatroBot** is a Lua mod that runs inside the Balatro game and exposes a JSON-RPC 2.0 HTTP API for programmatic control.
