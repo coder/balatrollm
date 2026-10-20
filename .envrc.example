@@ -43,6 +43,7 @@
 # LLM provider settings.
 # export BALATROLLM_BASE_URL="https://openrouter.ai/api/v1" # default: https://openrouter.ai/api/v1
 # export BALATROLLM_API_KEY="sk-..." # default: unset
+# export BALATROLLM_API="chat" # default: chat (chat|responses|anthropic)
 
 # Views server toggle (0/1). Set to 1 to enable.
 # export BALATROLLM_VIEWS=0 # default: 0

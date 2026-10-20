@@ -65,7 +65,8 @@ class Bot:
 
         self._llm = LLMClient(
             base_url=self.config.base_url,
-            api_key=self.config.api_key or "",
+            api_key=self.config.api_key,
+            api=self.config.api,
         )
         await self._llm.__aenter__()
 

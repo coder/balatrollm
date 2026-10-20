@@ -275,7 +275,7 @@ class Collector:
 
         # Track tokens and cost for batch.json
         if response is not None and response.status_code == 200:
-            usage = response.body.get("usage", {})
+            usage = response.body.get("usage") or {}
             self._total_tokens += (usage.get("prompt_tokens", 0) or 0) + (
                 usage.get("completion_tokens", 0) or 0
             )
@@ -408,7 +408,7 @@ class Collector:
                 if "provider" in body:
                     provider_counts[body["provider"]] += 1
 
-                usage = body.get("usage", {})
+                usage = body.get("usage") or {}
                 input_tokens.append(usage.get("prompt_tokens", 0))
                 output_tokens.append(usage.get("completion_tokens", 0))
                 total_costs.append(usage.get("cost", 0))

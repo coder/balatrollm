@@ -42,6 +42,12 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("--port", type=int, help="Starting port")
     parser.add_argument("--base-url", help="LLM API base URL")
     parser.add_argument("--api-key", help="LLM API key")
+    parser.add_argument(
+        "--api",
+        choices=["chat", "responses", "anthropic"],
+        help="LLM API: chat (Chat Completions), responses (OpenAI Responses API) "
+        "or anthropic (Anthropic Messages API)",
+    )
 
     # CLI-only
     parser.add_argument("--dry-run", action="store_true", help="Show tasks only")

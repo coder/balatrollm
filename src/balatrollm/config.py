@@ -8,6 +8,8 @@ from typing import Any, Self
 
 import yaml
 
+from .llm import API, VALID_APIS
+
 STRATEGIES_DIR = Path(__file__).parent / "strategies"
 
 
@@ -40,6 +42,7 @@ ENV_MAP: dict[str, str] = {
     "port": "BALATROLLM_PORT",
     "base_url": "BALATROLLM_BASE_URL",
     "api_key": "BALATROLLM_API_KEY",
+    "api": "BALATROLLM_API",
     "views": "BALATROLLM_VIEWS",
 }
 
@@ -49,7 +52,7 @@ ENV_MAP: dict[str, str] = {
 
 BOOL_FIELDS: frozenset[str] = frozenset({"views"})
 LIST_FIELDS: frozenset[str] = frozenset({"model", "seed", "deck", "stake", "strategy"})
-STRING_FIELDS: frozenset[str] = frozenset({"host", "base_url", "api_key"})
+STRING_FIELDS: frozenset[str] = frozenset({"host", "base_url", "api_key", "api"})
 INT_FIELDS: frozenset[str] = frozenset({"parallel", "port"})
 
 ################################################################################
@@ -187,8 +190,10 @@ class Config:
     # Connection
     host: str = "127.0.0.1"
     port: int = 12346
-    base_url: str = "https://openrouter.ai/api/v1"
+    # None: OpenRouter for chat/responses, Anthropic API for anthropic
+    base_url: str | None = None
     api_key: str | None = None
+    api: API = "chat"
 
     # Model config (merged with DEFAULT_MODEL_CONFIG)
     model_config: dict[str, Any] = field(default_factory=dict)
@@ -231,6 +236,9 @@ class Config:
 
         if self.port < 1 or self.port > 65535:
             raise ValueError("port must be between 1 and 65535")
+
+        if self.api not in VALID_APIS:
+            raise ValueError(f"Invalid api: {self.api}. Valid: {VALID_APIS}")
 
         for deck in self.deck:
             if deck not in VALID_DECKS:

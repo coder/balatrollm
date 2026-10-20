@@ -80,8 +80,9 @@ model_config:
 | `--parallel N`        | `BALATROLLM_PARALLEL` | `1`                            | Concurrent game instances                           |
 | `--host HOST`         | `BALATROLLM_HOST`     | `127.0.0.1`                    | BalatroBot host                                     |
 | `--port PORT`         | `BALATROLLM_PORT`     | `12346`                        | Starting port                                       |
-| `--base-url URL`      | `BALATROLLM_BASE_URL` | `https://openrouter.ai/api/v1` | LLM API base URL                                    |
+| `--base-url URL`      | `BALATROLLM_BASE_URL` | `https://openrouter.ai/api/v1` | LLM API base URL (Anthropic API for `anthropic`)    |
 | `--api-key KEY`       | `BALATROLLM_API_KEY`  | *None*                         | LLM API key                                         |
+| `--api API`           | `BALATROLLM_API`      | `chat`                         | LLM API: `chat`, `responses` or `anthropic`         |
 | `--views`             | `BALATROLLM_VIEWS`    | `False`                        | Enable views HTTP server (set `BALATROLLM_VIEWS=1`) |
 | `--dry-run`           | -                     | `False`                        | Show tasks without executing                        |
 
@@ -89,6 +90,18 @@ model_config:
 
     `balatrollm` starts/stops Balatro instances automatically via `balatrobot`. With `--parallel N`, it spawns instances on ports `--port` through `--port + N - 1` (`port..port+parallel-1`).
     When using `--parallel N`, N workers are spawned. In order to fully utilize you have to have more tasks than workers. Check out th number of tasks that will be created using the `--dry-run` option.
+
+!!! note "Chat Completions vs Responses API"
+
+    By default BalatroLLM calls `/v1/chat/completions`, which works with OpenRouter and most OpenAI-compatible providers. Some newer OpenAI models (e.g. `gpt-6.1-sol`, `gpt-6-astra`) only support function tools with reasoning on `/v1/responses`. Use `--api responses` (or `api: responses` in YAML) for those. Requests are translated internally, so strategies, `TOOLS.json` and the run output format are unchanged. Set reasoning with `model_config.reasoning.effort`. Chat-only params such as `seed` are rejected with this API. With `--base-url https://api.openai.com/v1`, use the `openai/` prefix (e.g. `openai/gpt-6.1-sol`): it is stripped before calling OpenAI, and runs are stored under `runs/.../openai/<model>/`, matching BalatroBench.
+
+!!! note "Anthropic Messages API"
+
+    `--api anthropic` calls Claude models directly through the official `anthropic` SDK. Use the `anthropic/` prefix in the model name (e.g. `anthropic/claude-haiku-5-5`): it is stripped before calling the API, and runs are stored under `runs/.../anthropic/<model>/`, matching BalatroBench. If no API key is configured, the SDK reads `ANTHROPIC_API_KEY`. Set reasoning with `model_config.reasoning.effort`; thinking summaries are stored as `message.reasoning`.
+
+!!! note "Cost of direct OpenAI and Anthropic calls"
+
+    OpenRouter reports the cost of each request. The OpenAI and Anthropic APIs don't, so for `--api responses` (on `api.openai.com`) and `--api anthropic` the cost is estimated from the per-model prices in `src/balatrollm/pricing.py` and stored in the same `usage.cost` fields BalatroBench reads, marked `cost_details.estimated: true`. Models without a listed price get no cost.
 
 !!! note "Multiple Values"
 
@@ -114,6 +127,12 @@ balatrollm config/example.yaml
 # Run with configuration file via environment variable
 export BALATROLLM_CONFIG="config/example.yaml"
 balatrollm
+
+# Run an OpenAI model through the Responses API
+balatrollm --api responses --base-url https://api.openai.com/v1 --model openai/gpt-6.1-sol
+
+# Run a Claude model through the Anthropic Messages API (reads ANTHROPIC_API_KEY)
+balatrollm --api anthropic --model anthropic/claude-haiku-5-5
 
 # Run with config file and override specific options
 balatrollm config/example.yaml --model openai/gpt-5 --seed BBBBBBB

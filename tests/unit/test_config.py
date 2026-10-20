@@ -411,3 +411,40 @@ parallel: 2
         config = Config.load(yaml_path=yaml_file, args=args)
         assert config.model == ["openai/gpt-4"]  # From YAML
         assert config.parallel == 8  # From args (override)
+
+
+# ============================================================================
+# Test api option
+# ============================================================================
+
+
+class TestApiOption:
+    """Tests for the api (chat/responses) config option."""
+
+    def test_default_is_chat(self) -> None:
+        """Chat Completions is the default API."""
+        assert Config().api == "chat"
+
+    def test_invalid_api_raises(self) -> None:
+        """Unknown api values are rejected."""
+        config = Config(model=["m"], api="bogus")  # type: ignore[arg-type]
+        with pytest.raises(ValueError, match="Invalid api"):
+            config.validate()
+
+    def test_load_from_env(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """BALATROLLM_API sets the api."""
+        monkeypatch.setenv("BALATROLLM_API", "responses")
+        assert Config.load().api == "responses"
+
+    def test_load_from_yaml(self, tmp_path: Path) -> None:
+        """api can be set in YAML."""
+        yaml_file = tmp_path / "config.yaml"
+        yaml_file.write_text("model: m\napi: responses\n")
+        assert Config.load(yaml_path=yaml_file).api == "responses"
+
+    def test_cli_overrides_yaml(self, tmp_path: Path) -> None:
+        """--api overrides the YAML value."""
+        yaml_file = tmp_path / "config.yaml"
+        yaml_file.write_text("model: m\napi: chat\n")
+        args = Namespace(api="responses")
+        assert Config.load(yaml_path=yaml_file, args=args).api == "responses"

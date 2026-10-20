@@ -89,3 +89,8 @@ model_config:
 
 # LLM API key (prefer env var BALATROLLM_API_KEY)
 # api_key: sk-...
+
+# LLM API: chat (/v1/chat/completions, default), responses (OpenAI /v1/responses)
+# or anthropic (Anthropic Messages API, reads ANTHROPIC_API_KEY).
+# Use responses for OpenAI models that only support tools there (e.g. gpt-6.1-sol).
+# api: chat
